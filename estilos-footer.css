@@ -1,7 +1,7 @@
 
 footer{
     width: 100%;
-    position: absolute;
+    position: bottom;
     background: lightskyblue;
     padding: 100px 0 30px;
     font-size: 13px;
