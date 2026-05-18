@@ -1,0 +1,93 @@
+
+footer{
+    width: 100%;
+    position: absolute;
+    background: lightskyblue;
+    padding: 100px 0 30px;
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.footer-form{
+    padding-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid;
+    margin-bottom: 50px;
+}
+
+.footer-input-icon{
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.footer-form-button{
+    background: transparent;
+    border: 0;
+    outline: none;
+    cursor: pointer;
+    font-size: 16px;
+
+}
+
+.footer-form input{
+    width: 100%;
+    background: transparent;
+    color: black;
+    border: 0;
+    outline: none;
+}
+
+
+.social-icons .fa {
+  width: 40px;
+  height: 40px;
+  font-size: 40px !important;
+  color: blueviolet;
+}
+
+
+.row{
+    width: 85%;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+
+}
+
+.colu{
+    flex-basis: 25%;
+    padding: 10px;
+}
+
+.colu h3{
+    width: fit-content;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.logo{
+    width: 80px;
+    margin-bottom: 30px;
+}
+
+.email-contact{
+    width: fit-content;
+    border-bottom: 1px solid black;
+    margin: 20px 0;
+}
+
+ul li{
+    list-style: none;
+    margin-bottom: 12px;
+}
+
+ul li a{
+    text-decoration: none;
+    color: black;
+}
+
+
