@@ -1,17 +1,110 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
-    <title>VuelaSeguro</title>
-  </head>
-  <body>
- <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
-  </body>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VuelaSeguro</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cielo:       #2c7fc4;
+      --cielo-claro: #4a9fd4;
+      --gris:        #8a9ab0;
+      --gris-claro:  #b8c6d8;
+      --blanco-real: #ffffff;
+      --blanco:      #eaf3fc;
+      --fondo:       #18283c;
+      --borde:       rgba(74, 159, 212, 0.28);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--fondo); color: var(--blanco); }
+    .header-wrapper { background: var(--fondo); padding: 1.5rem 0 0 0; }
+    .navbar-custom { margin: 0 2rem; padding-bottom: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
+    .logo-wrap {  width: 115px;  height: 115px;  border-radius: 50%; border: 3px solid var(--cielo-claro); background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; position: relative; }
+    .logo-vuela { width: 100%; height: 100%; object-fit: cover; }
+    .nav-links { background: var(--blanco-real); border: 1px solid var(--borde); border-radius: 12px; padding: 0.5rem; display: flex; flex: 1; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+    .nav-links a { flex: 1; text-align: center; color: var(--gris); font-size: 0.9rem; font-weight: 500; padding: 0.7rem 0; border-radius: 8px; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+    .nav-links a:hover { color: var(--cielo); background: rgba(44,127,196,0.05); }
+    .nav-links a.active { color: #fff; background: var(--cielo); }
+    .nav-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+    .foto-perfil { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--cielo-claro); background: #0091ff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; overflow: hidden; }
+    .btn-registro { background: var(--cielo); border: none; color: #fff; border-radius: 9px; padding: 0.55rem 1.6rem; font-size: 0.9rem; font-weight: 600; white-space: nowrap; cursor: pointer; flex-shrink: 0; transition: all 0.2s; }
+    .btn-registro:hover { background: var(--cielo-claro); }
+    .filtro-bar { margin: 1.5rem 2rem; background: rgba(255,255,255,0.04); border: 1px solid var(--borde); border-radius: 14px; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .filtro-titulo { font-size: 0.84rem; font-weight: 600; color: var(--gris-claro); white-space: nowrap; flex-shrink: 0; }
+    .filtro-input, .fecha-container { flex: 1; min-width: 140px; }
+    .filtro-input { background: var(--blanco-real); border: 1px solid var(--borde); border-radius: 9px; color: #333; font-family: 'DM Sans', sans-serif; font-size: 0.84rem; padding: 0.5rem 0.9rem; outline: none; }
+    .filtro-input::placeholder { color: var(--gris); }
+    .fecha-container { position: relative; background: var(--blanco-real); border: 1px solid var(--borde); border-radius: 9px; display: flex; align-items: center; padding: 0.5rem 0.9rem; }
+    .fecha-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .fecha-espejo { display: flex; justify-content: space-between; width: 100%; font-size: 0.84rem; color: var(--gris); pointer-events: none; }
+    .fecha-espejo .label-texto { color: var(--gris); display: flex; align-items: center; gap: 0.4rem; }
+    .btn-buscar { background: var(--cielo); border: none; color: #fff; border-radius: 9px; padding: 0.5rem 1.6rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+  <div class="header-wrapper">
+    <nav class="navbar-custom">
+      <div class="logo-wrap">
+        <img src="./logo-vuelaseguro.png" alt="Logo VuelaSeguro">
+      </div>
+      <div class="nav-links">
+        <a href="#" class="active">Inicio</a>
+        <a href="#">Vuelos</a>
+        <a href="#">Novedades</a>
+        <a href="#">Promociones</a>
+      </div>
+      <div class="nav-right">
+        <div class="foto-perfil" title="Foto de perfil">
+      <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="21" cy="10" r="9" fill="#ffffff"/>
+        <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
+      </svg>
+        </div>
+        <button class="btn-registro">Registrarse</button>
+      </div>
+    </nav>
+  </div>
+  <div class="filtro-bar">
+    <span class="filtro-titulo">Filtrar vuelos</span>
+    <input class="filtro-input" type="text" placeholder="Origen"/>
+    <input class="filtro-input" type="text" placeholder="Destino"/>
+    <div class="fecha-container">
+      <div class="fecha-espejo" id="espejoIda">
+        <span>dd/mm/aaaa</span>
+        <span class="label-texto">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg>
+          - Ida
+        </span>
+      </div>
+      <input class="fecha-input" type="date" id="fechaIda" onchange="actualizarFecha(this, 'espejoIda', '- Ida')" onclick="this.showPicker()"/>
+    </div>
+    <div class="fecha-container">
+      <div class="fecha-espejo" id="espejoVuelta">
+        <span>dd/mm/aaaa</span>
+        <span class="label-texto">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg>
+          - Vuelta
+        </span>
+      </div>
+      <input class="fecha-input" type="date" id="fechaVuelta" onchange="actualizarFecha(this, 'espejoVuelta', '- Vuelta')" onclick="this.showPicker()"/>
+    </div>
+    <input class="filtro-input" type="text" placeholder="Pasajeros"/>
+    <button class="btn-buscar">Buscar</button>
+  </div>
+  <script>
+    function actualizarFecha(input, espejoId, labelTexto) {
+      const espejo = document.getElementById(espejoId);
+      if (input.value) {
+        const partes = input.value.split('-');
+        const fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+        espejo.innerHTML = `<span style="color: #333;">${fechaFormateada}</span><span class="label-texto" style="color: var(--gris);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg> ${labelTexto}</span>`;
+      } else {
+        espejo.innerHTML = `<span>dd/mm/aaaa</span><span class="label-texto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg> ${labelTexto}</span>`;
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
