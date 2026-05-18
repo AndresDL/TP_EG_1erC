@@ -1,0 +1,82 @@
+:root {
+      --azul:    #0a2463;
+      --azul-m:  #1e4db7;
+      --azul-cl: #3d9be9;
+      --acento:  #f7b731;
+      --fondo:   #f0f4fb;
+      --texto:   #1a1a2e;
+      --gris:    #e8eef7;
+      --blanco:  #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--fondo);
+      color: var(--texto);
+      margin: 0;
+    }
+
+    .novedades-section { 
+      background-color: rgb(243, 244, 245); 
+      padding: 3rem 0; 
+    }
+
+    .novedad-card {
+      background-color: var(--blanco);
+      border-radius: 13px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(10,36,99,.07);
+      height: 100%; 
+      display: flex;
+      flex-direction: column; 
+      border-top: 4px solid var(--azul-cl);
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .novedad-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(10,36,99,.13);
+    }
+
+    .novedad-card.destacada { border-top-color: var(--acento); }
+    .novedad-card.alerta    { border-top-color: #e74c3c; }
+
+    .badge-nov {
+      display: inline-block; font-size: .68rem; font-weight: 700;
+      letter-spacing: .5px; padding: .22rem .65rem; border-radius: 20px;
+      margin-bottom: 1rem; align-self: flex-start;
+    }
+
+    .badge-imp  { background: #fff0cc; color: #9a6800; }
+    .badge-info { background: #e0eeff; color: #1549a8; }
+    .badge-alt  { background: #ffe0e0; color: #c0392b; }
+    .badge-gen  { background: #e8f5e9; color: #2e7d32; }
+
+    .nov-titulo-card {
+      font-family: 'Sora', sans-serif; font-weight: 700;
+      font-size: 1rem; color: var(--azul);
+      margin-bottom: .5rem; line-height: 1.35;
+    }
+
+    .nov-texto {
+      font-size: .85rem; color: #4a5568;
+      line-height: 1.55; 
+      margin-bottom: 1rem; 
+      flex-grow: 1; 
+    }
+
+    .nov-fecha {
+      font-size: .75rem; color: #9aabbf;
+      display: flex; align-items: center; gap: .3rem;
+      margin-top: auto; 
+      flex-wrap: wrap;
+    }
+
+    .nov-vence {
+      font-size: .7rem; background: #fff0cc; color: #9a6800;
+      border-radius: 20px; padding: .15rem .55rem;
+      display: inline-flex; align-items: center; gap: .25rem; 
+      margin-left: auto; 
+    }
