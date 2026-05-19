@@ -8,6 +8,7 @@
       --blanco:      #eaf3fc;
       --fondo:       #18283c;
       --borde:       rgba(74, 159, 212, 0.28);
+      --negro:       #000000;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'DM Sans', sans-serif; background: var(--fondo); color: var(--blanco); }
@@ -15,10 +16,10 @@
     .navbar-custom { margin: 0 2rem; padding-bottom: 1.5rem; display: flex; align-items: center; gap: 1.5rem; }
     .logo-wrap {  width: 115px;  height: 115px;  border-radius: 50%; border: 3px solid var(--cielo-claro); background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; position: relative; }
     .logo-vuela { width: 100%; height: 100%; object-fit: cover; }
-    .nav-links { background: var(--blanco-real); border: 1px solid var(--borde); border-radius: 12px; padding: 0.5rem; display: flex; flex: 1; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+    .nav-links { background: var(--cielo); border: 1px solid var(--borde); border-radius: 12px; padding: 0.5rem; display: flex; flex: 1; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
     .nav-links a { flex: 1; text-align: center; color: var(--gris); font-size: 0.9rem; font-weight: 500; padding: 0.7rem 0; border-radius: 8px; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
-    .nav-links a:hover { color: var(--cielo); background: rgba(44,127,196,0.05); }
-    .nav-links a.active { color: #fff; background: var(--cielo); }
+    .nav-links a:hover { color: var(--gris-claro); background: rgba(44,127,196,0.05); }
+    .nav-links a.active { color: var(--blanco); background: var(--cielo); }
     .nav-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
     .foto-perfil { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--cielo-claro); background: #0091ff; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; overflow: hidden; }
     .btn-registro { background: var(--cielo); border: none; color: #fff; border-radius: 9px; padding: 0.55rem 1.6rem; font-size: 0.9rem; font-weight: 600; white-space: nowrap; cursor: pointer; flex-shrink: 0; transition: all 0.2s; }
@@ -27,9 +28,9 @@
     .filtro-titulo { font-size: 0.84rem; font-weight: 600; color: var(--gris-claro); white-space: nowrap; flex-shrink: 0; }
     .filtro-input, .fecha-container { flex: 1; min-width: 140px; }
     .filtro-input { background: var(--blanco-real); border: 1px solid var(--borde); border-radius: 9px; color: #333; font-family: 'DM Sans', sans-serif; font-size: 0.84rem; padding: 0.5rem 0.9rem; outline: none; }
-    .filtro-input::placeholder { color: var(--gris); }
+    .filtro-input::placeholder { color: var(--negro); }
     .fecha-container { position: relative; background: var(--blanco-real); border: 1px solid var(--borde); border-radius: 9px; display: flex; align-items: center; padding: 0.5rem 0.9rem; }
     .fecha-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
     .fecha-espejo { display: flex; justify-content: space-between; width: 100%; font-size: 0.84rem; color: var(--gris); pointer-events: none; }
-    .fecha-espejo .label-texto { color: var(--gris); display: flex; align-items: center; gap: 0.4rem; }
+    .fecha-espejo .label-texto { color: var(--negro); display: flex; align-items: center; gap: 0.4rem; }
     .btn-buscar { background: var(--cielo); border: none; color: #fff; border-radius: 9px; padding: 0.5rem 1.6rem; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
