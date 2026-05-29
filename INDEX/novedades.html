@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novedades</title>
+  
+  <!-- Bootstrap CSS (Asegúrate de incluirlo si no lo tienes en el head) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+ <link rel="stylesheet" href="estilos-novedades.css">
+ <link rel="stylesheet" href="estilos-navbar.css">
+ <link rel="stylesheet" href="estilos-footer.css">
+<body>
+<header>
+  <!-- Barra de navegación -->
+  <section class="navbar-section">
+    <div class="header-wrapper">
+      <nav class="navbar-custom">
+        <div class="logo-wrap">
+          <img src="./logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+        </div>
+        <div class="nav-links">
+          <a href="#" class="active">Inicio</a>
+          <a href="#">Vuelos</a>
+          <a href="#">Novedades</a>
+          <a href="#">Promociones</a>
+        </div>
+        <div class="nav-right">
+          <div class="foto-perfil" title="Foto de perfil">
+        <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="21" cy="10" r="9" fill="#ffffff"/>
+          <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
+        </svg>
+          </div>
+          <button class="btn-registro">Registrarse</button>
+        </div>
+      </nav>
+    </div>
+    <script>
+      function actualizarFecha(input, espejoId, labelTexto) {
+        const espejo = document.getElementById(espejoId);
+        if (input.value) {
+          const partes = input.value.split('-');
+          const fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+          espejo.innerHTML = `<span style="color: #333;">${fechaFormateada}</span><span class="label-texto" style="color: var(--gris);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg> ${labelTexto}</span>`;
+        } else {
+          espejo.innerHTML = `<span>dd/mm/aaaa</span><span class="label-texto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg> ${labelTexto}</span>`;
+        }
+      }
+    </script>
+  </section>
+</header>
+  <div class="container">
+  <h1 class="text-center m-0" style="font-family: 'Sora', sans-serif; font-weight: 700;">Novedades</h1>
+</div>
+<br>
+<br>
+    <div class="container">
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+<!-- Novedad predeterminada importante -->
+        <div class="col">
+          <div class="novedad-card destacada"> 
+            <span class="badge-nov badge-imp"><i class="bi bi-star-fill me-1"></i>Importante</span>
+            <div class="nov-titulo-card">Mantenimiento programado – Aeropuerto Internacional Rosario</div>
+            <p class="nov-texto">
+              Debido a tareas de mantenimiento en la pista principal, el aeropuerto permanecerá
+              parcialmente operativo los días 20 y 21 de mayo. Los vuelos afectados serán
+              reprogramados con 48 hs de anticipación.
+            </p>
+            <div class="nov-fecha">
+              <span><i class="bi bi-calendar3"></i> 14/05/2026</span>
+              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 25/05</span>
+            </div>
+          </div>
+        </div>
+ <!-- Novedad Alerta predeterminada -->
+        <div class="col">
+          <div class="novedad-card alerta">
+            <span class="badge-nov badge-alt"><i class="bi bi-cloud-lightning me-1"></i>Alerta</span>
+            <div class="nov-titulo-card">Alerta climática – Rutas patagónicas</div>
+            <p class="nov-texto">
+              Condiciones meteorológicas adversas podrían generar demoras o cancelaciones en vuelos
+              con destino a Bariloche, Ushuaia y El Calafate durante la semana del 19 al 23 de mayo.
+            </p>
+            <div class="nov-fecha">
+              <span><i class="bi bi-calendar3"></i> 12/05/2026</span>
+              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 23/05</span>
+            </div>
+          </div>
+        </div>       
+       <!-- Novedad Informativa predeterminada -->
+        <div class="col">
+          <div class="novedad-card">
+            <span class="badge-nov badge-info">Informativa</span>
+            <div class="nov-titulo-card">Check-in online disponible hasta 48 hs antes del vuelo</div>
+            <p class="nov-texto">
+              Desde esta semana los pasajeros pueden hacer el check-in online hasta 48 horas antes
+              del vuelo, para todas las aerolíneas registradas en la plataforma.
+            </p>
+            <div class="nov-fecha">
+              <span><i class="bi bi-calendar3"></i> 10/05/2026</span>
+              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 10/08</span>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="novedad-card destacada"> 
+            <span class="badge-nov badge-imp"><i class="bi bi-star-fill me-1"></i>Importante</span>
+            <div class="nov-titulo-card">Novedad 4</div>
+            <p class="nov-texto">
+              Blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla
+            </p>
+            <div class="nov-fecha">
+              <span><i class="bi bi-calendar3"></i> 14/05/2026</span>
+              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 25/05</span>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="novedad-card alerta">
+            <span class="badge-nov badge-alt"><i class="bi bi-cloud-lightning me-1"></i>Alerta</span>
+            <div class="nov-titulo-card">Alerta climática – Rutas patagónicas</div>
+            <p class="nov-texto">
+              Condiciones meteorológicas adversas podrían generar demoras o cancelaciones en vuelos
+              con destino a Bariloche, Ushuaia y El Calafate durante la semana del 19 al 23 de mayo.
+            </p>
+            <div class="nov-fecha">
+              <span><i class="bi bi-calendar3"></i> 12/05/2026</span>
+              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 23/05</span>
+            </div>
+          </div>
+        </div>  
+           <div class="col">
+          <div class="novedad-card">
+            <span class="badge-nov badge-info">Informativa</span>
+            <div class="nov-titulo-card">Check-in online disponible hasta 48 hs antes del vuelo</div>
+            <p class="nov-texto">
+              Desde esta semana los pasajeros pueden hacer el check-in online hasta 48 horas antes
+              del vuelo, para todas las aerolíneas registradas en la plataforma.
+            </p>
+            <div class="nov-fecha">
+              <span><i class="bi bi-calendar3"></i> 10/05/2026</span>
+              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 10/08</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div> 
+    </div> 
+    </div> 
+
+    <!-- Paginación -->
+  <div class="container" class="pagination">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      <nav class="pagination" class="mx-auto" aria-label="Page navigation example">
+  <ul class="pagination" style="justify-content: center; margin-top: 30px;">
+    <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
+    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+    <li class="page-item"><a class="page-link" href="#">2</a></li>
+    <li class="page-item"><a class="page-link" href="#">3</a></li>
+    <li class="page-item"><a class="page-link" href="#">Siguiente</a></li>
+  </ul>
+</nav>
+    </div>
+  </div>
+ 
+
+<footer>
+  <section class="footer-section">
+    <footer>
+      <div class="row">
+          <div class="colu">
+            <img src="logo-vuelaseguro.png" alt="AVION" class="logo">
+            <p>NBA home blowouts are especially soul crushing because the DJ just keeps firing up instrumentals from 2005 rap songs while your team misses its 11th consecutive three</p>
+          </div>
+
+          <div class="colu">
+            <h3>Oficinas</h3>
+            <p>Zeballos 1341</p>
+            <p>Santa Fe, Rosario</p>
+            <p>Codigo postal 2000, Argentina</p>
+            <p class="email-contact">andres2000adl@gmail.com</p>
+            <p>+54-9-341-6754321</p>
+          </div>
+            
+          <div class="colu">
+            <h3>Links</h3>
+            <ul>
+              <li><a href="https://www.frro.utn.edu.ar/">Sobre nosotros</a></li>
+              <li><a href="">Vuelos</a></li>
+              <li><a href="">Novedades</a></li>
+              <li><a href="">Promociones</a></li>
+            </ul>
+          </div>
+
+          <div class="colu">
+            <h3>Newsletter</h3>
+            <form class="footer-form">
+              <img src="envelope.png" alt="jijo" class="footer-input-icon">
+              <input type="email" placeholder="Ingrese su mail">
+              <button type="button" class="footer-form-button">Enviar</button>
+            </form>
+            <div class="social-icons">
+              <i class="bi bi-facebook"></i>
+              <i class="fa-brands fa-square-x-twitter"></i>
+              <i class="fa-brands fa-whatsapp"></i>
+            </div>
+          </div>
+      </div>
+    </footer>
+  </section>
+ 
+</footer>
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
