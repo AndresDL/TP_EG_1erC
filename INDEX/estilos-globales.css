@@ -49,6 +49,12 @@ body {
     gap: 1.5rem;
 }
 
+.breadcrumb{
+    justify-content: left;
+    height: 1px;
+    margin-left: 20px;
+}
+
 .logo-wrap {
     width: 115px;
     height: 115px;
