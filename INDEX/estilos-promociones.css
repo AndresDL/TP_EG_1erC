@@ -1,50 +1,111 @@
-.promociones-section{
-    background-color: var(--azul-m);
+/* =========================
+   SECCIÓN PROMOCIONES (INDEX)
+========================== */
+ 
+.promociones-section {
+    padding: 30px 25px;
     margin: 40px auto;
-    padding: 30px; 
-    width: 50%;
-    box-shadow: 0px 0px 10px #000000;
+    max-width: 900px;
 }
-
-.promociones-section h2{
-    color: #1a1a2e;
-    font-size: 32px;
-    font-weight: bold;
+ 
+.promociones-section h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--azul-oscuro);
+    margin-bottom: 20px;
 }
-
-.contenedor-carousel{
-    width: 50%;
-    margin: auto;
+ 
+/* CONTENEDOR CAROUSEL */
+ 
+.contenedor-carousel {
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ffffff;
 }
-
-.carousel-item img{
-    height: 420px;
+ 
+/* Bootstrap ya pone position:relative en .carousel,
+   las flechas se posicionan sobre la imagen correctamente */
+ 
+/* IMÁGENES */
+ 
+.carousel-item img {
+    height: 380px;
     object-fit: cover;
-    border-radius: 20px;
+    width: 100%;
 }
-
-.carousel-caption{
-    background: rgba(0,0,0,0.45);
-    border-radius: 15px;
-    padding: 20px;
+ 
+/* CAPTION */
+ 
+.carousel-caption {
+    background: rgba(24, 40, 60, 0.65);
+    border-radius: 12px;
+    padding: 16px 20px;
     bottom: 20px;
+    left: 20px;
+    right: 20px;
+    text-align: left;
 }
-
-.carousel-caption h3{
-    font-size: 28px;
-    font-weight: bold;
+ 
+.carousel-caption h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #ffffff;
 }
-
-.carousel-caption p{
-    font-size: 18px;
+ 
+.carousel-caption p {
+    font-size: 0.95rem;
+    color: #ffffff;
+    margin-bottom: 4px;
 }
-
-.carousel-caption span{
-    font-size: 15px;
-    color: #d7e7ff;
+ 
+.carousel-caption span {
+    font-size: 0.82rem;
+    color: #cbd5e0;
 }
-
-.promociones-section:hover{
-    box-shadow: 0px 0px 30px #0a1f3c;
-    transition: 0.3s;
+ 
+/* CONTROLES — flechas a los costados */
+ 
+.carousel-control-prev,
+.carousel-control-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    background: var(--azul);
+    border-radius: 50%;
+    opacity: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+ 
+.carousel-control-prev {
+    left: 12px;
+}
+ 
+.carousel-control-next {
+    right: 12px;
+}
+ 
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    opacity: 0.85;
+}
+ 
+/* =========================
+   RESPONSIVE
+========================== */
+ 
+@media (max-width: 900px) {
+    .promociones-section {
+        padding: 20px 15px;
+    }
+ 
+    .carousel-item img {
+        height: 240px;
+    }
+}
+ 
