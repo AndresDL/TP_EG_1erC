@@ -1,7 +1,3 @@
-/* =========================
-   SECCIÓN PROMOCIONES (INDEX)
-========================== */
- 
 .promociones-section {
     padding: 30px 25px;
     margin: 40px auto;
@@ -15,8 +11,6 @@
     margin-bottom: 20px;
 }
  
-/* CONTENEDOR CAROUSEL */
- 
 .contenedor-carousel {
     border: 1px solid var(--borde);
     border-radius: 16px;
@@ -24,18 +18,11 @@
     background: #ffffff;
 }
  
-/* Bootstrap ya pone position:relative en .carousel,
-   las flechas se posicionan sobre la imagen correctamente */
- 
-/* IMÁGENES */
- 
 .carousel-item img {
     height: 380px;
     object-fit: cover;
     width: 100%;
 }
- 
-/* CAPTION */
  
 .carousel-caption {
     background: rgba(24, 40, 60, 0.65);
@@ -65,8 +52,6 @@
     color: #cbd5e0;
 }
  
-/* CONTROLES — flechas a los costados */
- 
 .carousel-control-prev,
 .carousel-control-next {
     position: absolute;
@@ -94,10 +79,6 @@
 .carousel-control-next:hover {
     opacity: 0.85;
 }
- 
-/* =========================
-   RESPONSIVE
-========================== */
  
 @media (max-width: 900px) {
     .promociones-section {
