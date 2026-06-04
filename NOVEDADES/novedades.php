@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novedades</title>
+  
+  <!-- Bootstrap CSS (Asegúrate de incluirlo si no lo tienes en el head) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  
+  <!--Links de estilos-->
+  <link href="../INDEX/estilos-globales.css" rel="stylesheet">
+  <link href= novedades.css rel="stylesheet">
+
+</head>
+
+<body>
+<header>
+  <!-- Barra de navegación -->
+  <section class="navbar-section">
+    <div class="header-wrapper">
+      <nav class="navbar-custom">
+        <div class="logo-wrap">
+          <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+        </div>
+        <div class="nav-links">
+          <a href="../INDEX/index.html">Inicio</a>
+          <a href="../VUELOS/vuelos.html">Vuelos</a>
+          <a href="../NOVEDADES/novedades.html" class="active">Novedades</a>
+          <a href="../PROMOCIONES/promociones.html">Promociones</a>
+        </div>
+        <div class="nav-right">
+          <div class="foto-perfil" title="Foto de perfil">
+        <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="21" cy="10" r="9" fill="#ffffff"/>
+          <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
+        </svg>
+          </div>
+          <button class="btn-registro">Registrarse</button>
+        </div>
+      </nav>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="../INDEX/index.html">Inico</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Novedades</li>
+        </ol>
+      </nav>
+    </div>
+    <script>
+      function actualizarFecha(input, espejoId, labelTexto) {
+        const espejo = document.getElementById(espejoId);
+        if (input.value) {
+          const partes = input.value.split('-');
+          const fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+          espejo.innerHTML = `<span style="color: #333;">${fechaFormateada}</span><span class="label-texto" style="color: var(--gris);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg> ${labelTexto}</span>`;
+        } else {
+          espejo.innerHTML = `<span>dd/mm/aaaa</span><span class="label-texto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg> ${labelTexto}</span>`;
+        }
+      }
+    </script>
+  </section>
+</header>
+<div class="container novedades-container">
+  <h1 class="text-center m-0" style="font-family: 'Sora', sans-serif; font-weight: 700;">Novedades</h1>
+</div>
+<br>
+<br>
+    <div class="container">
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+<!-- Novedad predeterminada importante -->
+        <div class="col">
+          <div class="novedad-card destacada"> 
+            <span class="badge-nov badge-imp"><i class="bi bi-star-fill me-1"></i>Importante</span>
+            <div class="nov-titulo-card">Mantenimiento programado – Aeropuerto Internacional Rosario</div>
+            <p class="nov-texto">
+              Debido a tareas de mantenimiento en la pista principal, el aeropuerto permanecerá
+              parcialmente operativo los días 20 y 21 de mayo. Los vuelos afectados serán
+              reprogramados con 48 hs de anticipación.
+            </p>
+            <div class="nov-fecha">
+              <span><i class="bi bi-calendar3"></i> 14/05/2026</span>
+              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 25/05</span>
+            </div>
+          </div>
+        </div>
+ <!-- Novedad Alerta predeterminada -->
+        <div class="col">
+          <div class="novedad-card alerta">
+            <span class="badge-nov badge-alt"><i class="bi bi-cloud-lightning me-1"></i>Alerta</span>
+            <div class="nov-titulo-card">Alerta climática – Rutas patagónicas</div>
+            <p class="nov-texto">
+              Condiciones meteorológicas adversas podrían generar demoras o cancelaciones en vuelos
+              con destino a Bariloche, Ushuaia y El Calafate durante la semana del 19 al 23 de mayo.
+            </p>
+            <div class="nov-fecha">
+              <span><i class="bi bi-calendar3"></i> 12/05/2026</span>
+              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 23/05</span>
+            </div>
+          </div>
+        </div>       
+       <!-- Novedad Informativa predeterminada -->
+        <div class="col">
+          <div class="novedad-card">
+            <span class="badge-nov badge-info">Informativa</span>
+            <div class="nov-titulo-card">Check-in online disponible hasta 48 hs antes del vuelo</div>
+            <p class="nov-texto">
+              Desde esta semana los pasajeros pueden hacer el check-in online hasta 48 horas antes
+              del vuelo, para todas las aerolíneas registradas en la plataforma.
+            </p>
+            <div class="nov-fecha">
+              <span><i class="bi bi-calendar3"></i> 10/05/2026</span>
+              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 10/08</span>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="novedad-card destacada"> 
+            <span class="badge-nov badge-imp"><i class="bi bi-star-fill me-1"></i>Importante</span>
+            <div class="nov-titulo-card">Novedad 4</div>
+            <p class="nov-texto">
+              Blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla blabla
+            </p>
+            <div class="nov-fecha">
+              <span><i class="bi bi-calendar3"></i> 14/05/2026</span>
+              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 25/05</span>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="novedad-card alerta">
+            <span class="badge-nov badge-alt"><i class="bi bi-cloud-lightning me-1"></i>Alerta</span>
+            <div class="nov-titulo-card">Alerta climática – Rutas patagónicas</div>
+            <p class="nov-texto">
+              Condiciones meteorológicas adversas podrían generar demoras o cancelaciones en vuelos
+              con destino a Bariloche, Ushuaia y El Calafate durante la semana del 19 al 23 de mayo.
+            </p>
+            <div class="nov-fecha">
+              <span><i class="bi bi-calendar3"></i> 12/05/2026</span>
+              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 23/05</span>
+            </div>
+          </div>
+        </div>  
+           <div class="col">
+          <div class="novedad-card">
+            <span class="badge-nov badge-info">Informativa</span>
+            <div class="nov-titulo-card">Check-in online disponible hasta 48 hs antes del vuelo</div>
+            <p class="nov-texto">
+              Desde esta semana los pasajeros pueden hacer el check-in online hasta 48 horas antes
+              del vuelo, para todas las aerolíneas registradas en la plataforma.
+            </p>
+            <div class="nov-fecha">
+              <span><i class="bi bi-calendar3"></i> 10/05/2026</span>
+              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 10/08</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div> 
+    </div> 
+    </div> 
+
+    <!-- PAGINACIÓN -->
+    <nav class="mt-4">
+      <ul class="pagination justify-content-center">
+        <li class="page-item"><a class="page-link" href="#">Anterior</a></li>
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">Siguiente</a></li>
+      </ul>
+    </nav>
+
+  </div>
+</nav>
+    </div>
+  </div>
+ 
+  <section class="footer-section">
+    <footer>
+      <div class="row">
+        <div class="col">
+          <h3><strong>Contactanos</strong><div class="subrayado"></div></h3>
+          <ul>
+            <li><i class="bi bi-envelope-at"></i><a>vuela@seguro.com.ar</a></li>
+            <li><i class="bi bi-whatsapp"></i><a>+54 9 341 234 5678</a></li>
+            <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.html">Formulario de Contacto</a></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3><strong>Mapa de sitio</strong><div class="subrayado"></div></h3>
+          <ul>
+            <li><a href="../INDEX/index.html">Inicio</a></li>
+            <li><a href="../VUELOS/vuelos.html">Vuelos</a></li>
+            <li><a href="../PROMOCIONES/promociones.html">Promociones</a></li>
+            <li><a href="../NOVEDADES/novedades.html">Novedades</a></li>
+            <li><a href="">Mi Perfil</a></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3><strong>Ubicación</strong><div class="subrayado"></div></h3>
+          <ul>
+            <li><a href="https://maps.app.goo.gl/UvsGpUXHgk9GkpYP9" target="_blank">Zeballos 1341</a></li>
+            <li><a href="https://maps.app.goo.gl/87YMeSLAp74gH9mc7" target="_blank">Rosario, Santa Fe</a></li>
+            <li><a href="https://maps.app.goo.gl/u94xc8o8xowqeTuz8" target="_blank">Argentina</a></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3><strong>Newsletter</strong><div class="subrayado"></div></h3>
+          <form>
+            <i class="bi bi-envelope"></i>
+            <input type="email" placeholder="Ingrese su mail">
+            <button type="submit"><i class="bi bi-arrow-return-left"></i></button>
+          </form>
+          <div class="iconos-redes">
+            <i class="bi bi-facebook"></i>
+            <i class="bi bi-instagram"></i>
+            <i class="bi bi-twitter-x"></i></i>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <p class="copyright">&copy; 2026 VuelaSeguro. Todos los derechos reservados. Licenciado bajo
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons BY 4.0</a>.
+      </p>
+    </footer>
+  </section>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
