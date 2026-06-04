@@ -20,10 +20,10 @@
           <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
         </div>
         <div class="nav-links">
-          <a href="../INDEX/index.html">Inicio</a>
-          <a href="../VUELOS/vuelos.html">Vuelos</a>
-          <a href="../NOVEDADES/novedades.html">Novedades</a>
-          <a href="../PROMOCIONES/promociones.html" class="active">Promociones</a>
+          <a href="../INDEX/index.php">Inicio</a>
+          <a href="../VUELOS/vuelos.php">Vuelos</a>
+          <a href="../NOVEDADES/novedades.php">Novedades</a>
+          <a href="../PROMOCIONES/promociones.php" class="active">Promociones</a>
         </div>
         <div class="nav-right">
           <div class="foto-perfil" title="Foto de perfil">
@@ -38,7 +38,7 @@
 
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="../INDEX/index.html">Inicio</a></li>
+          <li class="breadcrumb-item"><a href="../INDEX/index.php">Inicio</a></li>
           <li class="breadcrumb-item active" aria-current="page">Promociones</li>
         </ol>
       </nav>
@@ -129,10 +129,10 @@
         <div class="col">
           <h3><strong>Mapa de sitio</strong><div class="subrayado"></div></h3>
           <ul>
-            <li><a href="../INDEX/index.html">Inicio</a></li>
-            <li><a href="../VUELOS/vuelos.html">Vuelos</a></li>
-            <li><a href="../PROMOCIONES/promociones.html">Promociones</a></li>
-            <li><a href="../NOVEDADES/novedades.html">Novedades</a></li>
+            <li><a href="../INDEX/index.php">Inicio</a></li>
+            <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
+            <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
+            <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
             <li><a href="">Mi Perfil</a></li>
           </ul>
         </div>
