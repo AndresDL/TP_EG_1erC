@@ -36,10 +36,10 @@
           <img src="./logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
         </div>
         <div class="nav-links">
-          <a href="../INDEX/index.html" class="active">Inicio</a>
-          <a href="../VUELOS/vuelos.html">Vuelos</a>
-          <a href="../NOVEDADES/novedades.html">Novedades</a>
-          <a href="../PROMOCIONES/promociones.html">Promociones</a>
+          <a href="../INDEX/index.php" class="active">Inicio</a>
+          <a href="../VUELOS/vuelos.php">Vuelos</a>
+          <a href="../NOVEDADES/novedades.php">Novedades</a>
+          <a href="../PROMOCIONES/promociones.php">Promociones</a>
         </div>
         <div class="nav-right">
           <div class="foto-perfil" title="Foto de perfil">
@@ -210,10 +210,10 @@
         <div class="col">
           <h3><strong>Mapa de sitio</strong><div class="subrayado"></div></h3>
           <ul>
-            <li><a href="index.html">Inicio</a></li>
-            <li><a href="../VUELOS/vuelos.html">Vuelos</a></li>
-            <li><a href="../PROMOCIONES/promociones.html">Promociones</a></li>
-            <li><a href="../NOVEDADES/novedades.html">Novedades</a></li>
+            <li><a href="index.php">Inicio</a></li>
+            <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
+            <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
+            <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
             <li><a href="">Mi Perfil</a></li>
           </ul>
         </div>
