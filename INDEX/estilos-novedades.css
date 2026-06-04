@@ -163,3 +163,25 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* PAGINACIÓN */
+.pagination .page-link {
+    background: #ffffff;
+    border: 1px solid var(--borde);
+    color: var(--azul-oscuro);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    border-radius: 8px !important;
+    margin: 0 3px;
+}
+ 
+.pagination .page-link:hover {
+    background: var(--gris-claro);
+    color: var(--azul);
+}
+ 
+.pagination .active .page-link {
+    background: var(--azul);
+    border-color: var(--azul);
+    color: #ffffff;
+}
