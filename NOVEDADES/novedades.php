@@ -38,7 +38,7 @@
           <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
         </svg>
           </div>
-          <button class="btn-registro">Registrarse</button>
+          <a class="btn-registro" href="../LOGIN/login.php">Iniciar Sesión</a>
         </div>
       </nav>
       <nav aria-label="breadcrumb">

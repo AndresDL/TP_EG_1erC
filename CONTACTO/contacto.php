@@ -32,7 +32,7 @@
               <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
             </svg>
           </div>
-          <button class="btn-registro">Registrarse</button>
+          <a href="../LOGIN/login.php" class="btn-registro">Iniciar Sesión</a>
         </div>
       </nav>
  
