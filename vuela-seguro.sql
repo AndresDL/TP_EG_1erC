@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 11-06-2026 a las 15:53:02
+-- Tiempo de generación: 11-06-2026 a las 16:12:18
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -124,6 +124,12 @@ CREATE TABLE `vuelos` (
 --
 
 --
+-- Indices de la tabla `novedades`
+--
+ALTER TABLE `novedades`
+  ADD PRIMARY KEY (`codNovedad`);
+
+--
 -- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -138,6 +144,12 @@ ALTER TABLE `vuelos`
 --
 -- AUTO_INCREMENT de las tablas volcadas
 --
+
+--
+-- AUTO_INCREMENT de la tabla `novedades`
+--
+ALTER TABLE `novedades`
+  MODIFY `codNovedad` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
