@@ -1,3 +1,14 @@
+<?php
+//CONEXIÓN DB 
+session_start();
+require_once('../conexion.php');
+
+if (!isset($_SESSION['tipoUsuario']) || $_SESSION['tipoUsuario'] != 'admin') {
+    header("Location: ../USUARIO/login.php");
+    exit();
+}
+
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
