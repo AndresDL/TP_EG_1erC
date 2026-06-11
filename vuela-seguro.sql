@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 04-06-2026 a las 16:00:05
+-- Tiempo de generación: 11-06-2026 a las 15:40:47
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -45,7 +45,8 @@ CREATE TABLE `novedades` (
   `codNovedad` int(11) NOT NULL,
   `textoNovedad` text NOT NULL,
   `fechaPublicacionNovedad` date NOT NULL,
-  `fechaExpiracionNovedad` date NOT NULL
+  `fechaExpiracionNovedad` date NOT NULL,
+  `tipoNovedad` enum('Alerta','Importante','Informativa','') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -97,7 +98,8 @@ CREATE TABLE `usuarios` (
 
 INSERT INTO `usuarios` (`codUsuario`, `nombreUsuario`, `claveUsuario`, `tipoUsuario`, `emailUsuario`, `telefonoUsuario`) VALUES
 (1, 'Andres De Luca', '123', 'usuario', 'anddrers@gmail.com', '1234'),
-(2, 'Mateo', '123', 'CEO', 'mateo@gmail.com', '12345');
+(2, 'Mateo', '123', 'CEO', 'mateo@gmail.com', '12345'),
+(3, 'Lucio', 'admin123', 'admin', 'luciocasadedio.a@gmail.com', '34165678978');
 
 -- --------------------------------------------------------
 
@@ -140,7 +142,7 @@ ALTER TABLE `vuelos`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `codUsuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `codUsuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `vuelos`
