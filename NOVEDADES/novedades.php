@@ -6,7 +6,7 @@ if (!$link) {
 }
 
 $esAdmin = (isset($_SESSION['usuario']) && $_SESSION['usuario']['tipoUsuario'] === 'admin');
-$esAdmin = true; // TEMPORAL PARA TESTEO
+// $esAdmin = true; // TEMPORAL PARA TESTEO
 $mensaje = "";
 $tipo_mensaje = "";
 
