@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "../CONEXION/conexion.php";
+require_once "../conexion.inc";
 
 // ─── CONFIGURACIÓN ────────────────────────────────────────────
 define('IMG_DIR', __DIR__ . '/img/');   // carpeta donde se guardan las imágenes subidas
