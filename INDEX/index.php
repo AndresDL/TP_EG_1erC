@@ -1,5 +1,6 @@
-<!DOCTYPE html>
 <html lang="es">
+<!DOCTYPE html>
+
 <head>
   <title>VuelaSeguro</title>
 
@@ -43,7 +44,7 @@
               <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
             </svg>
           </div>
-          <a class="btn-registro" href="../LOGIN/login.php">Iniciar Sesión</a>
+          <button class="btn-registro">Registrarse</button>
         </div>
       </nav>
     </div>
@@ -91,7 +92,7 @@
     <div class="container px-3 px-md-4">
       <div class="d-flex justify-content-between align-items-end mb-4">
         <h2 class="m-0" style="color: var(--azul); font-weight: bold;">Novedades</h2>
-        <a href="novedades.html" style="font-size: .85rem; color: var(--azul-m); text-decoration: none; font-weight: 600;">
+        <a href="novedades.php" style="font-size: .85rem; color: var(--azul-m); text-decoration: none; font-weight: 600;">
           <u>Ver todas <i class="bi bi-arrow-right"></i></u>
         </a>
       </div>
@@ -199,7 +200,7 @@
           <ul>
             <li><i class="bi bi-envelope-at"></i><a>vuela@seguro.com.ar</a></li>
             <li><i class="bi bi-whatsapp"></i><a>+54 9 341 234 5678</a></li>
-            <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.php">Formulario de Contacto</a></li>
+            <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.html">Formulario de Contacto</a></li>
           </ul>
         </div>
         <div class="col">
