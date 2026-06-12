@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 11-06-2026 a las 21:08:41
+-- Tiempo de generación: 12-06-2026 a las 20:43:06
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -60,7 +60,6 @@ INSERT INTO `novedades` (`codNovedad`, `TituloNovedad`, `textoNovedad`, `fechaPu
 (3, 'Check-in online disponible hasta 48 hs antes del v', 'Desde esta semana los pasajeros pueden hacer el check-in online hasta 48 horas antes del vuelo, para todas las aerolíneas registradas en la plataforma.', '2026-05-10', '2026-08-10', 'Informativa'),
 (4, 'Nueva terminal en Ezeiza', 'A partir del mes de julio se habilitará la nueva terminal internacional del Aeropuerto de Ezeiza, lo que ampliará la capacidad de embarque y mejorará la experiencia de los pasajeros.', '2026-06-01', '2026-09-01', 'Importante'),
 (5, 'Protocolo de seguridad actualizado', 'Se actualizaron los protocolos de seguridad para el ingreso a las terminales. Se solicita a los pasajeros presentar DNI o pasaporte vigente y llegar con 2 horas de anticipación.', '2026-06-03', '2026-12-31', 'Informativa'),
-(6, 'Alerta por vientos en el NOA', 'Fuertes vientos en la región del Noroeste Argentino podrían afectar operaciones en los aeropuertos de Salta, Jujuy y Tucumán. Consulte el estado de su vuelo antes de dirigirse al aeropuerto.', '2026-06-05', '2026-06-30', 'Alerta'),
 (7, 'Descuentos especiales para jubilados', 'VuelaSeguro, en conjunto con las aerolíneas adheridas, ofrece un 15% de descuento adicional para pasajeros mayores de 60 años que presenten su credencial de jubilado al momento de la compra.', '2026-05-20', '2026-12-31', 'Informativa');
 
 -- --------------------------------------------------------
@@ -162,7 +161,7 @@ ALTER TABLE `vuelos`
 -- AUTO_INCREMENT de la tabla `novedades`
 --
 ALTER TABLE `novedades`
-  MODIFY `codNovedad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `codNovedad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
