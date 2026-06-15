@@ -1,3 +1,19 @@
+<?php
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'vuelaseguro';
+
+$link = mysqli_connect($host, $username, $password, $database);
+
+if (!$link) {
+    die("Error al conectar a la base de datos: " . mysqli_connect_error());
+}
+
+$sql = "SELECT * FROM vuelos"; 
+$result = mysqli_query($link, $sql);
+$totalVuelos = mysqli_num_rows($result);
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -114,7 +130,7 @@
 
       <div class="vuelos-header">
         <h2>Vuelos disponibles</h2>
-        <span class="vuelos-count">4 resultados</span>
+        <span class="vuelos-count"><?php echo $totalVuelos; ?></span>
       </div>
 
       <!-- VUELO 1 -->
@@ -122,7 +138,7 @@
       <div class="vuelo-card">
 
         <div class="vuelo-info">
-
+<?php if ($totalVuelos > 0) { ?>
           <div class="vuelo-aerolinea-row">
             <span class="vuelo-aerolinea">Aerolíneas Argentinas</span>
             <span class="badge-barato">MÁS BARATO</span>
@@ -155,134 +171,15 @@
           <span class="precio-valor">$89.990</span>
           <button class="btn-comprar">COMPRAR</button>
         </div>
-
-      </div>
-
-      <!-- VUELO 2 -->
-
-      <div class="vuelo-card">
-
-        <div class="vuelo-info">
-
-          <div class="vuelo-aerolinea-row">
-            <span class="vuelo-aerolinea">LATAM Argentina</span>
-          </div>
-
-          <div class="vuelo-ruta">
-
-            <div>
-              <span class="ciudad-nombre">Córdoba</span>
-              <span class="ciudad-horario">Salida: 09:15 hs</span>
-            </div>
-
-            <div>
-              <span class="ciudad-nombre">Bariloche</span>
-              <span class="ciudad-horario">Llegada: 11:35 hs</span>
-            </div>
-
-          </div>
-
-          <div class="vuelo-detalles-row">
-            <div>Pasajeros: <strong>1</strong></div>
-            <div>Duración: <strong>2h 20m</strong></div>
-            <div>Equipaje incluido: <span class="equipaje-si">✓</span></div>
-          </div>
-
-        </div>
-
-        <div class="vuelo-precio-col">
-          <span class="precio-label">PRECIO</span>
-          <span class="precio-valor">$112.500</span>
-          <button class="btn-comprar">COMPRAR</button>
-        </div>
-
-      </div>
-
-      <!-- VUELO 3 -->
-
-      <div class="vuelo-card">
-
-        <div class="vuelo-info">
-
-          <div class="vuelo-aerolinea-row">
-            <span class="vuelo-aerolinea">Flybondi</span>
-          </div>
-
-          <div class="vuelo-ruta">
-
-            <div>
-              <span class="ciudad-nombre">Rosario</span>
-              <span class="ciudad-horario">Salida: 13:30 hs</span>
-            </div>
-
-            <div>
-              <span class="ciudad-nombre">Mendoza</span>
-              <span class="ciudad-horario">Llegada: 15:40 hs</span>
-            </div>
-
-          </div>
-
-          <div class="vuelo-detalles-row">
-            <div>Pasajeros: <strong>1</strong></div>
-            <div>Duración: <strong>2h 10m</strong></div>
-            <div>Equipaje incluido: <span class="equipaje-no">✗</span></div>
-          </div>
-
-        </div>
-
-        <div class="vuelo-precio-col">
-          <span class="precio-label">PRECIO</span>
-          <span class="precio-valor">$98.200</span>
-          <button class="btn-comprar">COMPRAR</button>
-        </div>
-
-      </div>
-
-      <!-- VUELO 4 -->
-
-      <div class="vuelo-card">
-
-        <div class="vuelo-info">
-
-          <div class="vuelo-aerolinea-row">
-            <span class="vuelo-aerolinea">GOL</span>
-          </div>
-
-          <div class="vuelo-ruta">
-
-            <div>
-              <span class="ciudad-nombre">Buenos Aires</span>
-              <span class="ciudad-horario">Salida: 17:55 hs</span>
-            </div>
-
-            <div>
-              <span class="ciudad-nombre">Salta</span>
-              <span class="ciudad-horario">Llegada: 19:55 hs</span>
-            </div>
-
-          </div>
-
-          <div class="vuelo-detalles-row">
-            <div>Pasajeros: <strong>1</strong></div>
-            <div>Duración: <strong>2h 00m</strong></div>
-            <div>Equipaje incluido: <span class="equipaje-no">✗</span></div>
-          </div>
-
-        </div>
-
-        <div class="vuelo-precio-col">
-          <span class="precio-label">PRECIO</span>
-          <span class="precio-valor">$103.700</span>
-          <button class="btn-comprar">COMPRAR</button>
-        </div>
-
-      </div>
-
+       </div>
     </div>
+      <?php } else { 
+   echo "<p style='text-align: center; margin-top: 40px; color: --gris;'>No hay vuelos disponibles en este momento.</p>"; 
+} ?>
+  </div> 
+</div> 
 
-  </div>
-
-  <!-- FOOTER ORIGINAL -->
+  <!-- FOOTER -->
 
   <section class="footer-section">
     <footer>
