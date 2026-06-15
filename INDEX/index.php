@@ -8,14 +8,14 @@ $link = mysqli_connect('localhost', 'root', '', 'vuelaseguro');
 if (!$link) die("Error de conexión: " . mysqli_connect_error());
 mysqli_set_charset($link, 'utf8');
 
-// ── Últimas 3 novedades vigentes ──────────────────────────────────────────
+// Últimas 3 novedades vigentes
 $resNovedades = mysqli_query($link,
     "SELECT * FROM novedades
      WHERE fechaExpiracionNovedad >= CURDATE()
      ORDER BY fechaPublicacionNovedad DESC
      LIMIT 3");
 
-// ── 3 promociones aprobadas para el carrusel ──────────────────────────────
+// Ultimas 3 promociones aprobadas para el carrusel
 $resPromos = mysqli_query($link,
     "SELECT p.*, a.nombreAerolinea FROM promociones p
      LEFT JOIN aerolineas a ON p.codAerolinea = a.codAerolinea
@@ -89,7 +89,7 @@ function claseNovedad($tipo) {
   </nav>
 </div>
 
-<!-- ══ HERO + FILTRO ═══════════════════════════════════════════════════════ -->
+<!-- HERO + FILTRO -->
 <section class="hero">
   <h1>Tu próximo vuelo, <span style="color:#7ab4ff;">seguro y simple</span></h1>
   <p>Buscá vuelos, consultá novedades y aprovechá las mejores promociones.</p>
@@ -118,7 +118,7 @@ function claseNovedad($tipo) {
   </div>
 </section>
 
-<!-- ══ CONTENIDO PRINCIPAL ════════════════════════════════════════════════ -->
+<!-- CONTENIDO PRINCIPAL -->
 <main class="container py-5" style="max-width:1060px;">
 
   <?php
@@ -146,7 +146,7 @@ function claseNovedad($tipo) {
     </div>
   </div>
 
-  <!-- ══ NOVEDADES ══ -->
+  <!-- NOVEDADES -->
   <section class="seccion-bloque">
     <div class="seccion-titulo">
       <h2><i class="bi bi-newspaper me-2" style="color:var(--azul);"></i>Novedades</h2>
@@ -174,7 +174,7 @@ function claseNovedad($tipo) {
     <?php endif; ?>
   </section>
 
-  <!-- ══ PROMOCIONES DESTACADAS ══ -->
+  <!-- PROMOCIONES DESTACADAS -->
   <section class="seccion-bloque">
     <div class="seccion-titulo">
       <h2><i class="bi bi-tags me-2" style="color:var(--azul);"></i>Promociones Destacadas</h2>
@@ -259,7 +259,7 @@ function claseNovedad($tipo) {
 
 </main>
 
-<!-- ══ FOOTER ══════════════════════════════════════════════════════════════ -->
+<!-- FOOTER -->
 <section class="footer-section">
   <footer>
     <div class="row">

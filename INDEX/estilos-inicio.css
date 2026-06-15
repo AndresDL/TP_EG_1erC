@@ -1,4 +1,3 @@
- /* ── Hero ── */
     .hero {
         background: linear-gradient(135deg, var(--azul-oscuro) 0%, #1a3a5c 100%);
         padding: 56px 0 48px;
@@ -18,7 +17,6 @@
         margin: 0 auto 32px;
     }
 
-    /* ── Filtro hero ── */
     .filtro-hero {
         background: rgba(255,255,255,.07);
         border: 1px solid rgba(255,255,255,.18);
@@ -108,7 +106,7 @@
     }
     .seccion-titulo a:hover { text-decoration: underline; }
 
-    /* ── Carrusel mejorado ── */
+    /* Carrusel mejorado */
     .promo-carousel-wrap {
         border-radius: 20px;
         overflow: hidden;
@@ -185,7 +183,6 @@
         border-radius: 4px;
     }
 
-    /* Placeholder sin imagen */
     .promo-placeholder {
         height: 420px;
         display: flex;
@@ -197,7 +194,6 @@
         gap: 10px;
     }
 
-    /* ── Stats strip ── */
     .stats-strip {
         background: var(--blanco);
         border: 1px solid var(--borde);
@@ -223,7 +219,6 @@
         color: var(--gris);
     }
 
-    /* Espaciado secciones */
     .seccion-bloque {
         padding: 44px 0;
         border-top: 1px solid var(--borde);
