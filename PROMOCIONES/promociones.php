@@ -4,20 +4,19 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Conexión directa (igual que el test que funcionó)
+// Conexión directa
 $link = mysqli_connect('localhost', 'root', '', 'vuelaseguro');
 if (!$link) die("Error de conexión: " . mysqli_connect_error());
 mysqli_set_charset($link, 'utf8');
 
-// ── ROLES ──────────────────────────────────────────────────────────────────
-// Leemos sesión; si no hay sesión activa, usamos modo prueba
+// ROLES 
+// Leo sesión; si no hay sesión activa, uso modo prueba
 $usuario     = isset($_SESSION['usuario']) ? $_SESSION['usuario'] : null;
 $tipoUsuario = $usuario ? $usuario['tipoUsuario'] : 'no_registrado';
 $codUsuario  = $usuario ? (int)$usuario['codUsuario'] : 0;
 
-// ═══════════════════════════════════════════════════════════════
-// MODO PRUEBA — descomentá la línea del rol que querés testear
-// Comentalas todas cuando el login esté listo
+
+// MODO PRUEBA — descomentár la línea del rol que voy a testear
 // ═══════════════════════════════════════════════════════════════
 // $tipoUsuario = 'no_registrado'; $codUsuario = 0;
 //  $tipoUsuario = 'CEO';           $codUsuario = 2;
@@ -32,7 +31,7 @@ $esUsuario = ($tipoUsuario === 'usuario');
 $mensaje      = "";
 $tipo_mensaje = "";
 
-// ── SUBIR IMAGEN ──────────────────────────────────────────────────────────
+// SUBIR IMAGEN
 function guardarImagen($campo) {
     if (empty($_FILES[$campo]['name'])) return '';
     $ext = strtolower(pathinfo($_FILES[$campo]['name'], PATHINFO_EXTENSION));
@@ -43,7 +42,7 @@ function guardarImagen($campo) {
     return move_uploaded_file($_FILES[$campo]['tmp_name'], $destino) ? 'img/' . $nombre : '';
 }
 
-// ── POST: CREAR PROMOCIÓN (CEO) ────────────────────────────────────────────
+// POST: CREAR PROMOCIÓN (CEO)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_promo']) && $esCEO) {
     $descripcion  = mysqli_real_escape_string($link, trim($_POST['descripcionPromocion'] ?? ''));
     $descuento    = (float)($_POST['descuentoPromocion'] ?? 0);
@@ -80,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_promo']) && $es
     }
 }
 
-// ── POST: EDITAR PROMOCIÓN (CEO) ───────────────────────────────────────────
+// POST: EDITAR PROMOCIÓN (CEO)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_promo']) && $esCEO) {
     $id          = (int)$_POST['id'];
     $descripcion = mysqli_real_escape_string($link, trim($_POST['descripcionPromocion'] ?? ''));
@@ -105,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_promo']) && $e
     }
 }
 
-// ── POST: DAR DE BAJA (CEO) ────────────────────────────────────────────────
+// POST: DAR DE BAJA (CEO) 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['baja_promo']) && $esCEO) {
     $id    = (int)$_POST['id'];
     $check = mysqli_query($link, "SELECT codPromocion FROM promociones WHERE codPromocion=$id AND codCEO=$codUsuario AND estadoPromocion='aprobada'");
@@ -117,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['baja_promo']) && $esC
     }
 }
 
-// ── POST: APROBAR / RECHAZAR (ADMIN) ──────────────────────────────────────
+// POST: APROBAR / RECHAZAR (ADMIN)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aprobar_promo']) && $esAdmin) {
     $id = (int)$_POST['id'];
     mysqli_query($link, "UPDATE promociones SET estadoPromocion='aprobada' WHERE codPromocion=$id");
@@ -129,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rechazar_promo']) && 
     $mensaje = "Promoción rechazada."; $tipo_mensaje = "danger";
 }
 
-// ── PAGINACIÓN Y FILTRO ────────────────────────────────────────────────────
+// PAGINACIÓN Y FILTRO 
 $porPagina    = 4;
 $paginaActual = max(1, (int)($_GET['pagina'] ?? 1));
 $busqueda     = mysqli_real_escape_string($link, trim($_GET['buscar'] ?? ''));
@@ -455,7 +454,7 @@ function estadoBadge($estado) {
 
 </main>
 
-<!-- ═══ MODAL CREAR PROMO (CEO) ═══════════════════════════════════════════ -->
+<!-- MODAL CREAR PROMO (CEO)-->
 <?php if ($esCEO): ?>
 <div class="modal fade" id="modalCrearPromo" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -570,7 +569,7 @@ function estadoBadge($estado) {
 </div>
 <?php endif; ?>
 
-<!-- ═══ MODAL PENDIENTES (ADMIN) ══════════════════════════════════════════ -->
+<!-- MODAL PENDIENTES (ADMIN)-->
 <?php if ($esAdmin): ?>
 <div class="modal fade" id="modalPendientes" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl">
