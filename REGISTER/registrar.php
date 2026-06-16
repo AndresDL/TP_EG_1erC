@@ -1,3 +1,52 @@
+<?php
+
+  include_once('../conexion.inc');
+
+  if($_SERVER['REQUEST_METHOD'] === 'POST'){
+
+    $validarQuery = 'SELECT emailUsuario FROM usuarios WHERE emailUsuario = ?';
+
+    $email = $_POST['email'];
+
+    $stmt = mysqli_prepare($link, $validarQuery);
+
+    mysqli_stmt_bind_param($stmt, "s", $email);
+
+    mysqli_stmt_execute($stmt);
+
+    $rta = mysqli_stmt_get_result($stmt);
+
+    $row = mysqli_fetch_assoc($rta);
+
+    mysqli_stmt_close($stmt);
+
+    if ($row) {
+
+      echo 'error';
+
+    } else {
+        echo 'Email disponible, continuar con el registro.';
+
+        $hashedPassword = password_hash($_POST['clave'], PASSWORD_BCRYPT);
+
+        $fullname = "{$_POST['nombre1']} {$_POST['nombre2']}";
+
+        $stmt2 = mysqli_prepare($link, 
+        'INSERT INTO usuarios VALUES (NULL, ?, ?, "usuario", ?, ?)');
+
+        mysqli_stmt_bind_param($stmt2, 'ssss',
+        $fullname,
+        $hashedPassword,
+        $_POST['email'],
+        $_POST['telefono']);
+
+        mysqli_stmt_execute($stmt2);
+        
+        mysqli_stmt_close($stmt2);  
+    };
+  }
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -51,26 +100,31 @@
       <h2>Creación de cuenta</h2>
       <h4>Completá el formulario con los datos requeridos para continuar</h4>
  
-      <form action="registeradb.php" method="POST">
+      <form action="registrar.php" method="POST">
  
         <div class="mb-3">
           <label class="form-label">Nombre</label>
-          <input type="text" class="form-control" name="nombre" placeholder="Tu nombre" required>
+          <input type="text" class="form-control" name="nombre1" placeholder="Tu nombre" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Apellido</label>
+          <input type="text" class="form-control" name="nombre2" placeholder="Tu apellido" required>
         </div>
  
         <div class="mb-3">
           <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" name="clave" placeholder="Tu contraseña" >
+          <input type="password" class="form-control" name="clave" placeholder="Tu contraseña" required>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Email</label>
-          <input type="email" class="form-control" name="email" placeholder="Tu email" >
+          <input type="email" class="form-control" name="email" placeholder="Tu email" required>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Telefono</label>
-          <input type="int" class="form-control" name="telefono" placeholder="Tu telefono" >
+          <input type="int" class="form-control" name="telefono" placeholder="Tu telefono" required>
         </div>
  
         <div class="d-flex justify-content-end">
