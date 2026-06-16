@@ -126,58 +126,47 @@ $totalVuelos = mysqli_num_rows($result);
 
     <!-- LISTA VUELOS -->
 
-    <div class="vuelos-lista">
+<div class="vuelos-lista">
 
-      <div class="vuelos-header">
-        <h2>Vuelos disponibles</h2>
-        <span class="vuelos-count"><?php echo $totalVuelos; ?></span>
+  <div class="vuelos-header">
+    <h2>Vuelos disponibles</h2>
+    <span class="vuelos-count"><?php echo $totalVuelos; ?></span>
+  </div>
+
+  <?php if ($totalVuelos > 0) { ?>
+    <div class="vuelo-card">
+      <div class="vuelo-info">
+        <div class="vuelo-aerolinea-row">
+          <span class="vuelo-aerolinea">Aerolíneas Argentinas</span>
+          <span class="badge-barato">MÁS BARATO</span>
+        </div>
+        <div class="vuelo-ruta">
+          <div>
+            <span class="ciudad-nombre">Buenos Aires</span>
+            <span class="ciudad-horario">Salida: 06:45 hs</span>
+          </div>
+          <div>
+            <span class="ciudad-nombre">Mendoza</span>
+            <span class="ciudad-horario">Llegada: 08:40 hs</span>
+          </div>
+        </div>
+        <div class="vuelo-detalles-row">
+          <div>Pasajeros: <strong>1</strong></div>
+          <div>Duración: <strong>1h 55m</strong></div>
+          <div>Equipaje incluido: <span class="equipaje-si">✓</span></div>
+        </div>
       </div>
-
-      <!-- VUELO 1 -->
-
-      <div class="vuelo-card">
-
-        <div class="vuelo-info">
-<?php if ($totalVuelos > 0) { ?>
-          <div class="vuelo-aerolinea-row">
-            <span class="vuelo-aerolinea">Aerolíneas Argentinas</span>
-            <span class="badge-barato">MÁS BARATO</span>
-          </div>
-
-          <div class="vuelo-ruta">
-
-            <div>
-              <span class="ciudad-nombre">Buenos Aires</span>
-              <span class="ciudad-horario">Salida: 06:45 hs</span>
-            </div>
-
-            <div>
-              <span class="ciudad-nombre">Mendoza</span>
-              <span class="ciudad-horario">Llegada: 08:40 hs</span>
-            </div>
-
-          </div>
-
-          <div class="vuelo-detalles-row">
-            <div>Pasajeros: <strong>1</strong></div>
-            <div>Duración: <strong>1h 55m</strong></div>
-            <div>Equipaje incluido: <span class="equipaje-si">✓</span></div>
-          </div>
-
-        </div>
-
-        <div class="vuelo-precio-col">
-          <span class="precio-label">PRECIO</span>
-          <span class="precio-valor">$89.990</span>
-          <button class="btn-comprar">COMPRAR</button>
-        </div>
-       </div>
+      <div class="vuelo-precio-col">
+        <span class="precio-label">PRECIO</span>
+        <span class="precio-valor">$89.990</span>
+        <button class="btn-comprar">COMPRAR</button>
+      </div>
     </div>
-      <?php } else { 
-   echo "<p style='text-align: center; margin-top: 40px; color: --gris;'>No hay vuelos disponibles en este momento.</p>"; 
-} ?>
-  </div> 
-</div> 
+  <?php } else { ?>
+    <p style="text-align: center; margin-top: 10px; color: var(--gris); border: 1px solid var(--borde); border-radius: 8px; padding: 40px 20px; background-color: var(--gris-claro);">No hay vuelos disponibles en este momento.</p>
+  <?php } ?>
+
+</div> </div> 
 
   <!-- FOOTER -->
 
