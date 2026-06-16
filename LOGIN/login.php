@@ -1,3 +1,57 @@
+<?php
+
+  include_once('../conexion.inc');
+
+  if($_SERVER['REQUEST_METHOD'] === 'POST'){
+
+    $validarQuery = 'SELECT * FROM usuarios WHERE emailUsuario = ?';
+
+    $email = $_POST['mail'];
+
+    $clave = $_POST['clave'];
+
+    $stmt = mysqli_prepare($link, $validarQuery);
+
+    mysqli_stmt_bind_param($stmt, "s", $email);
+
+    mysqli_stmt_execute($stmt);
+
+    $rta = mysqli_stmt_get_result($stmt);
+
+    $row = mysqli_fetch_assoc($rta);
+
+    mysqli_stmt_close($stmt);
+
+    if ($row) {
+
+      $claveHash = $row['claveUsuario'];
+
+      if(password_verify($clave, $claveHash)){
+
+        $_SESSION['codUsuario'] = $row['codUsuario'];
+        
+        $_SESSION['nombreUsuario'] = $row['nombreUsuario'];
+
+        $_SESSION['tipoUsuario'] = $row['tipoUsuario'];
+
+        $_SESSION['emailUsuario'] = $row['emailUsuario'];
+
+        $_SESSION['telefonoUsuario'] = $row['telefonoUsuario'];
+
+      } else {
+
+        echo 'Contraseña incorrecta';
+
+      }
+
+    } else {
+      
+      echo 'Usuario no existente';
+
+    };
+  }
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,7 +59,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VuelaSeguro – Contacto</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
     <link rel="stylesheet" href="login.css">
@@ -52,7 +107,7 @@
       <h2>Ingresa a tu cuenta</h2>
       <h4>Completa con los datos de tu cuenta</h4>
  
-      <form action="logindb.php" method="GET">
+      <form action="login.php" method="POST">
  
         <div class="mb-3">
           <label class="form-label">Email</label>
@@ -64,7 +119,7 @@
           <input type="password" class="form-control" name="clave" placeholder="Tu contraseña" required>
         </div>
 
-        <div class="form-text" id="basic-addon4">No tenes una cuenta? <a href="../REGISTER/register.php">Registrate aquí</a></div>
+        <div class="form-text" id="basic-addon4">No tenes una cuenta? <a href="../REGISTER/registrar.php">Registrate aquí</a></div>
  
         <div class="d-flex justify-content-end">
           <button type="submit" class="btn-enviar">Enviar</button>
@@ -127,6 +182,6 @@
     </footer>
   </section>
  
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
