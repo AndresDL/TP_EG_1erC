@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 12-06-2026 a las 20:43:06
+-- Tiempo de generación: 16-06-2026 a las 19:11:11
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -99,7 +99,7 @@ CREATE TABLE `reservas` (
 CREATE TABLE `usuarios` (
   `codUsuario` int(11) NOT NULL,
   `nombreUsuario` varchar(100) DEFAULT NULL,
-  `claveUsuario` varchar(8) DEFAULT NULL,
+  `claveUsuario` varchar(255) NOT NULL,
   `tipoUsuario` varchar(20) DEFAULT NULL,
   `emailUsuario` varchar(100) DEFAULT NULL,
   `telefonoUsuario` varchar(20) DEFAULT NULL
@@ -112,7 +112,9 @@ CREATE TABLE `usuarios` (
 INSERT INTO `usuarios` (`codUsuario`, `nombreUsuario`, `claveUsuario`, `tipoUsuario`, `emailUsuario`, `telefonoUsuario`) VALUES
 (1, 'Andres De Luca', '123', 'usuario', 'anddrers@gmail.com', '1234'),
 (2, 'Mateo', '123', 'CEO', 'mateo@gmail.com', '12345'),
-(3, 'Lucio', 'admin123', 'admin', 'luciocasadedio.a@gmail.com', '34165678978');
+(3, 'Lucio', 'admin123', 'admin', 'luciocasadedio.a@gmail.com', '34165678978'),
+(4, 'Jacob Lash', '$2y$10$/', 'usuario', 'jacob@gmail.com', '31231231113213'),
+(5, 'Profesor Dynamo', '$2y$10$5uXzsFB3iuf5H4UvnnGkbuPZbkF0vOwaBu6lTl7g8LST7283O4aV2', 'usuario', 'dynamo@gmail.com', '32131231231313');
 
 -- --------------------------------------------------------
 
@@ -167,7 +169,7 @@ ALTER TABLE `novedades`
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `codUsuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `codUsuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `vuelos`
