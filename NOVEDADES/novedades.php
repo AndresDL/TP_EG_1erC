@@ -6,7 +6,7 @@ if (!$link) {
 }
 
 $esAdmin = (isset($_SESSION['usuario']) && $_SESSION['usuario']['tipoUsuario'] === 'admin');
-$esAdmin = true; // TEMPORAL PARA TESTEO
+// $esAdmin = true; // TEMPORAL PARA TESTEO
 $mensaje = "";
 $tipo_mensaje = "";
 
@@ -155,22 +155,13 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
           <a href="../PROMOCIONES/promociones.php">Promociones</a>
         </div>
         <div class="nav-right">
-          <?php if (isset($_SESSION['usuario'])): ?>
-            <span style="color:#fff; font-size:.9rem; font-weight:600; margin-right: 15px;">
-              <?= htmlspecialchars($_SESSION['usuario']['nombreUsuario']) ?>
-            </span>
-            <a href="../logout.php" class="btn-registro" style="text-decoration:none; background:#dc3545;">
-              Salir
-            </a>
-          <?php else: ?>
-            <div class="foto-perfil" title="Foto de perfil">
-              <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="21" cy="10" r="9" fill="#ffffff"/>
-                <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
-              </svg>
-            </div>
-            <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration:none; background:transparent; border:1px solid #fff;">Registrarse</a>
-          <?php endif; ?>
+          <div class="foto-perfil" title="Foto de perfil">
+        <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="21" cy="10" r="9" fill="#ffffff"/>
+          <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
+        </svg>
+          </div>
+          <a class="btn-registro" href="../LOGIN/login.php">Iniciar Sesión</a>
         </div>
       </nav>
       
