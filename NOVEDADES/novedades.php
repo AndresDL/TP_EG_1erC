@@ -141,6 +141,7 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
 
 <body>
 
+<!-- ══ NAVBAR ══════════════════════════════════════════════════════════════ -->
 <header>
   <section class="navbar-section">
     <div class="header-wrapper">
@@ -149,29 +150,29 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
           <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
         </div>
         <div class="nav-links">
-          <a href="../INDEX/index.php">Inicio</a>
+          <a href="index.php" class="active">Inicio</a>
           <a href="../VUELOS/vuelos.php">Vuelos</a>
-          <a href="novedades.php" class="active">Novedades</a>
+          <a href="../NOVEDADES/novedades.php">Novedades</a>
           <a href="../PROMOCIONES/promociones.php">Promociones</a>
         </div>
         <div class="nav-right">
-          <div class="foto-perfil" title="Foto de perfil">
-        <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="21" cy="10" r="9" fill="#ffffff"/>
-          <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
-        </svg>
-          </div>
-          <a class="btn-registro" href="../LOGIN/login.php">Iniciar Sesión</a>
+          <?php if (!empty($_SESSION)): ?>
+            <span style="color:#fff;font-size:.9rem;font-weight:600;margin-right:8px;">
+              <?= htmlspecialchars($_SESSION['nombreUsuario']) ?>
+            </span>
+            <a href="../logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Salir</a>
+          <?php else: ?>
+            <div class="foto-perfil">
+              <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="21" cy="10" r="9" fill="#ffffff"/>
+                <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
+              </svg>
+            </div>
+            <?php if(empty($_SESSION)): ?>
+              <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration:none;">Iniciar sesión</a>
+            <?php endif; ?>
+          <?php endif; ?>
         </div>
-      </nav>
-      
-      <nav aria-label="breadcrumb" style="padding: 0.5rem 2rem;">
-        <ol class="breadcrumb mb-0" style="background:transparent;">
-          <li class="breadcrumb-item">
-            <a href="../INDEX/index.php" style="color:#cbd5e0;">Inicio</a>
-          </li>
-          <li class="breadcrumb-item active" style="color:#90aecb;" aria-current="page">Novedades</li>
-        </ol>
       </nav>
     </div>
   </section>

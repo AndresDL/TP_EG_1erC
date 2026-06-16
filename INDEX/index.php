@@ -71,9 +71,9 @@ function claseNovedad($tipo) {
       <a href="../PROMOCIONES/promociones.php">Promociones</a>
     </div>
     <div class="nav-right">
-      <?php if ($usuario): ?>
+      <?php if (!empty($_SESSION)): ?>
         <span style="color:#fff;font-size:.9rem;font-weight:600;margin-right:8px;">
-          <?= htmlspecialchars($usuario['nombreUsuario']) ?>
+          <a href="../USUARIO/usuario.php">"<?= htmlspecialchars($_SESSION['nombreUsuario']) ?>"</a>
         </span>
         <a href="../logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Salir</a>
       <?php else: ?>
@@ -83,7 +83,9 @@ function claseNovedad($tipo) {
             <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
           </svg>
         </div>
-        <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration:none;">Iniciar sesión</a>
+        <?php if(empty($_SESSION)): ?>
+          <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration:none;">Iniciar sesión</a>
+        <?php endif; ?>
       <?php endif; ?>
     </div>
   </nav>
