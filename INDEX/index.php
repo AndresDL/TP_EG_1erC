@@ -1,252 +1,330 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params(['path' => '/']);
+    session_start();
+}
 
+$link = mysqli_connect('localhost', 'root', '', 'vuelaseguro');
+if (!$link) die("Error de conexión: " . mysqli_connect_error());
+mysqli_set_charset($link, 'utf8');
 
+// Últimas 3 novedades vigentes
+$resNovedades = mysqli_query($link,
+    "SELECT * FROM novedades
+     WHERE fechaExpiracionNovedad >= CURDATE()
+     ORDER BY fechaPublicacionNovedad DESC
+     LIMIT 3");
 
+// Ultimas 3 promociones aprobadas para el carrusel
+$resPromos = mysqli_query($link,
+    "SELECT p.*, a.nombreAerolinea FROM promociones p
+     LEFT JOIN aerolineas a ON p.codAerolinea = a.codAerolinea
+     WHERE p.estadoPromocion = 'aprobada'
+     ORDER BY p.codPromocion DESC
+     LIMIT 3");
 
-<html lang="es">
+$usuario     = isset($_SESSION['usuario']) ? $_SESSION['usuario'] : null;
+$tipoUsuario = $usuario ? $usuario['tipoUsuario'] : 'no_registrado';
+
+function badgeNovedad($tipo) {
+    return match($tipo) {
+        'Importante'  => '<span class="badge-nov badge-imp"><i class="bi bi-star-fill me-1"></i>Importante</span>',
+        'Alerta'      => '<span class="badge-nov badge-alt"><i class="bi bi-cloud-lightning me-1"></i>Alerta</span>',
+        'Informativa' => '<span class="badge-nov badge-info">Informativa</span>',
+        default       => '<span class="badge-nov badge-info">' . htmlspecialchars($tipo) . '</span>',
+    };
+}
+
+function claseNovedad($tipo) {
+    return match($tipo) {
+        'Importante' => 'destacada',
+        'Alerta'     => 'alerta',
+        default      => '',
+    };
+}
+?>
 <!DOCTYPE html>
-
+<html lang="es">
 <head>
-  <title>VuelaSeguro</title>
-
-  <!--Metadatos-->
+  <title>VuelaSeguro – Inicio</title>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@700&display=swap" rel="stylesheet"/>
   <link href="estilos-globales.css" rel="stylesheet">
   <link href="estilos-novedades.css" rel="stylesheet">
-  <link href="estilos-promociones.css" rel="stylesheet">
-   <style>
-    body { background: var(--gris-claro) !important; }
-  </style>
-
-  <!-- Bootstrap CSS  -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-  
+  <link href="estilos-inicio.css" rel="stylesheet">
 </head>
-
 <body>
-  <section class="navbar-section">
-    <div class="header-wrapper">
-      <nav class="navbar-custom">
-        <div class="logo-wrap">
-          <img src="./logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+
+<!-- ══ NAVBAR ══════════════════════════════════════════════════════════════ -->
+<div class="header-wrapper">
+  <nav class="navbar-custom">
+    <div class="logo-wrap">
+      <img src="./logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+    </div>
+    <div class="nav-links">
+      <a href="index.php" class="active">Inicio</a>
+      <a href="../VUELOS/vuelos.php">Vuelos</a>
+      <a href="../NOVEDADES/novedades.php">Novedades</a>
+      <a href="../PROMOCIONES/promociones.php">Promociones</a>
+    </div>
+    <div class="nav-right">
+      <?php if ($usuario): ?>
+        <span style="color:#fff;font-size:.9rem;font-weight:600;margin-right:8px;">
+          <?= htmlspecialchars($usuario['nombreUsuario']) ?>
+        </span>
+        <a href="../logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Salir</a>
+      <?php else: ?>
+        <div class="foto-perfil">
+          <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="21" cy="10" r="9" fill="#ffffff"/>
+            <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
+          </svg>
         </div>
-        <div class="nav-links">
-          <a href="../INDEX/index.php" class="active">Inicio</a>
-          <a href="../VUELOS/vuelos.php">Vuelos</a>
-          <a href="../NOVEDADES/novedades.php">Novedades</a>
-          <a href="../PROMOCIONES/promociones.php">Promociones</a>
-        </div>
-        <div class="nav-right">
-          <div class="foto-perfil" title="Foto de perfil">
-            <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="21" cy="10" r="9" fill="#ffffff"/>
-              <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
-            </svg>
+        <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration:none;">Iniciar sesión</a>
+      <?php endif; ?>
+    </div>
+  </nav>
+</div>
+
+<!-- HERO + FILTRO -->
+<section class="hero">
+  <h1>Tu próximo vuelo, <span style="color:#7ab4ff;">seguro y simple</span></h1>
+  <p>Buscá vuelos, consultá novedades y aprovechá las mejores promociones.</p>
+
+  <div class="filtro-hero">
+    <input class="filtro-input" type="text" placeholder="✈ Origen" id="origen"/>
+    <input class="filtro-input" type="text" placeholder="✈ Destino" id="destino"/>
+    <div class="fecha-wrap">
+      <div class="fecha-label" id="labelIda">
+        <span id="textoIda">Ida</span>
+        <i class="bi bi-calendar3" style="color:var(--gris);"></i>
+      </div>
+      <input type="date" onchange="setFecha(this,'textoIda','Ida')"/>
+    </div>
+    <div class="fecha-wrap">
+      <div class="fecha-label" id="labelVuelta">
+        <span id="textoVuelta">Vuelta</span>
+        <i class="bi bi-calendar3" style="color:var(--gris);"></i>
+      </div>
+      <input type="date" onchange="setFecha(this,'textoVuelta','Vuelta')"/>
+    </div>
+    <input class="filtro-input" type="number" placeholder="👤 Pasajeros" min="1" style="max-width:130px;"/>
+    <button class="btn-buscar-hero" onclick="alert('Buscador en construcción.')">
+      <i class="bi bi-search me-1"></i> Buscar
+    </button>
+  </div>
+</section>
+
+<!-- CONTENIDO PRINCIPAL -->
+<main class="container py-5" style="max-width:1060px;">
+
+  <?php
+  // Stats dinámicos desde la BD
+  $totalVuelos  = mysqli_fetch_assoc(mysqli_query($link, "SELECT COUNT(*) AS n FROM vuelos"))['n'] ?? 0;
+  $totalPromos  = mysqli_fetch_assoc(mysqli_query($link, "SELECT COUNT(*) AS n FROM promociones WHERE estadoPromocion='aprobada'"))['n'] ?? 0;
+  $totalAero    = mysqli_fetch_assoc(mysqli_query($link, "SELECT COUNT(*) AS n FROM aerolineas"))['n'] ?? 0;
+  ?>
+  <div class="stats-strip">
+    <div class="stat-item">
+      <div class="stat-num"><?= $totalVuelos ?>+</div>
+      <div class="stat-label">Vuelos disponibles</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><?= $totalAero ?>+</div>
+      <div class="stat-label">Aerolíneas</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><?= $totalPromos ?>+</div>
+      <div class="stat-label">Promociones activas</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">24/7</div>
+      <div class="stat-label">Soporte disponible</div>
+    </div>
+  </div>
+
+  <!-- NOVEDADES -->
+  <section class="seccion-bloque">
+    <div class="seccion-titulo">
+      <h2><i class="bi bi-newspaper me-2" style="color:var(--azul);"></i>Novedades</h2>
+      <a href="../NOVEDADES/novedades.php">Ver todas <i class="bi bi-arrow-right"></i></a>
+    </div>
+
+    <?php if (!$resNovedades || mysqli_num_rows($resNovedades) === 0): ?>
+      <p style="color:var(--gris);">No hay novedades vigentes por el momento.</p>
+    <?php else: ?>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        <?php while ($nov = mysqli_fetch_assoc($resNovedades)): ?>
+          <div class="col">
+            <div class="novedad-card <?= claseNovedad($nov['tipoNovedad']) ?> h-100">
+              <?= badgeNovedad($nov['tipoNovedad']) ?>
+              <div class="nov-titulo-card"><?= htmlspecialchars($nov['TituloNovedad']) ?></div>
+              <p class="nov-texto"><?= htmlspecialchars($nov['textoNovedad']) ?></p>
+              <div class="nov-fecha">
+                <span><i class="bi bi-calendar3"></i> <?= date('d/m/Y', strtotime($nov['fechaPublicacionNovedad'])) ?></span>
+                <span class="nov-vence"><i class="bi bi-clock"></i> Vence: <?= date('d/m', strtotime($nov['fechaExpiracionNovedad'])) ?></span>
+              </div>
+            </div>
           </div>
-          <button class="btn-registro">Registrarse</button>
-        </div>
-      </nav>
-    </div>
-    <div class="filtro-bar">
-      <span class="filtro-titulo">Filtrar vuelos</span>
-      <input class="filtro-input" type="text" placeholder="Origen"/>
-      <input class="filtro-input" type="text" placeholder="Destino"/>
-      <div class="fecha-container">
-        <div class="fecha-espejo" id="espejoIda">
-          <span>dd/mm/aaaa</span>
-          <span class="label-texto">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg>
-            - Ida
-          </span>
-        </div>
-        <input class="fecha-input" type="date" id="fechaIda" onchange="actualizarFecha(this, 'espejoIda', '- Ida')" onclick="this.showPicker()"/>
+        <?php endwhile; ?>
       </div>
-      <div class="fecha-container">
-        <div class="fecha-espejo" id="espejoVuelta">
-          <span>dd/mm/aaaa</span>
-          <span class="label-texto">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg>
-            - Vuelta
-          </span>
-        </div>
-        <input class="fecha-input" type="date" id="fechaVuelta" onchange="actualizarFecha(this, 'espejoVuelta', '- Vuelta')" onclick="this.showPicker()"/>
-      </div>
-      <input class="filtro-input" type="text" placeholder="Pasajeros"/>
-      <button class="btn-buscar">Buscar</button>
-    </div>
-    <script>
-      function actualizarFecha(input, espejoId, labelTexto) {
-        const espejo = document.getElementById(espejoId);
-        if (input.value) {
-          const partes = input.value.split('-');
-          const fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
-          espejo.innerHTML = `<span style="color: #333;">${fechaFormateada}</span><span class="label-texto" style="color: var(--gris);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg> ${labelTexto}</span>`;
-        } else {
-          espejo.innerHTML = `<span>dd/mm/aaaa</span><span class="label-texto"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg> ${labelTexto}</span>`;
-        }
-      }
-    </script>
+    <?php endif; ?>
   </section>
-  <section class="novedades-section" id="novedades">
-    <div class="container px-3 px-md-4">
-      <div class="d-flex justify-content-between align-items-end mb-4">
-        <h2 class="m-0" style="color: var(--azul); font-weight: bold;">Novedades</h2>
-        <a href="novedades.html" style="font-size: .85rem; color: var(--azul-m); text-decoration: none; font-weight: 600;">
-          <u>Ver todas <i class="bi bi-arrow-right"></i></u>
-        </a>
-      </div>
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
-        
-        <!-- Novedad Destacada -->
-        <div class="col">
-          <div class="novedad-card destacada"> 
-            <span class="badge-nov badge-imp"><i class="bi bi-star-fill me-1"></i>Importante</span>
-            <div class="nov-titulo-card">Mantenimiento programado – Aeropuerto Internacional Rosario</div>
-            <p class="nov-texto">
-              Debido a tareas de mantenimiento en la pista principal, el aeropuerto permanecerá
-              parcialmente operativo los días 20 y 21 de mayo. Los vuelos afectados serán
-              reprogramados con 48 hs de anticipación.
-            </p>
-            <div class="nov-fecha">
-              <span><i class="bi bi-calendar3"></i> 14/05/2026</span>
-              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 25/05</span>
-            </div>
-          </div>
-        </div>
 
-        <!-- Novedad Alerta -->
-        <div class="col">
-          <div class="novedad-card alerta">
-            <span class="badge-nov badge-alt"><i class="bi bi-cloud-lightning me-1"></i>Alerta</span>
-            <div class="nov-titulo-card">Alerta climática – Rutas patagónicas</div>
-            <p class="nov-texto">
-              Condiciones meteorológicas adversas podrían generar demoras o cancelaciones en vuelos
-              con destino a Bariloche, Ushuaia y El Calafate durante la semana del 19 al 23 de mayo.
-            </p>
-            <div class="nov-fecha">
-              <span><i class="bi bi-calendar3"></i> 12/05/2026</span>
-              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 23/05</span>
-            </div>
+  <!-- PROMOCIONES DESTACADAS -->
+  <section class="seccion-bloque">
+    <div class="seccion-titulo">
+      <h2><i class="bi bi-tags me-2" style="color:var(--azul);"></i>Promociones Destacadas</h2>
+      <a href="../PROMOCIONES/promociones.php">Ver todas <i class="bi bi-arrow-right"></i></a>
+    </div>
+
+    <?php
+    $promos = [];
+    if ($resPromos) {
+        while ($p = mysqli_fetch_assoc($resPromos)) $promos[] = $p;
+    }
+    ?>
+
+    <?php if (empty($promos)): ?>
+      <div style="background:var(--blanco);border:1px solid var(--borde);border-radius:16px;padding:48px;text-align:center;color:var(--gris);">
+        <i class="bi bi-tags fs-1 d-block mb-3" style="opacity:.3;"></i>
+        <p>No hay promociones activas por el momento.</p>
+        <a href="../PROMOCIONES/promociones.php" style="color:var(--azul);font-weight:600;">Ver sección de promociones</a>
+      </div>
+    <?php else: ?>
+      <div class="promo-carousel-wrap">
+        <div id="carouselInicio" class="carousel slide" data-bs-ride="carousel">
+
+          <!-- Indicadores -->
+          <?php if (count($promos) > 1): ?>
+          <div class="carousel-indicators">
+            <?php foreach ($promos as $i => $p): ?>
+              <button type="button" data-bs-target="#carouselInicio"
+                      data-bs-slide-to="<?= $i ?>"
+                      <?= $i === 0 ? 'class="active" aria-current="true"' : '' ?>
+                      aria-label="Promoción <?= $i+1 ?>"></button>
+            <?php endforeach; ?>
           </div>
+          <?php endif; ?>
+
+          <div class="carousel-inner">
+            <?php foreach ($promos as $i => $promo):
+              $imgSrc = '';
+              if (!empty($promo['imagenPromocion'])) {
+                  $imgSrc = htmlspecialchars($promo['imagenPromocion']);
+              }
+            ?>
+              <div class="carousel-item <?= $i === 0 ? 'active' : '' ?>">
+                <?php if ($imgSrc): ?>
+                  <img src="<?= $imgSrc ?>" alt="<?= htmlspecialchars($promo['descripcionPromocion']) ?>"
+                       onerror="this.parentElement.querySelector('.promo-placeholder').style.display='flex'; this.style.display='none';">
+                <?php endif; ?>
+                <?php if (!$imgSrc): ?>
+                  <div class="promo-placeholder">
+                    <i class="bi bi-image fs-1"></i>
+                    <span style="font-size:.9rem;">Sin imagen</span>
+                  </div>
+                <?php endif; ?>
+                <div class="carousel-caption">
+                  <span class="promo-tag"><?= number_format($promo['descuentoPromocion'], 0) ?>% OFF</span>
+                  <h3><?= htmlspecialchars($promo['nombreAerolinea'] ?? 'Promoción especial') ?></h3>
+                  <p><?= htmlspecialchars($promo['descripcionPromocion']) ?></p>
+                  <?php if (!empty($promo['vigenciaPromocion'])): ?>
+                    <div class="vigencia">
+                      <i class="bi bi-clock me-1"></i>
+                      Vigencia hasta <?= date('d/m/Y', strtotime($promo['vigenciaPromocion'])) ?>
+                    </div>
+                  <?php endif; ?>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+
+          <?php if (count($promos) > 1): ?>
+          <button class="carousel-control-prev" type="button" data-bs-target="#carouselInicio" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carouselInicio" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+          </button>
+          <?php endif; ?>
+
         </div>
-        
-        <!-- Novedad Informativa -->
-        <div class="col">
-          <div class="novedad-card">
-            <span class="badge-nov badge-info">Informativa</span>
-            <div class="nov-titulo-card">Check-in online disponible hasta 48 hs antes del vuelo</div>
-            <p class="nov-texto">
-              Desde esta semana los pasajeros pueden hacer el check-in online hasta 48 horas antes
-              del vuelo, para todas las aerolíneas registradas en la plataforma.
-            </p>
-            <div class="nov-fecha">
-              <span><i class="bi bi-calendar3"></i> 10/05/2026</span>
-              <span class="nov-vence"><i class="bi bi-clock"></i>Vence: 10/08</span>
-            </div>
-          </div>
+      </div>
+    <?php endif; ?>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<section class="footer-section">
+  <footer>
+    <div class="row">
+      <div class="col">
+        <h3><strong>Contactanos</strong><div class="subrayado"></div></h3>
+        <ul>
+          <li><i class="bi bi-envelope-at"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
+          <li><i class="bi bi-whatsapp"></i><a href="#">+54 9 341 234 5678</a></li>
+          <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.php">Formulario de Contacto</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><strong>Mapa de sitio</strong><div class="subrayado"></div></h3>
+        <ul>
+          <li><a href="index.php">Inicio</a></li>
+          <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
+          <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
+          <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
+          <li><a href="">Mi Perfil</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><strong>Ubicación</strong><div class="subrayado"></div></h3>
+        <ul>
+          <li><a href="https://maps.app.goo.gl/UvsGpUXHgk9GkpYP9" target="_blank">Zeballos 1341</a></li>
+          <li><a href="https://maps.app.goo.gl/87YMeSLAp74gH9mc7" target="_blank">Rosario, Santa Fe</a></li>
+          <li><a href="https://maps.app.goo.gl/u94xc8o8xowqeTuz8" target="_blank">Argentina</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><strong>Newsletter</strong><div class="subrayado"></div></h3>
+        <form>
+          <i class="bi bi-envelope"></i>
+          <input type="email" placeholder="Ingrese su mail">
+          <button type="submit"><i class="bi bi-arrow-return-left"></i></button>
+        </form>
+        <div class="iconos-redes">
+          <i class="bi bi-facebook"></i>
+          <i class="bi bi-instagram"></i>
+          <i class="bi bi-twitter-x"></i>
         </div>
       </div>
     </div>
-  </section>    
+    <hr>
+    <p class="copyright">&copy; 2026 VuelaSeguro. Todos los derechos reservados. Licenciado bajo
+      <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons BY 4.0</a>.
+    </p>
+  </footer>
+</section>
 
-  <!--PROMOCIONES-->
-   <section class="promociones-section">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function setFecha(input, labelId, fallback) {
+    const el = document.getElementById(labelId);
+    if (input.value) {
+        const [y, m, d] = input.value.split('-');
+        el.textContent = d + '/' + m + '/' + y;
+        el.style.color = 'var(--azul-oscuro)';
+    } else {
+        el.textContent = fallback;
+        el.style.color = 'var(--gris)';
+    }
+}
+</script>
 
-    <h2 class="text-center mb-4"> Promociones Destacadas</h2>
-    <div class="contenedor-carousel">
-      <div id="carouselPromos" class="carousel slide" data-bs-ride="carousel" style="position:relative;">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <img src="https://www.radioromance.com/wp-content/uploads/2025/01/PATOS-1024x576.jpeg" class="d-block w-100" alt="Promo 1">
-            <div class="carousel-caption">
-              <h3>Promocion 1</h3>
-              <p>30% OFF en vuelos nacionales</p>
-              <span>Vigencia: 01/06/2026 - 30/06/2026</span>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <img src="https://verdecora.es/blog/wp-content/uploads/2025/06/cuidados-pato-casa.jpg" class="d-block w-100" alt="Promo 2">
-            <div class="carousel-caption">
-              <h3>Promocion 2</h3>
-              <p>20% OFF en vuelos nacionales</p>
-              <span>Vigencia: 03/07/2026 - 20/08/2026</span>
-            </div>
-          </div>
-          <div class="carousel-item">
-            <img src="https://findelmundo.tur.ar/imagecache/large/Anas-georgica-de-Jorge-La-Gotteria.jpg" class="d-block w-100" alt="Promo 3">
-            <div class="carousel-caption">
-              <h3>Promocion 3</h3>
-              <p>25% OFF en vuelos nacionales</p>
-              <span>Vigencia: 04/05/2026 - 22/06/2026</span>
-            </div>
-          </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselPromos" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselPromos" data-bs-slide="next">
-          <span class="carousel-control-next-icon"></span>
-        </button>
-      </div>
-    </div>
-  </section>
-  
-  <section class="footer-section">
-    <footer>
-      <div class="row">
-        <div class="col">
-          <h3><strong>Contactanos</strong><div class="subrayado"></div></h3>
-          <ul>
-            <li><i class="bi bi-envelope-at"></i><a>vuela@seguro.com.ar</a></li>
-            <li><i class="bi bi-whatsapp"></i><a>+54 9 341 234 5678</a></li>
-            <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.html">Formulario de Contacto</a></li>
-          </ul>
-        </div>
-        <div class="col">
-          <h3><strong>Mapa de sitio</strong><div class="subrayado"></div></h3>
-          <ul>
-            <li><a href="index.php">Inicio</a></li>
-            <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
-            <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
-            <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
-            <li><a href="">Mi Perfil</a></li>
-          </ul>
-        </div>
-        <div class="col">
-          <h3><strong>Ubicación</strong><div class="subrayado"></div></h3>
-          <ul>
-            <li><a href="https://maps.app.goo.gl/UvsGpUXHgk9GkpYP9" target="_blank">Zeballos 1341</a></li>
-            <li><a href="https://maps.app.goo.gl/87YMeSLAp74gH9mc7" target="_blank">Rosario, Santa Fe</a></li>
-            <li><a href="https://maps.app.goo.gl/u94xc8o8xowqeTuz8" target="_blank">Argentina</a></li>
-          </ul>
-        </div>
-        <div class="col">
-          <h3><strong>Newsletter</strong><div class="subrayado"></div></h3>
-          <form>
-            <i class="bi bi-envelope"></i>
-            <input type="email" placeholder="Ingrese su mail">
-            <button type="submit"><i class="bi bi-arrow-return-left"></i></button>
-          </form>
-          <div class="iconos-redes">
-            <i class="bi bi-facebook"></i>
-            <i class="bi bi-instagram"></i>
-          </div>
-        </div>
-      </div>
-      <hr>
-      <p class="copyright">&copy; 2026 VuelaSeguro. Todos los derechos reservados. Licenciado bajo
-        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons BY 4.0</a>.
-      </p>
-    </footer>
-  </section>
- 
-
-  <!-- Bootstrap Bundle with Popper -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<?php mysqli_close($link); ?>
 </body>
 </html>

@@ -1,3 +1,7 @@
+/* =========================
+   PROMOCIONES – estilos
+========================== */
+ 
 .promociones-wrapper {
     padding: 25px;
 }
@@ -14,6 +18,7 @@
     font-weight: 700;
 }
  
+/* ── Filtro ── */
 .promociones-filtro {
     background: var(--gris-claro);
     border: 1px solid var(--borde);
@@ -29,29 +34,37 @@
     font-size: .9rem;
 }
  
-.promociones-filtro .filtro-input-promo {
+.filtro-input-promo {
     width: 100%;
     border: 1px solid var(--borde);
     border-radius: 10px;
     padding: 12px;
     font-family: 'DM Sans', sans-serif;
-    background: #ffffff;
+    font-size: .9rem;
+    background: var(--blanco);
     outline: none;
+    transition: border-color .2s;
 }
  
+.filtro-input-promo:focus {
+    border-color: var(--azul);
+}
+ 
+/* ── Grid ── */
 .promociones-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
+    gap: 22px;
 }
-
+ 
+/* ── Card ── */
 .promo-card {
     display: flex;
     flex-direction: column;
     border: 1px solid var(--borde);
     border-radius: 16px;
     overflow: hidden;
-    background: #ffffff;
+    background: var(--blanco);
     transition: transform 0.2s, box-shadow 0.2s;
 }
  
@@ -66,6 +79,20 @@
     width: 100%;
 }
  
+/* Placeholder cuando no hay imagen */
+.promo-sin-imagen {
+    height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--gris-claro);
+    border-bottom: 1px solid var(--borde);
+    color: var(--gris);
+    gap: 6px;
+}
+ 
+/* ── Card body ── */
 .promo-card .card-body {
     padding: 20px;
     flex: 1;
@@ -77,7 +104,7 @@
 .promo-card .card-title {
     font-size: 1.1rem;
     font-weight: 700;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
  
 .promo-card .card-text {
@@ -86,34 +113,65 @@
     margin-bottom: 4px;
 }
  
+/* Descuento destacado */
+.promo-descuento {
+    display: inline-flex;
+    align-items: center;
+    background: #e8f0fe;
+    color: var(--azul);
+    border: 1px solid #b8cff8;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-weight: 700;
+    font-size: .9rem;
+    width: fit-content;
+    margin-bottom: 4px;
+}
+ 
 .promo-card .promo-vigencia {
     color: var(--gris);
     font-size: .85rem;
     border-top: 1px dashed var(--borde);
     padding-top: 10px;
-    margin-top: auto;
+    margin-top: 6px;
 }
  
+/* ── Botón solicitar ── */
 .btn-solicitar {
+    display: block;
     width: 100%;
     border: none;
     background: var(--azul);
-    color: #ffffff;
+    color: var(--blanco);
     padding: 12px;
     border-radius: 10px;
     font-weight: 700;
     margin-top: 12px;
     font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    text-align: center;
+    text-decoration: none;
     cursor: pointer;
     transition: opacity 0.2s;
 }
  
 .btn-solicitar:hover {
     opacity: 0.85;
+    color: var(--blanco);
 }
  
+/* ── Preview imagen en modal ── */
+.promo-preview-imagen {
+    border: 2px dashed var(--borde);
+    border-radius: 12px;
+    padding: 8px;
+    background: var(--gris-claro);
+    text-align: center;
+}
+ 
+/* ── Paginación ── */
 .pagination .page-link {
-    background: #ffffff;
+    background: var(--blanco);
     border: 1px solid var(--borde);
     color: var(--azul-oscuro);
     font-family: 'DM Sans', sans-serif;
@@ -130,9 +188,10 @@
 .pagination .active .page-link {
     background: var(--azul);
     border-color: var(--azul);
-    color: #ffffff;
+    color: var(--blanco);
 }
-
+ 
+/* ── Responsive ── */
 @media (max-width: 900px) {
     .navbar-custom {
         flex-direction: column;
