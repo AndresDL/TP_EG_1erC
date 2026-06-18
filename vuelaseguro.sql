@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 16-06-2026 a las 19:11:11
+-- Tiempo de generación: 18-06-2026 a las 15:20:56
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -31,9 +31,19 @@ CREATE TABLE `aerolineas` (
   `codAerolinea` int(11) NOT NULL,
   `nombreAerolinea` varchar(100) NOT NULL,
   `codigoIATA` varchar(3) NOT NULL,
-  `drescripcionAerolinea` text NOT NULL,
-  `codPais` text NOT NULL
+  `descripcionAerolinea` varchar(300) NOT NULL,
+  `codigoPais` varchar(3) NOT NULL,
+  `claveAerolinea` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `aerolineas`
+--
+
+INSERT INTO `aerolineas` (`codAerolinea`, `nombreAerolinea`, `codigoIATA`, `descripcionAerolinea`, `codigoPais`, `claveAerolinea`) VALUES
+(1, 'AndesMensuales', 'AT', 'Viajes anuales para cruzar los Andes (como San Martin)', 'AR', '$2y$10$r3H.xu7kxuXlRKGIT24HjeB3WTb1FhZZneC7tb5VNSqDp96BogIc6'),
+(2, 'Caribe Travel', 'CAT', 'Viajes al Caribe todo el año!', 'DM', '$2y$10$4PowHQETityXhU/Ic0IvSOarynf5VUHvordcyLfYK2mH6Vy8ManCe'),
+(5, 'Cabos Sueltos', 'CBD', 'Viajes a Cabo Verde, le empatamos a ESPAÑA en la copa del mundo!', 'CV', '$2y$10$SFGoaNNijcmHev015SItaugfKO.pN8dPxhw1JaQXxDqKOUvjloUj2');
 
 -- --------------------------------------------------------
 
@@ -47,7 +57,7 @@ CREATE TABLE `novedades` (
   `textoNovedad` text NOT NULL,
   `fechaPublicacionNovedad` date NOT NULL,
   `fechaExpiracionNovedad` date NOT NULL,
-  `tipoNovedad` enum('Alerta','Importante','Informativa','') NOT NULL
+  `tipoNovedad` enum('Alerta','Importante','Informativa') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -60,7 +70,8 @@ INSERT INTO `novedades` (`codNovedad`, `TituloNovedad`, `textoNovedad`, `fechaPu
 (3, 'Check-in online disponible hasta 48 hs antes del v', 'Desde esta semana los pasajeros pueden hacer el check-in online hasta 48 horas antes del vuelo, para todas las aerolíneas registradas en la plataforma.', '2026-05-10', '2026-08-10', 'Informativa'),
 (4, 'Nueva terminal en Ezeiza', 'A partir del mes de julio se habilitará la nueva terminal internacional del Aeropuerto de Ezeiza, lo que ampliará la capacidad de embarque y mejorará la experiencia de los pasajeros.', '2026-06-01', '2026-09-01', 'Importante'),
 (5, 'Protocolo de seguridad actualizado', 'Se actualizaron los protocolos de seguridad para el ingreso a las terminales. Se solicita a los pasajeros presentar DNI o pasaporte vigente y llegar con 2 horas de anticipación.', '2026-06-03', '2026-12-31', 'Informativa'),
-(7, 'Descuentos especiales para jubilados', 'VuelaSeguro, en conjunto con las aerolíneas adheridas, ofrece un 15% de descuento adicional para pasajeros mayores de 60 años que presenten su credencial de jubilado al momento de la compra.', '2026-05-20', '2026-12-31', 'Informativa');
+(7, 'Descuentos especiales para jubilados', 'VuelaSeguro, en conjunto con las aerolíneas adheridas, ofrece un 15% de descuento adicional para pasajeros mayores de 60 años que presenten su credencial de jubilado al momento de la compra.', '2026-05-20', '2026-12-31', 'Informativa'),
+(11, 'Los knicks ganan las finales de la nba ', 'SI VIAJAS A NUEVA YOL TENE MUCHO CUIDADO', '2026-06-17', '2026-06-18', 'Alerta');
 
 -- --------------------------------------------------------
 
@@ -87,7 +98,7 @@ CREATE TABLE `reservas` (
   `codUsuario` int(11) NOT NULL,
   `codVuelo` int(11) NOT NULL,
   `fechaReserva` date NOT NULL,
-  `estadoReserva` varchar(20) NOT NULL
+  `estadoReserva` enum('Pendiente de pago','Confirmada') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -114,7 +125,8 @@ INSERT INTO `usuarios` (`codUsuario`, `nombreUsuario`, `claveUsuario`, `tipoUsua
 (2, 'Mateo', '123', 'CEO', 'mateo@gmail.com', '12345'),
 (3, 'Lucio', 'admin123', 'admin', 'luciocasadedio.a@gmail.com', '34165678978'),
 (4, 'Jacob Lash', '$2y$10$/', 'usuario', 'jacob@gmail.com', '31231231113213'),
-(5, 'Profesor Dynamo', '$2y$10$5uXzsFB3iuf5H4UvnnGkbuPZbkF0vOwaBu6lTl7g8LST7283O4aV2', 'usuario', 'dynamo@gmail.com', '32131231231313');
+(5, 'Profesor Dynamo', '$2y$10$5uXzsFB3iuf5H4UvnnGkbuPZbkF0vOwaBu6lTl7g8LST7283O4aV2', 'usuario', 'dynamo@gmail.com', '32131231231313'),
+(6, 'admin admin', '$2y$10$USzA2JI.UcRN2PMMiKK6sOjKHr.fZIp77oM0z9QKeOtNQvh2iKAPi', 'admin', 'admin@gmail.com', '12345');
 
 -- --------------------------------------------------------
 
@@ -136,6 +148,12 @@ CREATE TABLE `vuelos` (
 --
 -- Índices para tablas volcadas
 --
+
+--
+-- Indices de la tabla `aerolineas`
+--
+ALTER TABLE `aerolineas`
+  ADD PRIMARY KEY (`codAerolinea`);
 
 --
 -- Indices de la tabla `novedades`
@@ -160,16 +178,22 @@ ALTER TABLE `vuelos`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `aerolineas`
+--
+ALTER TABLE `aerolineas`
+  MODIFY `codAerolinea` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
 -- AUTO_INCREMENT de la tabla `novedades`
 --
 ALTER TABLE `novedades`
-  MODIFY `codNovedad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `codNovedad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `codUsuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `codUsuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `vuelos`
