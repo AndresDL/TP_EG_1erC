@@ -4,9 +4,11 @@
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
-    $validarQuery = 'SELECT emailUsuario FROM usuarios WHERE emailUsuario = ?';
+    $validarQuery = 'SELECT * FROM aerolineas WHERE nombreAerolinea = ?';
 
-    $email = $_POST['email'];
+    $email = $_POST['nombre'];
+
+    $clave = $_POST['clave'];
 
     $stmt = mysqli_prepare($link, $validarQuery);
 
@@ -22,27 +24,32 @@
 
     if ($row) {
 
-      echo 'error';
+      $claveHash = $row['claveAerolinea'];
+
+      if(password_verify($clave, $claveHash)){
+
+        $_SESSION['codUsuario'] = $row['codAerolinea'];
+        
+        $_SESSION['nombreUsuario'] = $row['nombreAerolinea'];
+
+        $_SESSION['tipoUsuario'] = 'CEO';
+
+        $_SESSION['codigoIATA'] = $row['codigoIATA'];
+
+        $_SESSION['codigoPais'] = $row['codigoPais'];
+
+        header('Location: ../INDEX/index.php');
+
+      } else {
+
+        echo 'Contraseña incorrecta';
+
+      }
 
     } else {
-      $hashedPassword = password_hash($_POST['clave'], PASSWORD_BCRYPT);
-
-      $fullname = "{$_POST['nombre1']} {$_POST['nombre2']}";
-
-      $stmt2 = mysqli_prepare($link, 
-      'INSERT INTO usuarios VALUES (NULL, ?, ?, "usuario", ?, ?)');
-
-      mysqli_stmt_bind_param($stmt2, 'ssss',
-      $fullname,
-      $hashedPassword,
-      $_POST['email'],
-      $_POST['telefono']);
-
-      mysqli_stmt_execute($stmt2);
       
-      mysqli_stmt_close($stmt2);  
+      echo 'Usuario no existente';
 
-      header('Location: ../LOGIN/login.php');
     };
   }
 ?>
@@ -54,12 +61,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VuelaSeguro – Contacto</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
-    <link rel="stylesheet" href="register.css">
+    <link rel="stylesheet" href="../CONTACTO/contacto.css">
 </head>
 <body>
+ 
   <!-- NAVBAR -->
   <section class="navbar-section">
     <div class="header-wrapper">
@@ -80,14 +89,14 @@
               <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
             </svg>
           </div>
-          <button class="btn-registro"><a href="../LOGIN/login.php" style="text-decoration: none; color: white;">Iniciar sesión</a></button>
+          <button class="btn-registro">Iniciar sesión</button>
         </div>
       </nav>
  
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="../INDEX/index.php">Inicio</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Crear cuenta</li>
+          <li class="breadcrumb-item active" aria-current="page">Inicio de sesión aerolinea</li>
         </ol>
       </nav>
     </div>
@@ -97,34 +106,19 @@
  
     <div class="contacto-form-card">
  
-      <h2>Creación de cuenta</h2>
-      <h4>Completá el formulario con los datos requeridos para continuar</h4>
+      <h2>Ingresa a la cuenta de tu aerolinea</h2>
+      <h4>Completa con los datos de la cuenta</h4>
  
-      <form action="registrar.php" method="POST">
+      <form action="aerolinea-login.php" method="POST">
  
         <div class="mb-3">
-          <label class="form-label">Nombre</label>
-          <input type="text" class="form-control" name="nombre1" placeholder="Tu nombre" required>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Apellido</label>
-          <input type="text" class="form-control" name="nombre2" placeholder="Tu apellido" required>
+          <label class="form-label">Nombre de aerolinea</label>
+          <input type="text" class="form-control" name="nombre" placeholder="Nombre de la aerolinea" required>
         </div>
  
         <div class="mb-3">
           <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" name="clave" placeholder="Tu contraseña" required>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-control" name="email" placeholder="Tu email" required>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Telefono</label>
-          <input type="int" class="form-control" name="telefono" placeholder="Tu telefono" required>
+          <input type="password" class="form-control" name="clave" placeholder="Contraseña proveida por administrador" required>
         </div>
  
         <div class="d-flex justify-content-end">
@@ -188,6 +182,6 @@
     </footer>
   </section>
  
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

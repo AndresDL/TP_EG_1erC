@@ -36,7 +36,7 @@ body {
    NAVBAR
 ========================== */
 
- .header-wrapper {
+.header-wrapper {
     background: var(--azul-oscuro);
     padding: 1.5rem 0 0 0;
 }
@@ -53,6 +53,7 @@ body {
     justify-content: left;
     height: 1px;
     margin-left: 20px;
+    color: black;
 }
 
 .logo-wrap {
