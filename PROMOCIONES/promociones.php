@@ -1,13 +1,9 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_set_cookie_params(['path' => '/']);
-    session_start();
+$link = null;
+include_once('../conexion.inc');
+if (!$link) {
+    die("Error de conexión a la base de datos.");
 }
-
-// Conexión directa
-$link = mysqli_connect('localhost', 'root', '', 'vuelaseguro');
-if (!$link) die("Error de conexión: " . mysqli_connect_error());
-mysqli_set_charset($link, 'utf8');
 
 // ROLES 
 // Leo sesión; si no hay sesión activa, uso modo prueba
@@ -214,16 +210,19 @@ function estadoBadge($estado) {
     <div class="nav-links">
       <a href="../INDEX/index.php">Inicio</a>
       <a href="../VUELOS/vuelos.php">Vuelos</a>
-      <a href="../NOVEDADES/novedades.php">Novedades</a>
-      <a href="promociones.php" class="active">Promociones</a>
+      <a href="../NOVEDADES/novedades.php"  >Novedades</a>
+      <a href="../PROMOCIONES/promociones.php" class="active">Promociones</a>
     </div>
     <div class="nav-right">
-      <?php if ($usuario): ?>
-        <span style="color:#fff;font-size:.9rem;font-weight:600;margin-right:12px;">
-          <?= htmlspecialchars($usuario['nombreUsuario']) ?>
-          <span style="font-size:.75rem;opacity:.75;">(<?= htmlspecialchars($tipoUsuario) ?>)</span>
-        </span>
-        <a href="../logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Salir</a>
+      <?php if (!empty($_SESSION)): ?>
+          <div class="foto-perfil">
+              <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="21" cy="10" r="9" fill="#ffffff"/>
+                <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
+              </svg>
+          </div>
+        <span class="text-white me-2"><a href="../PERFIL/perfiles.php" style="text-decoration: none; color: white">Hola, <strong><?php echo htmlspecialchars($_SESSION['nombreUsuario']); ?><a></strong></span>
+        <a href="../LOGIN/logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Cerrar sesion</a>
       <?php else: ?>
         <div class="foto-perfil">
           <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
@@ -231,15 +230,18 @@ function estadoBadge($estado) {
             <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
           </svg>
         </div>
-        <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration:none;">Iniciar sesión</a>
+        <?php if(empty($_SESSION)): ?>
+          <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration:none;">Iniciar sesión</a>
+        <?php endif; ?>
       <?php endif; ?>
     </div>
   </nav>
-  <nav aria-label="breadcrumb" style="padding:.5rem 2rem;">
-    <ol class="breadcrumb mb-0" style="background:transparent;">
-      <li class="breadcrumb-item"><a href="../INDEX/index.php" style="color:#cbd5e0;">Inicio</a></li>
-      <li class="breadcrumb-item active" style="color:#90aecb;">Promociones</li>
-    </ol>
+
+  <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="../INDEX/index.php">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Promociones</li>
+      </ol>
   </nav>
 </div>
 
@@ -642,7 +644,7 @@ function estadoBadge($estado) {
         <ul>
           <li><i class="bi bi-envelope-at"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
           <li><i class="bi bi-whatsapp"></i><a href="#">+54 9 341 234 5678</a></li>
-          <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.html">Formulario de Contacto</a></li>
+          <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.php">Formulario de Contacto</a></li>
         </ul>
       </div>
       <div class="col">
