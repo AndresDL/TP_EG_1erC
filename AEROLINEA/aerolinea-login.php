@@ -4,9 +4,9 @@
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
-    $validarQuery = 'SELECT * FROM usuarios WHERE emailUsuario = ?';
+    $validarQuery = 'SELECT * FROM aerolineas WHERE nombreAerolinea = ?';
 
-    $email = $_POST['mail'];
+    $email = $_POST['nombre'];
 
     $clave = $_POST['clave'];
 
@@ -24,19 +24,19 @@
 
     if ($row) {
 
-      $claveHash = $row['claveUsuario'];
+      $claveHash = $row['claveAerolinea'];
 
       if(password_verify($clave, $claveHash)){
 
-        $_SESSION['codUsuario'] = $row['codUsuario'];
+        $_SESSION['codUsuario'] = $row['codAerolinea'];
         
-        $_SESSION['nombreUsuario'] = $row['nombreUsuario'];
+        $_SESSION['nombreUsuario'] = $row['nombreAerolinea'];
 
-        $_SESSION['tipoUsuario'] = $row['tipoUsuario'];
+        $_SESSION['tipoUsuario'] = 'CEO';
 
-        $_SESSION['emailUsuario'] = $row['emailUsuario'];
+        $_SESSION['codigoIATA'] = $row['codigoIATA'];
 
-        $_SESSION['telefonoUsuario'] = $row['telefonoUsuario'];
+        $_SESSION['codigoPais'] = $row['codigoPais'];
 
         header('Location: ../INDEX/index.php');
 
@@ -65,7 +65,7 @@
     <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="../CONTACTO/contacto.css">
 </head>
 <body>
  
@@ -96,7 +96,7 @@
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="../INDEX/index.php">Inicio</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Inicio de sesión</li>
+          <li class="breadcrumb-item active" aria-current="page">Inicio de sesión aerolinea</li>
         </ol>
       </nav>
     </div>
@@ -106,24 +106,20 @@
  
     <div class="contacto-form-card">
  
-      <h2>Ingresa a tu cuenta</h2>
-      <h4>Completa con los datos de tu cuenta</h4>
+      <h2>Ingresa a la cuenta de tu aerolinea</h2>
+      <h4>Completa con los datos de la cuenta</h4>
  
-      <form action="login.php" method="POST">
+      <form action="aerolinea-login.php" method="POST">
  
         <div class="mb-3">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-control" name="mail" placeholder="Tu email" required>
+          <label class="form-label">Nombre de aerolinea</label>
+          <input type="text" class="form-control" name="nombre" placeholder="Nombre de la aerolinea" required>
         </div>
  
         <div class="mb-3">
           <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" name="clave" placeholder="Tu contraseña" required>
+          <input type="password" class="form-control" name="clave" placeholder="Contraseña proveida por administrador" required>
         </div>
-
-        <div class="form-text" id="basic-addon4">No tenes una cuenta? <a href="../REGISTER/registrar.php">Registrate aquí</a></div>
-
-        <div class="form-text" id="basic-addon4">Representas a una aerolinea? <a href="../AEROLINEA/aerolinea-login.php">Ingresa aquí</a></div>
  
         <div class="d-flex justify-content-end">
           <button type="submit" class="btn-enviar">Enviar</button>

@@ -63,6 +63,8 @@
   </section>
 </header>
 
+
+<!-- PERFIL DE ADMINISTRADOR -->
 <?php if(!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'admin'): ?>
     <div class="contacto-wrapper">
         <div class="contacto-form-card">
@@ -88,59 +90,102 @@
             </div>
         </div>
     </div>
+
+<!-- PERFIL DE USUARIO -->
 <?php elseif(!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario'): ?>
-    <p>soy un usuario</p>
+    <div class="contacto-wrapper">
+        <div class="contacto-form-card">
+
+            <h2>Panel de <?php echo $_SESSION['tipoUsuario'] ?></h2>
+            <h4>Podes utilizar las funciones de abajo.</h4>
+            
+            <div class="d-flex justify-content-center">
+                <button class="btn-enviar"><i class="bi bi-airplane"></i> 
+                    <a href="" style="text-decoration: none; color:white;"> Resevas activas</a>
+                </button>
+            </div>
+            <div class="d-flex justify-content-center" style="margin-top: 10px;">
+                <button class="btn-enviar"><i class="bi bi-list"></i>
+                <a href="" style="text-decoration: none; color:white;"> Historial de compras</a> 
+            </button>
+            </div>
+            <div class="d-flex justify-content-center" style="margin-top: 10px;">
+                <button class="btn-enviar"><i class="bi bi-journal-plus"></i> Modificar perfil</button>
+            </div>
+        </div>
+    </div>
+
+<!-- PERFIL DE CEO -->
+<?php elseif(!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'CEO'): ?>
+    <div class="contacto-wrapper">
+        <div class="contacto-form-card">
+            <h2>Panel de <?php echo $_SESSION['tipoUsuario'] ?></h2>
+            <h4>Podes utilizar las funciones de abajo.</h4>
+            
+            <div class="d-flex justify-content-center">
+                <button class="btn-enviar"><i class="bi bi-cash-coin"></i> 
+                    <a href="" style="text-decoration: none; color:white;"> Reporte de ventas</a>
+                </button>
+            </div>
+            <div class="d-flex justify-content-center" style="margin-top: 40px;">
+                <button class="btn-enviar"><i class="bi bi-airplane"></i>
+                <a href="" style="text-decoration: none; color:white;"> Reporte de ocupación de vuelos</a> 
+                </button>
+            </div>
+        </div>
+    </div>
 <?php endif; ?>
+
 
 <!-- FOOTER -->
 <section class="footer-section">
-<footer>
-    <div class="row">
-    <div class="col">
-        <h3><strong>Contactanos</strong><div class="subrayado"></div></h3>
-        <ul>
-        <li><i class="bi bi-envelope-at"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
-        <li><i class="bi bi-whatsapp"></i><a href="#">+54 9 341 234 5678</a></li>
-        <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.php">Formulario de Contacto</a></li>
-        </ul>
-    </div>
-    <div class="col">
-        <h3><strong>Mapa de sitio</strong><div class="subrayado"></div></h3>
-        <ul>
-        <li><a href="../INDEX/index.php">Inicio</a></li>
-        <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
-        <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
-        <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
-        <li><a href="">Mi Perfil</a></li>
-        </ul>
-    </div>
-    <div class="col">
-        <h3><strong>Ubicación</strong><div class="subrayado"></div></h3>
-        <ul>
-        <li><a href="https://maps.app.goo.gl/UvsGpUXHgk9GkpYP9" target="_blank">Zeballos 1341</a></li>
-        <li><a href="https://maps.app.goo.gl/87YMeSLAp74gH9mc7" target="_blank">Rosario, Santa Fe</a></li>
-        <li><a href="https://maps.app.goo.gl/u94xc8o8xowqeTuz8" target="_blank">Argentina</a></li>
-        </ul>
-    </div>
-    <div class="col">
-        <h3><strong>Newsletter</strong><div class="subrayado"></div></h3>
-        <form>
-        <i class="bi bi-envelope"></i>
-        <input type="email" placeholder="Ingrese su mail">
-        <button type="submit"><i class="bi bi-arrow-return-left"></i></button>
-        </form>
-        <div class="iconos-redes">
-        <i class="bi bi-facebook"></i>
-        <i class="bi bi-instagram"></i>
-        <i class="bi bi-twitter-x"></i>
+    <footer>
+        <div class="row">
+            <div class="col">
+                <h3><strong>Contactanos</strong><div class="subrayado"></div></h3>
+                <ul>
+                <li><i class="bi bi-envelope-at"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
+                <li><i class="bi bi-whatsapp"></i><a href="#">+54 9 341 234 5678</a></li>
+                <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.php">Formulario de Contacto</a></li>
+                </ul>
+            </div>
+            <div class="col">
+                <h3><strong>Mapa de sitio</strong><div class="subrayado"></div></h3>
+                <ul>
+                <li><a href="../INDEX/index.php">Inicio</a></li>
+                <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
+                <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
+                <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
+                <li><a href="">Mi Perfil</a></li>
+                </ul>
+            </div>
+            <div class="col">
+                <h3><strong>Ubicación</strong><div class="subrayado"></div></h3>
+                <ul>
+                <li><a href="https://maps.app.goo.gl/UvsGpUXHgk9GkpYP9" target="_blank">Zeballos 1341</a></li>
+                <li><a href="https://maps.app.goo.gl/87YMeSLAp74gH9mc7" target="_blank">Rosario, Santa Fe</a></li>
+                <li><a href="https://maps.app.goo.gl/u94xc8o8xowqeTuz8" target="_blank">Argentina</a></li>
+                </ul>
+            </div>
+            <div class="col">
+                <h3><strong>Newsletter</strong><div class="subrayado"></div></h3>
+                <form>
+                <i class="bi bi-envelope"></i>
+                <input type="email" placeholder="Ingrese su mail">
+                <button type="submit"><i class="bi bi-arrow-return-left"></i></button>
+                </form>
+                <div class="iconos-redes">
+                <i class="bi bi-facebook"></i>
+                <i class="bi bi-instagram"></i>
+                <i class="bi bi-twitter-x"></i>
+                </div>
+            </div>
         </div>
-    </div>
-    </div>
-    <hr>
-    <p class="copyright">&copy; 2026 VuelaSeguro. Todos los derechos reservados. Licenciado bajo
-    <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons BY 4.0</a>.
-    </p>
-</footer>
+        <hr>
+        <p class="copyright">&copy; 2026 VuelaSeguro. Todos los derechos reservados. Licenciado bajo
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons BY 4.0</a>.
+        </p>
+    </footer>
 </section>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

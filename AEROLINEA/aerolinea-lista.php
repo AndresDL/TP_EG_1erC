@@ -1,8 +1,28 @@
 <?php
 $link = null;
 include_once('../conexion.inc');
+
 if (!$link) {
     die("Error de conexión a la base de datos.");
+}
+
+
+if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])){
+
+    $validarQuery = 'DELETE FROM aerolineas WHERE codAerolinea = ? ';
+
+    $cod = $_POST['id'];
+
+    $stmt = mysqli_prepare($link, $validarQuery);
+
+    mysqli_stmt_bind_param($stmt, "i", $cod);
+
+    mysqli_stmt_execute($stmt);
+
+    mysqli_stmt_close($stmt);
+
+    header('Location: ../AEROLINEA/aerolinea-lista.php');
+  
 }
 
 $validarQuery = 'SELECT * FROM aerolineas';
@@ -16,6 +36,7 @@ $rta = mysqli_stmt_get_result($stmt);
 $array = mysqli_fetch_all($rta, MYSQLI_ASSOC); 
 
 mysqli_stmt_close($stmt);
+
 
 ?>
 
@@ -90,12 +111,19 @@ mysqli_stmt_close($stmt);
                         <div class="aerolinea-img">'.$aero['codigoIATA'].'</div>
                         <div class="aerolinea-info">
                             <div class="aerolinea-nombre">'.$aero['nombreAerolinea'].'</div>
-                            <div class="aerolinea-categoria">'.$aero['drescripcionAerolinea'].'</div>
+                            <div class="aerolinea-categoria">'.$aero['descripcionAerolinea'].'</div>
                             <span class="aerolinea-badge badge-stock">'.$aero['codigoPais'].'</span>
                         </div>
                         <div class="aerolinea-acciones">
-                            <button class="btn-accion">Editar</button>
-                            <button class="btn-accion btn-danger-sm">Eliminar</button>
+                            <form method="POST" action="aerolinea.php" style="display:inline;">
+                                <input type="hidden" name="estado" value="pendiente">
+                                <input type="hidden" name="id" value="'.$aero['codAerolinea'].'">
+                                <button type="submit" class="btn-accion">Editar</button>
+                            </form>
+                            <form method="POST" action="aerolinea-lista.php" style="display:inline;">
+                                <input type="hidden" name="id" value="'.$aero['codAerolinea'].'">
+                                <button type="submit" class="btn-accion btn-danger-sm">Eliminar</button>
+                            </form>
                         </div>
                     </div>'
                 ;
