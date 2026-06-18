@@ -2,7 +2,32 @@
 
   include_once('../conexion.inc');
 
-  if($_SERVER['REQUEST_METHOD'] === 'POST'){
+  if(!empty($_SESSION)){
+    if($_SESSION['tipoUsuario'] !== 'admin'){
+      header('Location: https://www.google.com/search?client=firefox-b-d&hs=plQV&sca_esv=753862decbe9c4a6&sxsrf=ANbL-n7XpUh_yqPVhp8HESrR9_zURXsM_g:1781756455732&udm=2&fbs=ADc_l-aN0CWEZBOHjofHoaMMDiKpaEWjvZ2Py1XXV8d8KvlI3h8ctYcc-oNQOArn-iW4N6B_ZBAm40m5vBjJxlKgIxwgbWULpp2jmbpEgT1h3S_Yb1Cnejh7HSY-G3-sC5c0tbHsSzk5MrK6D02YBkEu5mrI6oBsROQp6S1ETg7SNjJnwZ79AmErh7j9JYHKKx8iozW1EK8cBt6ItdrTdElNzPE9ipyfOQ&q=ladron&sa=X&ved=2ahUKEwiH4_qE-I-VAxWzq5UCHTWcCcEQtKgLegQIFhAB&biw=1920&bih=947&dpr=1
+      ');
+    };
+  }
+
+  $aerolinea = null;
+  if(isset($_POST['id'])){
+
+    $buscarQuery = 'SELECT * FROM aerolineas WHERE codAerolinea = ?';
+
+    $id = $_POST['id'];
+
+    $stmt = mysqli_prepare($link, $buscarQuery);
+
+    mysqli_stmt_bind_param($stmt,"i",$id);
+
+    mysqli_stmt_execute($stmt);
+
+    $rta = mysqli_stmt_get_result($stmt);
+
+    $aerolinea = mysqli_fetch_assoc($rta);
+  }
+
+  if($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['estado'] === 'nuevo'){
 
     $validarQuery = 'SELECT nombreAerolinea FROM aerolineas WHERE nombreAerolinea = ?';
 
@@ -63,6 +88,66 @@
       echo 'aerolinea registrada';
     };
   }
+
+  if($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['estado'] === 'edicion'){
+
+    $validarQuery = 'SELECT * FROM aerolineas WHERE codAerolinea != ?';
+
+    $nombre = $_POST['id'];
+
+    $stmt = mysqli_prepare($link, $validarQuery);
+
+    mysqli_stmt_bind_param($stmt, "i", $nombre);
+
+    mysqli_stmt_execute($stmt);
+
+    $rta = mysqli_stmt_get_result($stmt);
+
+    $array = mysqli_fetch_all($rta, MYSQLI_ASSOC); 
+
+    mysqli_stmt_close($stmt);
+
+
+    foreach($array as $aero) {
+
+      if($aero['nombreAerolinea'] === $_POST['nombre'] || $aero['codigoIATA'] === $_POST['codigoIATA']){
+
+        echo'error';
+
+        return;
+      }
+
+    }
+
+      $id = $_POST['id'];
+
+      $hashedPassword = password_hash($_POST['clave'], PASSWORD_BCRYPT);
+
+      $stmt2 = mysqli_prepare($link, 
+      'UPDATE aerolineas SET 
+        nombreAerolinea = ?,
+        codigoIATA = ?,
+        descripcionAerolinea = ?,
+        codigoPais = ?,
+        claveAerolinea = ? WHERE codAerolinea = ?'
+      );
+
+      mysqli_stmt_bind_param($stmt2, 'sssssi',
+      $_POST['nombre'],
+      $_POST['codigoIATA'],
+      $_POST['desc'],
+      $_POST['codigoPAIS'],
+      $hashedPassword,
+      $_POST['id']
+      );
+
+      mysqli_stmt_execute($stmt2);
+      
+      mysqli_stmt_close($stmt2);  
+
+      header('Location: ../AEROLINEA/aerolinea-lista.php');
+  };
+  
 ?>
 
 <!DOCTYPE html>
@@ -130,39 +215,78 @@
  
       <h2>Alta de aerolinea</h2>
       <h4>Completá el formulario con los datos requeridos para continuar</h4>
- 
-      <form action="aerolinea.php" method="POST">
- 
-        <div class="mb-3">
-          <label class="form-label">Nombre</label>
-          <input type="text" class="form-control" name="nombre" placeholder="Nombre aerolinea" required>
-        </div>
 
-        <div class="mb-3">
-          <label class="form-label">Codigo IATA</label>
-          <input type="text" class="form-control" name="codigoIATA" placeholder="Codigo IATA " required>
-        </div>
- 
-        <div class="mb-3">
-          <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" name="clave" placeholder="Contraseña para CEO" required>
-        </div>
+      <?php if(empty($_POST['id'])): ?>
+        <form action="aerolinea.php" method="POST">
+          <input type="hidden" name="estado" value="nuevo">
 
-        <div class="mb-3">
-          <label class="form-label">Descripción</label>
-          <input type="text" class="form-control" name="desc" placeholder="Descripción aerolinea" required>
-        </div>
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" name="nombre" placeholder="Nombre aerolinea" required>
+          </div>
 
-        <div class="mb-3">
-          <label class="form-label">Codigo pais</label>
-          <input type="text" class="form-control" name="codigoPAIS" placeholder="Codigo del pais" required>
-        </div>
- 
-        <div class="d-flex justify-content-end">
-          <button type="submit" class="btn-enviar">Enviar</button>
-        </div>
-        
-      </form>
+          <div class="mb-3">
+            <label class="form-label">Codigo IATA</label>
+            <input type="text" class="form-control" name="codigoIATA" placeholder="Codigo IATA " required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input type="password" class="form-control" name="clave" placeholder="Contraseña para CEO" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input type="text" class="form-control" name="desc" placeholder="Descripción aerolinea" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Codigo pais</label>
+            <input type="text" class="form-control" name="codigoPAIS" placeholder="Codigo del pais" required>
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button type="submit" class="btn-enviar">Enviar</button>
+          </div>
+        </form>
+      <?php elseif(!empty($_POST['id'])): ?>
+          <form action="aerolinea.php" method="POST">
+
+          <input type="hidden" name="id" value="<?= $aerolinea['codAerolinea'] ?>">
+
+          <input type="hidden" name="estado" value="edicion">
+
+          <div class="mb-3">
+              <label class="form-label">Nombre</label>
+              <input type="text" class="form-control" name="nombre" value="<?= htmlspecialchars($aerolinea['nombreAerolinea']) ?>" required>
+          </div>
+
+          <div class="mb-3">
+              <label class="form-label">Codigo IATA</label>
+              <input type="text" class="form-control" name="codigoIATA" value="<?= htmlspecialchars($aerolinea['codigoIATA']) ?>" required>
+          </div>
+
+
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input type="password" class="form-control" name="clave" placeholder="Nueva contraseña para CEO" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input type="text" class="form-control" name="desc" value="<?= htmlspecialchars($aerolinea['descripcionAerolinea']) ?>" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Codigo pais</label>
+            <input type="text" class="form-control" name="codigoPAIS" value="<?= htmlspecialchars($aerolinea['codigoPais']) ?>" required>
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button type="submit" class="btn-enviar">Enviar</button>
+          </div>
+        </form>
+      <?php endif; ?>
     </div>
   </div>
  
