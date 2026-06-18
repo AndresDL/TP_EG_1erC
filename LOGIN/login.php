@@ -38,6 +38,8 @@
 
         $_SESSION['telefonoUsuario'] = $row['telefonoUsuario'];
 
+        header('Location: ../INDEX/index.php');
+
       } else {
 
         echo 'Contraseña incorrecta';
@@ -120,6 +122,8 @@
         </div>
 
         <div class="form-text" id="basic-addon4">No tenes una cuenta? <a href="../REGISTER/registrar.php">Registrate aquí</a></div>
+
+        <div class="form-text" id="basic-addon4">Representas a una aerolinea? <a href="../AEROLINEA/aerolinea-login.php">Ingresa aquí</a></div>
  
         <div class="d-flex justify-content-end">
           <button type="submit" class="btn-enviar">Enviar</button>
