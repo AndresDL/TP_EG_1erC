@@ -4,45 +4,63 @@
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
-    $validarQuery = 'SELECT emailUsuario FROM usuarios WHERE emailUsuario = ?';
+    $validarQuery = 'SELECT nombreAerolinea FROM aerolineas WHERE nombreAerolinea = ?';
 
-    $email = $_POST['email'];
+    $nombre = $_POST['nombre'];
 
     $stmt = mysqli_prepare($link, $validarQuery);
 
-    mysqli_stmt_bind_param($stmt, "s", $email);
+    mysqli_stmt_bind_param($stmt, "s", $nombre);
 
     mysqli_stmt_execute($stmt);
 
     $rta = mysqli_stmt_get_result($stmt);
 
-    $row = mysqli_fetch_assoc($rta);
+    $row1 = mysqli_fetch_assoc($rta);
 
     mysqli_stmt_close($stmt);
 
-    if ($row) {
+
+    $validarQuery = 'SELECT codigoIATA FROM aerolineas WHERE codigoIATA = ?';
+
+    $cod = $_POST['codigoIATA'];
+
+    $stmt = mysqli_prepare($link, $validarQuery);
+
+    mysqli_stmt_bind_param($stmt, "s", $cod);
+
+    mysqli_stmt_execute($stmt);
+
+    $rta = mysqli_stmt_get_result($stmt);
+
+    $row2 = mysqli_fetch_assoc($rta);
+
+    mysqli_stmt_close($stmt);
+
+
+    if (!empty($row1) || !empty($row2)) {
 
       echo 'error';
 
     } else {
+
       $hashedPassword = password_hash($_POST['clave'], PASSWORD_BCRYPT);
 
-      $fullname = "{$_POST['nombre1']} {$_POST['nombre2']}";
-
       $stmt2 = mysqli_prepare($link, 
-      'INSERT INTO usuarios VALUES (NULL, ?, ?, "usuario", ?, ?)');
+      'INSERT INTO aerolineas VALUES (NULL, ?, ?, ?, ?, ?)');
 
-      mysqli_stmt_bind_param($stmt2, 'ssss',
-      $fullname,
-      $hashedPassword,
-      $_POST['email'],
-      $_POST['telefono']);
+      mysqli_stmt_bind_param($stmt2, 'sssss',
+      $_POST['nombre'],
+      $_POST['codigoIATA'],
+      $_POST['desc'],
+      $_POST['codigoPAIS'],
+      $hashedPassword,);
 
       mysqli_stmt_execute($stmt2);
       
       mysqli_stmt_close($stmt2);  
 
-      header('Location: ../LOGIN/login.php');
+      echo 'aerolinea registrada';
     };
   }
 ?>
@@ -57,74 +75,87 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
-    <link rel="stylesheet" href="register.css">
+    <link rel="stylesheet" href="../CONTACTO/contacto.css">
 </head>
 <body>
-  <!-- NAVBAR -->
-  <section class="navbar-section">
-    <div class="header-wrapper">
-      <nav class="navbar-custom">
-        <div class="logo-wrap">
-          <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
-        </div>
-        <div class="nav-links">
-          <a href="../INDEX/index.php">Inicio</a>
-          <a href="../VUELOS/vuelos.php">Vuelos</a>
-          <a href="../NOVEDADES/novedades.php">Novedades</a>
-          <a href="../PROMOCIONES/promociones.php">Promociones</a>
-        </div>
-        <div class="nav-right">
-          <div class="foto-perfil" title="Foto de perfil">
-            <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="21" cy="10" r="9" fill="#ffffff"/>
-              <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
-            </svg>
-          </div>
-          <button class="btn-registro"><a href="../LOGIN/login.php" style="text-decoration: none; color: white;">Iniciar sesión</a></button>
-        </div>
-      </nav>
- 
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="../INDEX/index.php">Inicio</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Crear cuenta</li>
-        </ol>
-      </nav>
+<!-- NAVBAR -->
+<div class="header-wrapper">
+  <nav class="navbar-custom">
+    <div class="logo-wrap">
+      <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
     </div>
-  </section>
+    <div class="nav-links">
+      <a href="../INDEX/index.php">Inicio</a>
+      <a href="../VUELOS/vuelos.php">Vuelos</a>
+      <a href="../NOVEDADES/novedades.php"  >Novedades</a>
+      <a href="../PROMOCIONES/promociones.php" >Promociones</a>
+    </div>
+    <div class="nav-right">
+      <?php if (!empty($_SESSION)): ?>
+          <div class="foto-perfil">
+              <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="21" cy="10" r="9" fill="#ffffff"/>
+                <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
+              </svg>
+          </div>
+        <span class="text-white me-2"><a href="../PERFIL/perfiles.php" style="text-decoration: none; color: white">Hola, <strong><?php echo htmlspecialchars($_SESSION['nombreUsuario']); ?><a></strong></span>
+        <a href="../LOGIN/logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Cerrar sesion</a>
+      <?php else: ?>
+        <div class="foto-perfil">
+          <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="21" cy="10" r="9" fill="#ffffff"/>
+            <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
+          </svg>
+        </div>
+        <?php if(empty($_SESSION)): ?>
+          <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration:none;">Iniciar sesión</a>
+        <?php endif; ?>
+      <?php endif; ?>
+    </div>
+  </nav>
+  
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="../INDEX/index.php">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="../PERFIL/perfiles.php">Perfil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Alta de aerolinea</li>
+        </ol>
+    </nav>
+
+</div>
  
   <div class="contacto-wrapper">
  
     <div class="contacto-form-card">
  
-      <h2>Creación de cuenta</h2>
+      <h2>Alta de aerolinea</h2>
       <h4>Completá el formulario con los datos requeridos para continuar</h4>
  
-      <form action="registrar.php" method="POST">
+      <form action="aerolinea.php" method="POST">
  
         <div class="mb-3">
           <label class="form-label">Nombre</label>
-          <input type="text" class="form-control" name="nombre1" placeholder="Tu nombre" required>
+          <input type="text" class="form-control" name="nombre" placeholder="Nombre aerolinea" required>
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Apellido</label>
-          <input type="text" class="form-control" name="nombre2" placeholder="Tu apellido" required>
+          <label class="form-label">Codigo IATA</label>
+          <input type="text" class="form-control" name="codigoIATA" placeholder="Codigo IATA " required>
         </div>
  
         <div class="mb-3">
           <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" name="clave" placeholder="Tu contraseña" required>
+          <input type="password" class="form-control" name="clave" placeholder="Contraseña para CEO" required>
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-control" name="email" placeholder="Tu email" required>
+          <label class="form-label">Descripción</label>
+          <input type="text" class="form-control" name="desc" placeholder="Descripción aerolinea" required>
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Telefono</label>
-          <input type="int" class="form-control" name="telefono" placeholder="Tu telefono" required>
+          <label class="form-label">Codigo pais</label>
+          <input type="text" class="form-control" name="codigoPAIS" placeholder="Codigo del pais" required>
         </div>
  
         <div class="d-flex justify-content-end">
@@ -132,9 +163,7 @@
         </div>
         
       </form>
- 
     </div>
- 
   </div>
  
   <!-- FOOTER -->

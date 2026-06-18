@@ -1,0 +1,122 @@
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f8f9fa;
+}
+
+.aerolineas-wrapper {
+    padding: 25px;
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.aerolineas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.aerolineas-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--azul-oscuro);
+}
+
+.aerolinea-card {
+    background: #ffffff;
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: box-shadow 0.2s;
+}
+
+.aerolinea-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+}
+
+.aerolinea-img {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: #f1f3f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 28px;
+}
+
+.aerolinea-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.aerolinea-nombre {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--azul-oscuro);
+    margin-bottom: 3px;
+}
+
+.aerolinea-categoria {
+    font-size: 0.82rem;
+    color: var(--gris);
+    margin-bottom: 6px;
+}
+
+.aerolinea-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 20px;
+}
+
+.badge-stock  { background: #d1fae5; color: #065f46; }
+.badge-agotado { background: #fee2e2; color: #991b1b; }
+.badge-poco   { background: #fef3c7; color: #92400e; }
+
+.aerolinea-precio {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--azul);
+    white-space: nowrap;
+}
+
+.aerolinea-acciones {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-accion {
+    border: 1px solid var(--borde);
+    background: #fff;
+    color: var(--azul-oscuro);
+    padding: 7px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-accion:hover { background: #f1f3f5; }
+
+.btn-primary-sm {
+    background: var(--azul);
+    color: #fff;
+    border-color: var(--azul);
+}
+
+.btn-primary-sm:hover { opacity: 0.88; }
+
+.btn-danger-sm {
+    color: #dc3545;
+    border-color: #dc3545;
+}

@@ -38,6 +38,8 @@
 
         $_SESSION['telefonoUsuario'] = $row['telefonoUsuario'];
 
+        header('Location: ../INDEX/index.php');
+
       } else {
 
         echo 'Contraseña incorrecta';
