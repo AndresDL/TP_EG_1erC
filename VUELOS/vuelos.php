@@ -15,7 +15,7 @@ if (!$link) {
 
 // MODO PRUEBA — descomento el rol que voy a prbar
 // ═══════════════════════════════════════════════════════════════
-// $_SESSION['usuario'] = ['nombreUsuario' => 'Mateo', 'tipoUsuario' => 'CEO', 'codAerolinea' => 2];
+ $_SESSION['usuario'] = ['nombreUsuario' => 'Mateo', 'tipoUsuario' => 'CEO', 'codAerolinea' => 2];
 // $_SESSION['usuario'] = ['nombreUsuario' => 'Heis', 'tipoUsuario' => 'usuario', 'codAerolinea' => 1];
 // ═══════════════════════════════════════════════════════════════
 
@@ -26,6 +26,19 @@ $codAerolineaCEO = $esCEO ? $_SESSION['usuario']['codAerolinea'] : null;
 // Variables de notificación
 $mensaje = "";
 $tipo_mensaje = "danger";
+
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] === 'creado') {
+        $mensaje = "El vuelo ha sido registrado exitosamente.";
+        $tipo_mensaje = "success";
+    } elseif ($_GET['msg'] === 'actualizado') {
+        $mensaje = "Los datos del vuelo han sido actualizados con éxito.";
+        $tipo_mensaje = "success";
+    } elseif ($_GET['msg'] === 'eliminado') {
+        $mensaje = "El vuelo ha sido eliminado correctamente.";
+        $tipo_mensaje = "success";
+    }
+}
 
 //  Traigo lista de aerolíneas
 $queryAerolineas = mysqli_query($link, "SELECT codAerolinea, nombreAerolinea FROM aerolineas ORDER BY nombreAerolinea ASC");
@@ -72,8 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_vuelo']) && $es
                           VALUES ('$origen', '$destino', '$fecha', '$hora', $precio, $asientos, $codAerolinea)";
 
             if (mysqli_query($link, $sqlInsert)) {
-                $mensaje = "El vuelo ha sido registrado exitosamente.";
-                $tipo_mensaje = "success";
+                header('Location: vuelos.php?msg=creado');
+                exit;
             } else {
                 $mensaje = "Error al registrar el vuelo en la base de datos.";
             }
@@ -86,8 +99,8 @@ if (isset($_GET['eliminar']) && $esCEO) {
     $idEliminar = (int)$_GET['eliminar'];
     $sqlDelete = "DELETE FROM vuelos WHERE codVuelo = $idEliminar";
     if (mysqli_query($link, $sqlDelete)) {
-        $mensaje = "El vuelo ha sido eliminado correctamente.";
-        $tipo_mensaje = "success";
+        header('Location: vuelos.php?msg=eliminado');
+        exit;
     }
 }
 
@@ -120,8 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_vuelo']) && $e
                       WHERE codVuelo=$idEditar";
 
         if (mysqli_query($link, $sqlUpdate)) {
-            $mensaje = "Los datos del vuelo han sido actualizados con éxito.";
-            $tipo_mensaje = "success";
+            header('Location: vuelos.php?msg=actualizado');
+            exit;
         } else {
             $mensaje = "Error al intentar actualizar la información del vuelo.";
         }
@@ -135,8 +148,6 @@ $precioMasBaratoReal = $fetchMin['minimo'] ?? 0;
 
 // OBTENER VUELOS 
 $sql = "SELECT v.*, a.nombreAerolinea FROM vuelos v LEFT JOIN aerolineas a ON v.codAerolinea = a.codAerolinea ORDER BY v.fechaSalidaVuelo ASC";
-
-$sql = "SELECT * FROM vuelos"; 
 $result = mysqli_query($link, $sql);
 $totalVuelos = mysqli_num_rows($result);
 ?>
@@ -406,49 +417,6 @@ $totalVuelos = mysqli_num_rows($result);
       </div>
     </div>
   <?php endif; ?>
-    <!-- LISTA VUELOS -->
-
-<div class="vuelos-lista">
-
-  <div class="vuelos-header">
-    <h2>Vuelos disponibles</h2>
-    <span class="vuelos-count"><?php echo $totalVuelos; ?></span>
-  </div>
-
-  <?php if ($totalVuelos > 0) { ?>
-    <div class="vuelo-card">
-      <div class="vuelo-info">
-        <div class="vuelo-aerolinea-row">
-          <span class="vuelo-aerolinea">Aerolíneas Argentinas</span>
-          <span class="badge-barato">MÁS BARATO</span>
-        </div>
-        <div class="vuelo-ruta">
-          <div>
-            <span class="ciudad-nombre">Buenos Aires</span>
-            <span class="ciudad-horario">Salida: 06:45 hs</span>
-          </div>
-          <div>
-            <span class="ciudad-nombre">Mendoza</span>
-            <span class="ciudad-horario">Llegada: 08:40 hs</span>
-          </div>
-        </div>
-        <div class="vuelo-detalles-row">
-          <div>Pasajeros: <strong>1</strong></div>
-          <div>Duración: <strong>1h 55m</strong></div>
-          <div>Equipaje incluido: <span class="equipaje-si">✓</span></div>
-        </div>
-      </div>
-      <div class="vuelo-precio-col">
-        <span class="precio-label">PRECIO</span>
-        <span class="precio-valor">$89.990</span>
-        <button class="btn-comprar">COMPRAR</button>
-      </div>
-    </div>
-  <?php } else { ?>
-    <p style="text-align: center; margin-top: 10px; color: var(--gris); border: 1px solid var(--borde); border-radius: 8px; padding: 40px 20px; background-color: var(--gris-claro);">No hay vuelos disponibles en este momento.</p>
-  <?php } ?>
-
-</div> </div> 
 
   <!-- FOOTER -->
 
