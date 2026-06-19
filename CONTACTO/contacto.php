@@ -55,37 +55,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
   <!-- NAVBAR -->
-  <section class="navbar-section">
-    <div class="header-wrapper">
-      <nav class="navbar-custom">
-        <div class="logo-wrap">
-          <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
-        </div>
-        <div class="nav-links">
-          <a href="../INDEX/index.php">Inicio</a>
-          <a href="../VUELOS/vuelos.php">Vuelos</a>
-          <a href="../NOVEDADES/novedades.php">Novedades</a>
-          <a href="../PROMOCIONES/promociones.php">Promociones</a>
-        </div>
-        <div class="nav-right">
-          <div class="foto-perfil" title="Foto de perfil">
+  <div class="header-wrapper">
+    <nav class="navbar-custom">
+      <div class="logo-wrap">
+        <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+      </div>
+      <div class="nav-links">
+        <a href="../INDEX/index.php">Inicio</a>
+        <a href="../VUELOS/vuelos.php">Vuelos</a>
+        <a href="../NOVEDADES/novedades.php"  >Novedades</a>
+        <a href="../PROMOCIONES/promociones.php" >Promociones</a>
+      </div>
+      <div class="nav-right">
+        <?php if (!empty($_SESSION)): ?>
+            <div class="foto-perfil">
+                <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="21" cy="10" r="9" fill="#ffffff"/>
+                  <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
+                </svg>
+            </div>
+          <span class="text-white me-2"><a href="../USUARIO/usuario.php" style="text-decoration: none; color: white">Hola, <strong><?php echo htmlspecialchars($_SESSION['nombreUsuario']); ?><a></strong></span>
+          <a href="../LOGIN/logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Cerrar sesion</a>
+        <?php else: ?>
+          <div class="foto-perfil">
             <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
               <circle cx="21" cy="10" r="9" fill="#ffffff"/>
               <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
             </svg>
           </div>
-          <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration:none;">Iniciar Sesión</a>
-        </div>
-      </nav>
-
-      <nav aria-label="breadcrumb">
+          <?php if(empty($_SESSION)): ?>
+            <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration:none;">Iniciar sesión</a>
+          <?php endif; ?>
+        <?php endif; ?>
+      </div>
+    </nav>
+    
+    <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="../INDEX/index.php" style="color:#cbd5e0;">Inicio</a></li>
-          <li class="breadcrumb-item active" style="color:#90aecb;" aria-current="page">Contacto</li>
+          <li class="breadcrumb-item"><a href="../INDEX/index.php">Inicio</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Formulario de contacto</li>
         </ol>
-      </nav>
-    </div>
-  </section>
+    </nav>
+  </div>
 
   <div class="contacto-wrapper">
     <div class="contacto-form-card">
@@ -119,7 +130,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form method="POST" action="contacto.php">
-
           <div class="mb-3">
             <label class="form-label">Nombre</label>
             <input type="text" name="nombre" class="form-control"
@@ -127,7 +137,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                    value="<?= htmlspecialchars($_POST['nombre'] ?? '') ?>"
                    required>
           </div>
-
           <div class="mb-3">
             <label class="form-label">Email</label>
             <input type="email" name="email" class="form-control"
@@ -135,23 +144,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                    value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
                    required>
           </div>
-
           <div class="mb-4">
             <label class="form-label">Mensaje</label>
             <textarea name="mensaje" class="form-control textarea-contacto" rows="6"
                       placeholder="Escribí tu mensaje acá..." required><?= htmlspecialchars($_POST['mensaje'] ?? '') ?></textarea>
           </div>
-
           <div class="d-flex justify-content-end">
             <button type="submit" class="btn-enviar">
               <i class="bi bi-send me-1"></i> Enviar
             </button>
           </div>
-
         </form>
-
       <?php endif; ?>
-
     </div>
   </div>
 
