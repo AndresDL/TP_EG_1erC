@@ -15,7 +15,7 @@ $codUsuario  = $usuario ? (int)$usuario['codUsuario'] : 0;
 // MODO PRUEBA — descomentár la línea del rol que voy a testear
 // ═══════════════════════════════════════════════════════════════
 // $tipoUsuario = 'no_registrado'; $codUsuario = 0;
-//  $tipoUsuario = 'CEO';           $codUsuario = 2;
+//$tipoUsuario = 'CEO';           $codUsuario = 2;
 // $tipoUsuario = 'usuario';       $codUsuario = 1;
 // $tipoUsuario = 'admin';         $codUsuario = 3;
 // ═══════════════════════════════════════════════════════════════

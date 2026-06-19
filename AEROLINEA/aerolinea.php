@@ -1,11 +1,14 @@
 <?php
-
-  include_once('../conexion.inc');
+$link = null;
+include_once('../conexion.inc');
+if (!$link) {
+    die("Error de conexión a la base de datos.");
+}
 
   if(!empty($_SESSION)){
     if($_SESSION['tipoUsuario'] !== 'admin'){
-      header('Location: https://www.google.com/search?client=firefox-b-d&hs=plQV&sca_esv=753862decbe9c4a6&sxsrf=ANbL-n7XpUh_yqPVhp8HESrR9_zURXsM_g:1781756455732&udm=2&fbs=ADc_l-aN0CWEZBOHjofHoaMMDiKpaEWjvZ2Py1XXV8d8KvlI3h8ctYcc-oNQOArn-iW4N6B_ZBAm40m5vBjJxlKgIxwgbWULpp2jmbpEgT1h3S_Yb1Cnejh7HSY-G3-sC5c0tbHsSzk5MrK6D02YBkEu5mrI6oBsROQp6S1ETg7SNjJnwZ79AmErh7j9JYHKKx8iozW1EK8cBt6ItdrTdElNzPE9ipyfOQ&q=ladron&sa=X&ved=2ahUKEwiH4_qE-I-VAxWzq5UCHTWcCcEQtKgLegQIFhAB&biw=1920&bih=947&dpr=1
-      ');
+      header('Location: ../LOGIN/login.php');
+      exit();
     };
   }
 
