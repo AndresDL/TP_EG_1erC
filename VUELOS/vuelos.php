@@ -191,15 +191,12 @@ $totalVuelos = mysqli_num_rows($result);
             </svg>
           </div>
           
-          <?php if (isset($_SESSION['usuario'])): ?>
-              <span class="text-white me-2">Hola, <strong><?php echo htmlspecialchars($_SESSION['usuario']['nombreUsuario']); ?></strong> (<?php echo htmlspecialchars($_SESSION['usuario']['tipoUsuario']); ?>)</span>
-              <a href="../LOGIN/logout.php" class="btn-registro bg-danger" style="text-decoration: none;">Salir</a>
+          <?php if (!empty($_SESSION)): ?>
+              <span class="text-white me-2"><a href="../PERFIL/perfiles.php" style="text-decoration: none; color: white">Hola, <strong><?php echo htmlspecialchars($_SESSION['nombreUsuario']); ?><a></strong></span>
+              <a href="../LOGIN/logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Cerrar sesion</a>
           <?php else: ?>
-              <a href="../LOGIN/login.php" class="btn-registro">Iniciar Sesión</a>
+              <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration: none; color: white;">Iniciar sesión</a>
           <?php endif; ?>
-
-          <a href="../LOGIN/login.php" class="btn-registro">Iniciar Sesión</a>
-
         </div>
       </nav>
 
