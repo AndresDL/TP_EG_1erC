@@ -124,12 +124,12 @@
             
             <div class="d-flex justify-content-center">
                 <button class="btn-enviar"><i class="bi bi-cash-coin"></i> 
-                    <a href="" style="text-decoration: none; color:white;"> Reporte de ventas</a>
+                    <a href="reporte-ventas.php" style="text-decoration: none; color:white;"> Reporte de ventas</a>
                 </button>
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 40px;">
                 <button class="btn-enviar"><i class="bi bi-airplane"></i>
-                <a href="" style="text-decoration: none; color:white;"> Reporte de ocupación de vuelos</a> 
+                <a href="reporte-ocupacion.php" style="text-decoration: none; color:white;"> Reporte de ocupación de vuelos</a> 
                 </button>
             </div>
         </div>

@@ -1,6 +1,9 @@
 <?php
-
-  include_once('../conexion.inc');
+$link = null;
+include_once('../conexion.inc');
+if (!$link) {
+    die("Error de conexión a la base de datos.");
+}
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
@@ -124,7 +127,7 @@
 
         <div class="mb-3">
           <label class="form-label">Telefono</label>
-          <input type="int" class="form-control" name="telefono" placeholder="Tu telefono" required>
+          <input type="tel" class="form-control" name="telefono" placeholder="Tu telefono" required>
         </div>
  
         <div class="d-flex justify-content-end">
