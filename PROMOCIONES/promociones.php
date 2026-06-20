@@ -5,23 +5,14 @@ if (!$link) {
     die("Error de conexión a la base de datos.");
 }
 
-// ROLES 
-// Leo sesión; si no hay sesión activa, uso modo prueba
-$usuario     = isset($_SESSION['usuario']) ? $_SESSION['usuario'] : null;
-$tipoUsuario = $usuario ? $usuario['tipoUsuario'] : 'no_registrado';
-$codUsuario  = $usuario ? (int)$usuario['codUsuario'] : 0;
+// ── ROLES ──────────────────────────────────────────────────────────────────
+// Leemos la sesión tal como la escribe el login
+$tipoUsuario  = $_SESSION['tipoUsuario']  ?? 'no_registrado';
+$codUsuario   = (int)($_SESSION['codUsuario']  ?? 0);
+$nombreSesion = $_SESSION['nombreUsuario'] ?? '';
 
-
-// MODO PRUEBA — descomentár la línea del rol que voy a testear
-// ═══════════════════════════════════════════════════════════════
-// $tipoUsuario = 'no_registrado'; $codUsuario = 0;
-//$tipoUsuario = 'CEO';           $codUsuario = 2;
-// $tipoUsuario = 'usuario';       $codUsuario = 1;
-// $tipoUsuario = 'admin';         $codUsuario = 3;
-// ═══════════════════════════════════════════════════════════════
-
-$esCEO   = ($tipoUsuario === 'CEO');
-$esAdmin = ($tipoUsuario === 'admin');
+$esCEO     = ($tipoUsuario === 'CEO');
+$esAdmin   = ($tipoUsuario === 'admin');
 $esUsuario = ($tipoUsuario === 'usuario');
 
 $mensaje      = "";
@@ -55,9 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_promo']) && $es
     if ($descripcion !== '' && $descuento > 0 && $vigencia !== '') {
         $valAero = $codAerolinea > 0 ? $codAerolinea : 'NULL';
         $sql = "INSERT INTO promociones
-                    (descripcionPromocion, descuentoPromocion, codAerolinea, estadoPromocion, imagenPromocion, vigenciaPromocion, codCEO)
+                    (descripcionPromocion, descuentoPromocion, codAerolinea, estadoPromocion)
                 VALUES
-                    ('$descripcion', $descuento, $valAero, 'pendiente', '$imagen', '$vigencia', $codUsuario)";
+                    ('$descripcion', $descuento, $valAero, 'pendiente')";
         if (mysqli_query($link, $sql)) {
             $mensaje      = "Promoción enviada correctamente. Quedará pendiente hasta que el administrador la apruebe.";
             $tipo_mensaje = "success";
@@ -82,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_promo']) && $e
     $descuento   = (float)($_POST['descuentoPromocion'] ?? 0);
     $vigencia    = mysqli_real_escape_string($link, trim($_POST['vigenciaPromocion'] ?? ''));
 
-    $check = mysqli_query($link, "SELECT * FROM promociones WHERE codPromocion=$id AND codCEO=$codUsuario AND estadoPromocion='aprobada'");
+    $check = mysqli_query($link, "SELECT * FROM promociones WHERE codPromocion=$id");
     if ($check && mysqli_num_rows($check) > 0) {
         $promo  = mysqli_fetch_assoc($check);
         $imagen = $promo['imagenPromocion'];
@@ -92,8 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_promo']) && $e
         } elseif (!empty($_POST['imagenUrl'])) {
             $imagen = mysqli_real_escape_string($link, trim($_POST['imagenUrl']));
         }
-        mysqli_query($link, "UPDATE promociones SET descripcionPromocion='$descripcion', descuentoPromocion=$descuento,
-            vigenciaPromocion='$vigencia', imagenPromocion='$imagen' WHERE codPromocion=$id AND codCEO=$codUsuario");
+        mysqli_query($link, "UPDATE promociones SET descripcionPromocion='$descripcion', descuentoPromocion=$descuento WHERE codPromocion=$id");
         $mensaje = "Promoción actualizada."; $tipo_mensaje = "success";
     } else {
         $mensaje = "No tenés permiso para editar esta promoción."; $tipo_mensaje = "danger";
@@ -103,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_promo']) && $e
 // POST: DAR DE BAJA (CEO) 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['baja_promo']) && $esCEO) {
     $id    = (int)$_POST['id'];
-    $check = mysqli_query($link, "SELECT codPromocion FROM promociones WHERE codPromocion=$id AND codCEO=$codUsuario AND estadoPromocion='aprobada'");
+    $check = mysqli_query($link, "SELECT codPromocion FROM promociones WHERE codPromocion=$id AND estadoPromocion='aprobada'");
     if ($check && mysqli_num_rows($check) > 0) {
         mysqli_query($link, "UPDATE promociones SET estadoPromocion='denegada' WHERE codPromocion=$id");
         $mensaje = "Promoción dada de baja."; $tipo_mensaje = "success";
@@ -152,11 +142,7 @@ $pendientesRes  = null;
 $cantPendientes = 0;
 if ($esAdmin) {
     $pendientesRes  = mysqli_query($link,
-        "SELECT p.*, a.nombreAerolinea, u.nombreUsuario AS nombreCEO
-         FROM promociones p
-         LEFT JOIN aerolineas a ON p.codAerolinea = a.codAerolinea
-         LEFT JOIN usuarios u ON p.codCEO = u.codUsuario
-         WHERE p.estadoPromocion = 'pendiente' ORDER BY p.codPromocion DESC");
+        "SELECT p.*, a.nombreAerolinea FROM promociones p LEFT JOIN aerolineas a ON p.codAerolinea = a.codAerolinea WHERE p.estadoPromocion = 'pendiente' ORDER BY p.codPromocion DESC");
     $cantPendientes = $pendientesRes ? mysqli_num_rows($pendientesRes) : 0;
 }
 
@@ -166,7 +152,7 @@ if ($esCEO) {
     $misPromosRes = mysqli_query($link,
         "SELECT p.*, a.nombreAerolinea FROM promociones p
          LEFT JOIN aerolineas a ON p.codAerolinea = a.codAerolinea
-         WHERE p.codCEO = $codUsuario ORDER BY p.codPromocion DESC");
+         ORDER BY p.codPromocion DESC");
 }
 
 // Aerolíneas
@@ -349,7 +335,7 @@ function estadoBadge($estado) {
                       onclick="alert('Promoción solicitada. Un asesor se comunicará con usted.')">
                 SOLICITAR
               </button>
-            <?php elseif ($esCEO && $promo['codCEO'] == $codUsuario): ?>
+            <?php elseif ($esCEO): ?>
               <div class="mt-2 d-flex gap-2 align-items-center">
                 <?= estadoBadge($promo['estadoPromocion']) ?>
                 <button class="btn btn-sm btn-outline-primary"
@@ -367,7 +353,7 @@ function estadoBadge($estado) {
           </div>
         </div>
 
-        <?php if ($esCEO && $promo['codCEO'] == $codUsuario): ?>
+        <?php if ($esCEO): ?>
         <!-- Modal Editar -->
         <div class="modal fade" id="modalEditar<?= $promo['codPromocion'] ?>" tabindex="-1" aria-hidden="true">
           <div class="modal-dialog modal-lg">
@@ -543,7 +529,7 @@ function estadoBadge($estado) {
         <div class="table-responsive">
           <table class="table table-hover align-middle mb-0">
             <thead class="table-dark">
-              <tr><th>#</th><th>Aerolínea</th><th>Descripción</th><th>Descuento</th><th>Vigencia</th><th>Estado</th></tr>
+              <tr><th>#</th><th>Aerolínea</th><th>Descripción</th><th>Descuento</th><th>Estado</th></tr>
             </thead>
             <tbody>
               <?php if ($misPromosRes && mysqli_num_rows($misPromosRes) > 0):
@@ -553,7 +539,6 @@ function estadoBadge($estado) {
                   <td><?= htmlspecialchars($mp['nombreAerolinea'] ?? '-') ?></td>
                   <td><?= htmlspecialchars($mp['descripcionPromocion']) ?></td>
                   <td><?= number_format($mp['descuentoPromocion'], 0) ?>%</td>
-                  <td><?= $mp['vigenciaPromocion'] ? date('d/m/Y', strtotime($mp['vigenciaPromocion'])) : '-' ?></td>
                   <td><?= estadoBadge($mp['estadoPromocion']) ?></td>
                 </tr>
               <?php endwhile; else: ?>
@@ -584,7 +569,7 @@ function estadoBadge($estado) {
         <div class="table-responsive">
           <table class="table table-hover align-middle mb-0">
             <thead class="table-dark">
-              <tr><th>#</th><th>Aerolínea</th><th>CEO</th><th>Descripción</th><th>Descuento</th><th>Vigencia</th><th>Imagen</th><th>Acciones</th></tr>
+              <tr><th>#</th><th>Aerolínea</th><th>Descripción</th><th>Descuento</th><th>Acciones</th></tr>
             </thead>
             <tbody>
               <?php if ($pendientesRes && mysqli_num_rows($pendientesRes) > 0):
@@ -594,10 +579,8 @@ function estadoBadge($estado) {
                 <tr>
                   <td><?= $pend['codPromocion'] ?></td>
                   <td><?= htmlspecialchars($pend['nombreAerolinea'] ?? 'Sin aerolínea') ?></td>
-                  <td><?= htmlspecialchars($pend['nombreCEO'] ?? '-') ?></td>
                   <td><?= htmlspecialchars($pend['descripcionPromocion']) ?></td>
                   <td><?= number_format($pend['descuentoPromocion'], 0) ?>%</td>
-                  <td><?= $pend['vigenciaPromocion'] ? date('d/m/Y', strtotime($pend['vigenciaPromocion'])) : '-' ?></td>
                   <td>
                     <?php if ($imgP): ?>
                       <img src="<?= $imgP ?>" style="height:48px;width:70px;object-fit:cover;border-radius:6px;" onerror="this.replaceWith('N/A')">
