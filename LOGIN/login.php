@@ -1,6 +1,9 @@
 <?php
-
-  include_once('../conexion.inc');
+$link = null;
+include_once('../conexion.inc');
+if (!$link) {
+    die("Error de conexión a la base de datos.");
+}
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
