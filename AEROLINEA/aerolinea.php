@@ -230,7 +230,7 @@ if (!$link) {
 
           <div class="mb-3">
             <label class="form-label">Codigo IATA</label>
-            <input type="text" class="form-control" name="codigoIATA" placeholder="Codigo IATA " required>
+            <input type="text" class="form-control" name="codigoIATA" placeholder="Codigo IATA " maxlength="3" required>
           </div>
 
           <div class="mb-3">
@@ -245,7 +245,7 @@ if (!$link) {
 
           <div class="mb-3">
             <label class="form-label">Codigo pais</label>
-            <input type="text" class="form-control" name="codigoPAIS" placeholder="Codigo del pais" required>
+            <input type="text" class="form-control" name="codigoPAIS" placeholder="Codigo del pais" maxlength="3" required>
           </div>
 
           <div class="d-flex justify-content-end">
@@ -266,7 +266,7 @@ if (!$link) {
 
           <div class="mb-3">
               <label class="form-label">Codigo IATA</label>
-              <input type="text" class="form-control" name="codigoIATA" value="<?= htmlspecialchars($aerolinea['codigoIATA']) ?>" required>
+              <input type="text" class="form-control" name="codigoIATA" value="<?= htmlspecialchars($aerolinea['codigoIATA']) ?>" maxlength="3" required>
           </div>
 
 
@@ -282,7 +282,7 @@ if (!$link) {
 
           <div class="mb-3">
             <label class="form-label">Codigo pais</label>
-            <input type="text" class="form-control" name="codigoPAIS" value="<?= htmlspecialchars($aerolinea['codigoPais']) ?>" required>
+            <input type="text" class="form-control" name="codigoPAIS" value="<?= htmlspecialchars($aerolinea['codigoPais']) ?>" maxlength="3" required>
           </div>
 
           <div class="d-flex justify-content-end">
