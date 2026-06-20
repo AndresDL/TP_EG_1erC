@@ -13,12 +13,6 @@ if (!$link) {
     die("Error al conectar a la base de datos: " . mysqli_connect_error());
 }
 
-// MODO PRUEBA — descomento el rol que voy a prbar
-// ═══════════════════════════════════════════════════════════════
- $_SESSION['usuario'] = ['nombreUsuario' => 'Mateo', 'tipoUsuario' => 'CEO', 'codAerolinea' => 2];
-// $_SESSION['usuario'] = ['nombreUsuario' => 'Heis', 'tipoUsuario' => 'usuario', 'codAerolinea' => 1];
-// ═══════════════════════════════════════════════════════════════
-
 // Variables de control de rol
 $esCEO = (isset($_SESSION['usuario']) && $_SESSION['usuario']['tipoUsuario'] === 'CEO');
 $codAerolineaCEO = $esCEO ? $_SESSION['usuario']['codAerolinea'] : null;
