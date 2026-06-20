@@ -45,10 +45,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_promo']) && $es
 
     if ($descripcion !== '' && $descuento > 0 && $vigencia !== '') {
         $valAero = $codAerolinea > 0 ? $codAerolinea : 'NULL';
+        $imagen_escaped = mysqli_real_escape_string($link, $imagen);
         $sql = "INSERT INTO promociones
-                    (descripcionPromocion, descuentoPromocion, codAerolinea, estadoPromocion)
+                    (descripcionPromocion, descuentoPromocion, codAerolinea, estadoPromocion, imagenPromocion, vigenciaPromocion, codCEO)
                 VALUES
-                    ('$descripcion', $descuento, $valAero, 'pendiente')";
+                    ('$descripcion', $descuento, $valAero, 'pendiente', '$imagen_escaped', '$vigencia', $codUsuario)";
         if (mysqli_query($link, $sql)) {
             $mensaje      = "Promoción enviada correctamente. Quedará pendiente hasta que el administrador la apruebe.";
             $tipo_mensaje = "success";
@@ -95,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['baja_promo']) && $esC
     $id    = (int)$_POST['id'];
     $check = mysqli_query($link, "SELECT codPromocion FROM promociones WHERE codPromocion=$id AND estadoPromocion='aprobada'");
     if ($check && mysqli_num_rows($check) > 0) {
-        mysqli_query($link, "UPDATE promociones SET estadoPromocion='denegada' WHERE codPromocion=$id");
+        mysqli_query($link, "UPDATE promociones SET estadoPromocion='denegada' WHERE codPromocion=$id AND codAerolinea=$codUsuario");
         $mensaje = "Promoción dada de baja."; $tipo_mensaje = "success";
     } else {
         $mensaje = "No podés dar de baja esta promoción."; $tipo_mensaje = "danger";
@@ -105,13 +106,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['baja_promo']) && $esC
 // POST: APROBAR / RECHAZAR (ADMIN)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aprobar_promo']) && $esAdmin) {
     $id = (int)$_POST['id'];
-    mysqli_query($link, "UPDATE promociones SET estadoPromocion='aprobada' WHERE codPromocion=$id");
-    $mensaje = "Promoción aprobada."; $tipo_mensaje = "success";
+    if ($id > 0) {
+        mysqli_query($link, "UPDATE promociones SET estadoPromocion='aprobada' WHERE codPromocion=$id AND estadoPromocion='pendiente'");
+        $mensaje = "Promoción aprobada."; $tipo_mensaje = "success";
+    } else {
+        $mensaje = "ID inválido."; $tipo_mensaje = "danger";
+    }
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['rechazar_promo']) && $esAdmin) {
     $id = (int)$_POST['id'];
-    mysqli_query($link, "UPDATE promociones SET estadoPromocion='denegada' WHERE codPromocion=$id");
-    $mensaje = "Promoción rechazada."; $tipo_mensaje = "danger";
+    if ($id > 0) {
+        mysqli_query($link, "UPDATE promociones SET estadoPromocion='denegada' WHERE codPromocion=$id AND estadoPromocion='pendiente'");
+        $mensaje = "Promoción rechazada."; $tipo_mensaje = "danger";
+    } else {
+        $mensaje = "ID inválido."; $tipo_mensaje = "danger";
+    }
 }
 
 // PAGINACIÓN Y FILTRO 
@@ -335,7 +344,7 @@ function estadoBadge($estado) {
                       onclick="alert('Promoción solicitada. Un asesor se comunicará con usted.')">
                 SOLICITAR
               </button>
-            <?php elseif ($esCEO): ?>
+            <?php elseif ($esCEO && $promo['codAerolinea'] == $codUsuario): ?>
               <div class="mt-2 d-flex gap-2 align-items-center">
                 <?= estadoBadge($promo['estadoPromocion']) ?>
                 <button class="btn btn-sm btn-outline-primary"
@@ -348,6 +357,10 @@ function estadoBadge($estado) {
                         data-bs-target="#modalBaja<?= $promo['codPromocion'] ?>">
                   <i class="bi bi-arrow-down-circle"></i>
                 </button>
+              </div>
+            <?php elseif ($esCEO): ?>
+              <div class="mt-2">
+                <?= estadoBadge($promo['estadoPromocion']) ?>
               </div>
             <?php endif; ?>
           </div>
@@ -409,7 +422,7 @@ function estadoBadge($estado) {
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                  <button type="submit" name="baja_promo" class="btn btn-danger">Sí, dar de baja</button>
+                  <button type="button" class="btn btn-danger" onclick="darDeBaja(<?= $promo['codPromocion'] ?>)">Sí, dar de baja</button>
                 </div>
               </div>
             </form>
@@ -569,7 +582,7 @@ function estadoBadge($estado) {
         <div class="table-responsive">
           <table class="table table-hover align-middle mb-0">
             <thead class="table-dark">
-              <tr><th>#</th><th>Aerolínea</th><th>Descripción</th><th>Descuento</th><th>Acciones</th></tr>
+              <tr><th>#</th><th>Aerolínea</th><th>Descripción</th><th>Descuento</th><th>Imagen</th><th>Acciones</th></tr>
             </thead>
             <tbody>
               <?php if ($pendientesRes && mysqli_num_rows($pendientesRes) > 0):
@@ -587,24 +600,18 @@ function estadoBadge($estado) {
                     <?php else: ?><span class="text-muted small">Sin imagen</span><?php endif; ?>
                   </td>
                   <td>
-                    <form method="POST" action="promociones.php" class="d-inline">
-                      <input type="hidden" name="id" value="<?= $pend['codPromocion'] ?>">
-                      <button type="submit" name="aprobar_promo" value="1" class="btn btn-sm btn-success"
-                              onclick="return confirm('¿Aprobar?')">
-                        <i class="bi bi-check-lg"></i> Aprobar
-                      </button>
-                    </form>
-                    <form method="POST" action="promociones.php" class="d-inline ms-1">
-                      <input type="hidden" name="id" value="<?= $pend['codPromocion'] ?>">
-                      <button type="submit" name="rechazar_promo" value="1" class="btn btn-sm btn-danger"
-                              onclick="return confirm('¿Rechazar?')">
-                        <i class="bi bi-x-lg"></i> Rechazar
-                      </button>
-                    </form>
+                    <button type="button" class="btn btn-sm btn-success"
+                            onclick="accionPromo('aprobar', <?= $pend['codPromocion'] ?>)">
+                      <i class="bi bi-check-lg"></i> Aprobar
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger ms-1"
+                            onclick="accionPromo('rechazar', <?= $pend['codPromocion'] ?>)">
+                      <i class="bi bi-x-lg"></i> Rechazar
+                    </button>
                   </td>
                 </tr>
               <?php endwhile; else: ?>
-                <tr><td colspan="8" class="text-center py-4 text-muted">No hay promociones pendientes.</td></tr>
+                <tr><td colspan="6" class="text-center py-4 text-muted">No hay promociones pendientes.</td></tr>
               <?php endif; ?>
             </tbody>
           </table>
@@ -637,6 +644,7 @@ function estadoBadge($estado) {
           <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
           <li><a href="promociones.php">Promociones</a></li>
           <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
+	  <li><a href="">Mi Perfil</a></li>
         </ul>
       </div>
       <div class="col">
@@ -667,6 +675,25 @@ function estadoBadge($estado) {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+  // Esto es javascript pq no se me ocurrió como hacerlo con php
+function darDeBaja(id) {
+  document.getElementById('idBaja').value = id;
+  document.getElementById('formBaja').submit();
+}
+
+function accionPromo(accion, id) {
+  if (accion === 'aprobar') {
+    if (!confirm('¿Aprobar esta promoción?')) return;
+    document.getElementById('idAprobar').value = id;
+    document.getElementById('formAprobar').submit();
+  } else {
+    if (!confirm('¿Rechazar esta promoción?')) return;
+    document.getElementById('idRechazar').value = id;
+    document.getElementById('formRechazar').submit();
+  }
+}
+</script>
+<script>
 function previewImg(input, id) {
   const wrap = document.getElementById(id);
   const img  = wrap.querySelector('img');
@@ -690,5 +717,18 @@ function previewUrl(url, id) {
 </script>
 
 <?php mysqli_close($link); ?>
+<!-- Forms ocultos para aprobar/rechazar/baja (fuera de cualquier modal) -->
+<form id="formBaja" method="POST" action="promociones.php" style="display:none;">
+  <input type="hidden" name="id" id="idBaja" value="0">
+  <input type="hidden" name="baja_promo" value="1">
+</form>
+<form id="formAprobar" method="POST" action="promociones.php" style="display:none;">
+  <input type="hidden" name="id" id="idAprobar" value="0">
+  <input type="hidden" name="aprobar_promo" value="1">
+</form>
+<form id="formRechazar" method="POST" action="promociones.php" style="display:none;">
+  <input type="hidden" name="id" id="idRechazar" value="0">
+  <input type="hidden" name="rechazar_promo" value="1">
+</form>
 </body>
 </html>
