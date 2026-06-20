@@ -83,9 +83,6 @@
             </button>
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 10px;">
-                <button class="btn-enviar"><i class="bi bi-list"></i> Listado de Promociones</button>
-            </div>
-            <div class="d-flex justify-content-center" style="margin-top: 10px;">
                 <button class="btn-enviar"><i class="bi bi-journal"></i> Reportes</button>
             </div>
         </div>
@@ -110,7 +107,9 @@
             </button>
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 10px;">
-                <button class="btn-enviar"><i class="bi bi-journal-plus"></i> Modificar perfil</button>
+                <button class="btn-enviar"><i class="bi bi-journal-plus"></i>
+                    <a href="perfil-modificar.php" style="text-decoration: none; color:white;"> Modificar perfil</a>
+                </button>
             </div>
         </div>
     </div>
