@@ -675,6 +675,7 @@ function estadoBadge($estado) {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+  // Esto es javascript pq no se me ocurrió como hacerlo con php
 function darDeBaja(id) {
   document.getElementById('idBaja').value = id;
   document.getElementById('formBaja').submit();
