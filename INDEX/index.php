@@ -41,17 +41,17 @@ function claseNovedad($tipo) {
 ?>
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <title>VuelaSeguro – Inicio</title>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@700&display=swap" rel="stylesheet"/>
-  <link href="estilos-globales.css" rel="stylesheet">
-  <link href="estilos-novedades.css" rel="stylesheet">
-  <link href="estilos-inicio.css" rel="stylesheet">
-</head>
+  <head>
+    <title>VuelaSeguro – Inicio</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@700&display=swap" rel="stylesheet"/>
+    <link href="../INDEX/estilos-globales.css" rel="stylesheet">
+    <link href="../INDEX/estilos-novedades.css" rel="stylesheet">
+    <link href="../INDEX/estilos-inicio.css" rel="stylesheet">
+  </head>
 <body>
 
 <!-- ══ NAVBAR ══════════════════════════════════════════════════════════════ -->
