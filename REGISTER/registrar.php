@@ -1,14 +1,21 @@
 <?php
-$link = null;
-include_once('../conexion.inc');
-if (!$link) {
-    die("Error de conexión a la base de datos.");
-}
+
+
+  $link = null;
+  include_once('../conexion.inc');
+  if (!$link) {
+      die("Error de conexión a la base de datos.");
+  }
+
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
-    $validarQuery = 'SELECT emailUsuario FROM usuarios WHERE emailUsuario = ?';
+    $_SESSION['message'] = ' su cuenta ha sido creada exitosamente.';
 
+    $message = '';
+
+    $validarQuery = 'SELECT emailUsuario FROM usuarios WHERE emailUsuario = ?';
+    
     $email = $_POST['email'];
 
     $stmt = mysqli_prepare($link, $validarQuery);
@@ -25,7 +32,7 @@ if (!$link) {
 
     if ($row) {
 
-      echo 'error';
+      $message = ' el email ya está registrado.';
 
     } else {
       $hashedPassword = password_hash($_POST['clave'], PASSWORD_BCRYPT);
@@ -56,13 +63,15 @@ if (!$link) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VuelaSeguro – Contacto</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
     <link rel="stylesheet" href="register.css">
 </head>
 <body>
+  
+
   <!-- NAVBAR -->
   <section class="navbar-section">
     <div class="header-wrapper">
@@ -95,14 +104,21 @@ if (!$link) {
       </nav>
     </div>
   </section>
- 
+
   <div class="contacto-wrapper">
  
     <div class="contacto-form-card">
  
       <h2>Creación de cuenta</h2>
       <h4>Completá el formulario con los datos requeridos para continuar</h4>
- 
+
+      <?php if(isset($message)): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong><i class="bi bi-exclamation-triangle"></i> Error!</strong> <?php echo $message;?>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <?php endif; ?>
+
       <form action="registrar.php" method="POST">
  
         <div class="mb-3">

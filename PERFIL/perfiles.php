@@ -140,7 +140,7 @@ body {
             
             <div class="d-flex justify-content-center">
                 <button class="btn-enviar"><i class="bi bi-airplane"></i> 
-                    <a href="../AEROLINEA/aerolinea.php" style="text-decoration: none; color:white;"> Reservas activas</a>
+                    <a href="../AEROLINEA/aerolinea.php" style="text-decoration: none; color:white;"> Alta de Aerolineas</a>
                 </button>
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 10px;">
