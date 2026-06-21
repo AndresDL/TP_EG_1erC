@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 18-06-2026 a las 15:20:56
+-- Tiempo de generación: 21-06-2026 a las 16:12:10
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -83,9 +83,19 @@ CREATE TABLE `promociones` (
   `codPromocion` int(11) NOT NULL,
   `descripcionPromocion` text NOT NULL,
   `descuentoPromocion` decimal(10,0) NOT NULL,
-  `codAerolinea` int(11) NOT NULL,
-  `estadoPromocion` varchar(20) NOT NULL
+  `codAerolinea` int(11) DEFAULT NULL,
+  `estadoPromocion` varchar(20) NOT NULL DEFAULT 'pendiente',
+  `imagenPromocion` varchar(500) DEFAULT NULL,
+  `vigenciaPromocion` date DEFAULT NULL,
+  `codCEO` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `promociones`
+--
+
+INSERT INTO `promociones` (`codPromocion`, `descripcionPromocion`, `descuentoPromocion`, `codAerolinea`, `estadoPromocion`, `imagenPromocion`, `vigenciaPromocion`, `codCEO`) VALUES
+(1, '25% OFF en Vuelos a el Cusco', 25, 2, 'aprobada', 'https://www.boletomachupicchu.com/gutblt/wp-content/uploads/2025/11/viaje-cusco-full.jpg', '2026-07-25', 2);
 
 -- --------------------------------------------------------
 
@@ -100,6 +110,24 @@ CREATE TABLE `reservas` (
   `fechaReserva` date NOT NULL,
   `estadoReserva` enum('Pendiente de pago','Confirmada') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `reservas`
+--
+
+INSERT INTO `reservas` (`codReserva`, `codUsuario`, `codVuelo`, `fechaReserva`, `estadoReserva`) VALUES
+(1, 7, 6, '2026-06-21', 'Confirmada'),
+(2, 7, 7, '2026-06-21', 'Confirmada'),
+(3, 7, 8, '2026-06-21', 'Confirmada'),
+(4, 7, 13, '2026-06-21', 'Confirmada'),
+(6, 7, 8, '2026-06-21', 'Confirmada'),
+(9, 8, 11, '2026-06-21', 'Confirmada'),
+(10, 8, 8, '2026-06-21', 'Confirmada'),
+(11, 8, 15, '2026-06-21', 'Confirmada'),
+(12, 8, 10, '2026-06-21', 'Confirmada'),
+(15, 8, 8, '2026-06-21', 'Confirmada'),
+(16, 7, 14, '2026-06-21', 'Confirmada'),
+(17, 8, 16, '2026-06-21', 'Confirmada');
 
 -- --------------------------------------------------------
 
@@ -126,7 +154,9 @@ INSERT INTO `usuarios` (`codUsuario`, `nombreUsuario`, `claveUsuario`, `tipoUsua
 (3, 'Lucio', 'admin123', 'admin', 'luciocasadedio.a@gmail.com', '34165678978'),
 (4, 'Jacob Lash', '$2y$10$/', 'usuario', 'jacob@gmail.com', '31231231113213'),
 (5, 'Profesor Dynamo', '$2y$10$5uXzsFB3iuf5H4UvnnGkbuPZbkF0vOwaBu6lTl7g8LST7283O4aV2', 'usuario', 'dynamo@gmail.com', '32131231231313'),
-(6, 'admin admin', '$2y$10$USzA2JI.UcRN2PMMiKK6sOjKHr.fZIp77oM0z9QKeOtNQvh2iKAPi', 'admin', 'admin@gmail.com', '12345');
+(6, 'admin admin', '$2y$10$USzA2JI.UcRN2PMMiKK6sOjKHr.fZIp77oM0z9QKeOtNQvh2iKAPi', 'admin', 'admin@gmail.com', '12345'),
+(7, 'Mateo Sampaulesi', '$2y$10$szEfo0F358gqDs2q.wFXeOk7DGlnHIfczcN5CGeCIkl04XRRbPFve', 'usuario', 'mateosampaulesicve@gmail.com', '03413117530'),
+(8, 'Alan Heis', '$2y$10$6cB8YMf.vJBPFJHkt64JuuNpDcAd6W67Xq/SH/EORiOq4Sa/YP18y', 'usuario', 'alanjheis@gmail.com', '3415836423');
 
 -- --------------------------------------------------------
 
@@ -141,9 +171,24 @@ CREATE TABLE `vuelos` (
   `destinoVuelo` varchar(50) DEFAULT NULL,
   `fechaSalidaVuelo` date DEFAULT NULL,
   `horaSalidaVuelo` time(5) DEFAULT NULL,
+  `fechaVuelta` date DEFAULT NULL,
+  `horaVuelta` time(5) DEFAULT NULL,
   `precioVuelo` decimal(10,0) DEFAULT NULL,
   `asientosDisponibles` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `vuelos`
+--
+
+INSERT INTO `vuelos` (`codVuelo`, `codAerolinea`, `origenVuelo`, `destinoVuelo`, `fechaSalidaVuelo`, `horaSalidaVuelo`, `fechaVuelta`, `horaVuelta`, `precioVuelo`, `asientosDisponibles`) VALUES
+(8, 2, 'España', 'Arabia Saudita', '2026-06-28', '12:00:00.00000', '0000-00-00', '00:00:00.00000', 1000000, 296),
+(11, 1, 'Uruguay', 'Cabo Verde', '2026-06-21', '19:00:00.00000', '0000-00-00', '00:00:00.00000', 300000, 199),
+(12, 1, 'Nueva Zelanda', 'Egipto', '2026-06-21', '22:00:00.00000', '2026-07-05', '08:00:00.00000', 400000, 250),
+(13, 1, 'Nueva Zelanda', 'Egipto', '2026-06-21', '19:00:00.00000', '2026-07-05', '10:00:00.00000', 350000, 130),
+(14, 1, 'Argentina', 'Austria', '2026-06-22', '14:00:00.00000', '0000-00-00', '00:00:00.00000', 10000000, 99),
+(15, 2, 'Francia', 'Irak', '2026-06-22', '18:00:00.00000', '2026-06-29', '00:00:00.00000', 6000000, 30),
+(16, 1, 'Noruega', 'Senegal', '2026-06-22', '09:00:00.00000', '2026-06-29', '14:00:00.00000', 300000, 199);
 
 --
 -- Índices para tablas volcadas
@@ -160,6 +205,18 @@ ALTER TABLE `aerolineas`
 --
 ALTER TABLE `novedades`
   ADD PRIMARY KEY (`codNovedad`);
+
+--
+-- Indices de la tabla `promociones`
+--
+ALTER TABLE `promociones`
+  ADD PRIMARY KEY (`codPromocion`);
+
+--
+-- Indices de la tabla `reservas`
+--
+ALTER TABLE `reservas`
+  ADD PRIMARY KEY (`codReserva`);
 
 --
 -- Indices de la tabla `usuarios`
@@ -190,16 +247,28 @@ ALTER TABLE `novedades`
   MODIFY `codNovedad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
+-- AUTO_INCREMENT de la tabla `promociones`
+--
+ALTER TABLE `promociones`
+  MODIFY `codPromocion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `reservas`
+--
+ALTER TABLE `reservas`
+  MODIFY `codReserva` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `codUsuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `codUsuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `vuelos`
 --
 ALTER TABLE `vuelos`
-  MODIFY `codVuelo` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `codVuelo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
