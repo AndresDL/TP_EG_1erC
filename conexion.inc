@@ -8,8 +8,9 @@ $host     = getenv('DB_HOST');
 $username = getenv('DB_USER');
 $password = getenv('DB_PASSWORD');
 $database = getenv('DB_NAME');
+$port     = (int) getenv('DB_PORT');
 
-$link = mysqli_connect($host, $username, $password, $database)
+$link = mysqli_connect($host, $username, $password, $database, $port)
     or die("Error al conectar a la base de datos: " . mysqli_connect_error());
 
 $db = mysqli_select_db($link, $database)
