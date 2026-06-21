@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 include_once(__DIR__ . '/../conexion.inc');
 $host = 'localhost';
 $username = 'root';
@@ -13,19 +11,66 @@ if (!$link) {
     die("Error al conectar a la base de datos: " . mysqli_connect_error());
 }
 
-// MODO PRUEBA — descomento el rol que voy a prbar
-// ═══════════════════════════════════════════════════════════════
-// $_SESSION['usuario'] = ['nombreUsuario' => 'Mateo', 'tipoUsuario' => 'CEO', 'codAerolinea' => 2];
-// $_SESSION['usuario'] = ['nombreUsuario' => 'Heis', 'tipoUsuario' => 'usuario', 'codAerolinea' => 1];
-// ═══════════════════════════════════════════════════════════════
-
 // Variables de control de rol
-$esCEO = (isset($_SESSION['usuario']) && $_SESSION['usuario']['tipoUsuario'] === 'CEO');
-$codAerolineaCEO = $esCEO ? $_SESSION['usuario']['codAerolinea'] : null;
+$esCEO = (isset($_SESSION['tipoUsuario']) && $_SESSION['tipoUsuario'] === 'CEO');
+$codAerolineaCEO = $esCEO ? $_SESSION['codUsuario'] : null;
 
 // Variables de notificación
 $mensaje = "";
 $tipo_mensaje = "danger";
+
+// Usuario reserva vuelo
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
+  if (empty($_SESSION) || $_SESSION['tipoUsuario'] !== 'usuario') {
+    header('Location: ../LOGIN/login.php');
+    exit;
+  }
+  $codVueloCompra = (int)$_POST['codVuelo'];
+  $codUsuarioCompra = (int)$_SESSION['codUsuario'];
+
+  $resVuelo = mysqli_query($link, "SELECT asientosDisponibles FROM vuelos WHERE codVuelo = $codVueloCompra");
+  $vueloData = mysqli_fetch_assoc($resVuelo);
+
+  if (!$vueloData || $vueloData ['asientosDisponibles'] < 1) {
+    $mensaje = "Lo sentimos, no hay asientos disponibles para este vuelo.";
+    $tipo_mensaje = "danger";
+  } else {
+    $resExiste = mysqli_query($link, "SELECT codReserva FROM reservas WHERE codUsuario = $codUsuarioCompra AND codVuelo = $codVueloCompra AND estadoReserva = 'Pendiente de pago'");
+    if (mysqli_num_rows($resExiste) > 0) {
+      $mensaje = "Ya tienes una reserva pendiente de pago para este vuelo. Revisá tu perfil.";
+      $tipo_mensaje = "warning";
+    } else {
+      $hoy = date('Y-m-d');
+      $sqlInsertReserva = "INSERT INTO reservas (codUsuario, codVuelo, fechaReserva, estadoReserva) VALUES ($codUsuarioCompra, $codVueloCompra, '$hoy', 'Pendiente de pago')";
+      if (mysqli_query($link, $sqlInsertReserva)) {
+        // Decremento asientos
+        mysqli_query($link, "UPDATE vuelos SET asientosDisponibles = asientosDisponibles - 1 WHERE codVuelo = $codVueloCompra");
+        header('Location: vuelos.php?msg=reservado');
+        exit;
+      } else {
+        $mensaje = "Error al procesar la reserva. Por favor, inténtalo nuevamente.";
+        $tipo_mensaje = "danger";
+      }
+    }
+  }
+}
+    
+// mensajes de éxito o
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] === 'creado') {
+        $mensaje = "El vuelo ha sido registrado exitosamente.";
+        $tipo_mensaje = "success";
+    } elseif ($_GET['msg'] === 'actualizado') {
+        $mensaje = "Los datos del vuelo han sido actualizados con éxito.";
+        $tipo_mensaje = "success";
+    } elseif ($_GET['msg'] === 'eliminado') {
+        $mensaje = "El vuelo ha sido eliminado correctamente.";
+        $tipo_mensaje = "success";
+    } elseif ($_GET['msg'] === 'reservado') {
+        $mensaje = "¡Reserva realizada con éxito! Revisá tu perfil en Reservas activas para confirmar el pago.";
+        $tipo_mensaje = "info";
+    }
+}
 
 //  Traigo lista de aerolíneas
 $queryAerolineas = mysqli_query($link, "SELECT codAerolinea, nombreAerolinea FROM aerolineas ORDER BY nombreAerolinea ASC");
@@ -48,7 +93,7 @@ if (isset($_GET['editar_id']) && $esCEO) {
 
 // CREAR VUELO 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_vuelo']) && $esCEO) {
-    if (empty($_POST['origen']) || empty($_POST['destino']) || empty($_POST['fecha']) || empty($_POST['hora']) || empty($_POST['precio']) || empty($_POST['asientos']) || empty($_POST['codAerolinea'])) {
+    if (empty($_POST['origen']) || empty($_POST['destino']) || empty($_POST['fecha']) || empty($_POST['hora']) || empty($_POST['precio']) || empty($_POST['asientos'])) {
         $mensaje = "Por favor, complete todos los campos para crear el vuelo.";
     } elseif (strtotime($_POST['fecha']) < strtotime(date('Y-m-d'))) {
         $mensaje = "La fecha del vuelo no puede ser anterior a la fecha actual.";
@@ -59,7 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_vuelo']) && $es
         $hora = $_POST['hora'];
         $precio = (float)$_POST['precio'];
         $asientos = (int)$_POST['asientos'];
-        $codAerolinea = (int)$_POST['codAerolinea'];
+        $codAerolinea = $codAerolineaCEO;
+        $fechaVuelta = $_POST['fechaVuelta'];
+        $horaVuelta = $_POST['horaVuelta'];
 
         if ($precio < 0 || $precio > 10000000) {
             $mensaje = "El precio debe estar entre 0 y 10.000.000.";
@@ -68,12 +115,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_vuelo']) && $es
             $mensaje = "La cantidad de asientos debe ser entre 1 y 300.";
             $tipo_mensaje = "danger";
         } else {
-            $sqlInsert = "INSERT INTO vuelos (origenVuelo, destinoVuelo, fechaSalidaVuelo, horaSalidaVuelo, precioVuelo, asientosDisponibles, codAerolinea) 
-                          VALUES ('$origen', '$destino', '$fecha', '$hora', $precio, $asientos, $codAerolinea)";
+            $sqlInsert = "INSERT INTO vuelos (origenVuelo, destinoVuelo, fechaSalidaVuelo, horaSalidaVuelo, precioVuelo, asientosDisponibles, codAerolinea, fechaVuelta, horaVuelta) 
+                          VALUES ('$origen', '$destino', '$fecha', '$hora', $precio, $asientos, $codAerolinea, '$fechaVuelta', '$horaVuelta')";
 
             if (mysqli_query($link, $sqlInsert)) {
-                $mensaje = "El vuelo ha sido registrado exitosamente.";
-                $tipo_mensaje = "success";
+                header('Location: vuelos.php?msg=creado');
+                exit;
             } else {
                 $mensaje = "Error al registrar el vuelo en la base de datos.";
             }
@@ -84,10 +131,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_vuelo']) && $es
 // ELIMINAR VUELO 
 if (isset($_GET['eliminar']) && $esCEO) {
     $idEliminar = (int)$_GET['eliminar'];
-    $sqlDelete = "DELETE FROM vuelos WHERE codVuelo = $idEliminar";
+    $sqlDelete = "DELETE FROM vuelos WHERE codVuelo = $idEliminar AND codAerolinea = $codAerolineaCEO";
     if (mysqli_query($link, $sqlDelete)) {
-        $mensaje = "El vuelo ha sido eliminado correctamente.";
-        $tipo_mensaje = "success";
+        header('Location: vuelos.php?msg=eliminado');
+        exit;
     }
 }
 
@@ -100,9 +147,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_vuelo']) && $e
   $hora = $_POST['hora'];
   $precio = (float)$_POST['precio'];
   $asientos = (int)$_POST['asientos'];
-    $codAerolinea = (int)$_POST['codAerolinea'];
+  $codAerolinea = $codAerolineaCEO;
+  $fechaVuelta = $_POST['fechaVuelta'];
+  $horaVuelta = $_POST['horaVuelta'];
 
-    if ($precio < 0 || $precio > 10000000) {
+    if (empty($_POST['origen']) || empty($_POST['destino']) || empty($_POST['fecha']) || empty($_POST['hora']) || empty($_POST['precio']) || empty($_POST['asientos'])) {
+        $mensaje = "Por favor, complete todos los campos para actualizar el vuelo.";
+        $tipo_mensaje = "danger";
+    } elseif ($precio < 0 || $precio > 10000000) {
         $mensaje = "El precio debe estar entre 0 y 10.000.000.";
         $tipo_mensaje = "danger";
     } elseif ($asientos < 1 || $asientos > 300) {
@@ -116,27 +168,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_vuelo']) && $e
                         horaSalidaVuelo='$hora', 
                         precioVuelo=$precio, 
                         asientosDisponibles=$asientos, 
-                        codAerolinea=$codAerolinea 
-                      WHERE codVuelo=$idEditar";
+                        codAerolinea=$codAerolinea, 
+                        fechaVuelta='$fechaVuelta', 
+                        horaVuelta='$horaVuelta' 
+                      WHERE codVuelo=$idEditar AND codAerolinea = $codAerolineaCEO";
 
         if (mysqli_query($link, $sqlUpdate)) {
-            $mensaje = "Los datos del vuelo han sido actualizados con éxito.";
-            $tipo_mensaje = "success";
+            header('Location: vuelos.php?msg=actualizado');
+            exit;
         } else {
             $mensaje = "Error al intentar actualizar la información del vuelo.";
         }
     }
 }
 
-// CONSULTA Y DETERMINACIÓN DE PRECIO MÍNIMO
-$queryPrecioMin = mysqli_query($link, "SELECT MIN(precioVuelo) as minimo FROM vuelos");
+// consulta y compara precios para cartelito "mas barato"
+$precioMinSql = "SELECT MIN(precioVuelo) as minimo FROM vuelos";
+if ($esCEO) {
+    $precioMinSql .= " WHERE codAerolinea = $codAerolineaCEO";
+}
+$queryPrecioMin = mysqli_query($link, $precioMinSql);
 $fetchMin = mysqli_fetch_assoc($queryPrecioMin);
 $precioMasBaratoReal = $fetchMin['minimo'] ?? 0;
 
 // OBTENER VUELOS 
-$sql = "SELECT v.*, a.nombreAerolinea FROM vuelos v LEFT JOIN aerolineas a ON v.codAerolinea = a.codAerolinea ORDER BY v.fechaSalidaVuelo ASC";
+$filtroOrigen = isset($_GET['origen']) ? trim($_GET['origen']) : '';
+$filtroDestino = isset($_GET['destino']) ? trim($_GET['destino']) : '';
+$filtroFechaIda = isset($_GET['fechaIda']) ? $_GET['fechaIda'] : '';
+$filtroFechaVuelta = isset($_GET['fechaVuelta']) ? $_GET['fechaVuelta'] : '';
 
-$sql = "SELECT * FROM vuelos"; 
+
+$condiciones = [];
+if ($esCEO) {
+    $condiciones[] = "v.codAerolinea = $codAerolineaCEO";
+}
+if ($filtroOrigen) {
+    $filtroOrigenEsc = mysqli_real_escape_string($link, $filtroOrigen);
+    $condiciones  [] = "v.origenVuelo LIKE '%$filtroOrigenEsc%'";
+}
+if ($filtroDestino) {
+    $filtroDestinoEsc = mysqli_real_escape_string($link, $filtroDestino);
+    $condiciones[] = "v.destinoVuelo LIKE '%$filtroDestinoEsc%'";
+}
+if ($filtroFechaIda) {
+    $filtroFechaIdaEsc = mysqli_real_escape_string($link, $filtroFechaIda);
+    $condiciones[] = "v.fechaSalidaVuelo = '$filtroFechaIdaEsc'";
+}
+if ($filtroFechaVuelta) {
+    $filtroFechaVueltaEsc = mysqli_real_escape_string($link, $filtroFechaVuelta);
+    $condiciones[] = "v.fechaVuelta = '$filtroFechaVueltaEsc'";
+} else if ($filtroFechaIda && !$filtroFechaVuelta) {
+    $condiciones[] = "(v.fechaVuelta IS NULL OR v.fechaVuelta = '0000-00-00')";
+}
+
+$sql = "SELECT v.*, a.nombreAerolinea FROM vuelos v LEFT JOIN aerolineas a ON v.codAerolinea = a.codAerolinea";
+if (!empty($condiciones)) {
+    $sql = $sql . " WHERE " . implode(" AND ", $condiciones);
+}
+$sql = $sql . " ORDER BY v.fechaSalidaVuelo ASC";
 $result = mysqli_query($link, $sql);
 $totalVuelos = mysqli_num_rows($result);
 ?>
@@ -213,25 +302,28 @@ $totalVuelos = mysqli_num_rows($result);
       <h3>MODIFICAR BÚSQUEDA</h3>
       <div class="sidebar-grupo">
         <label>Origen</label>
-        <input class="sidebar-input" type="text">
+        <input class="sidebar-input" type="text" id="sb_origen" value="<?php echo htmlspecialchars($filtroOrigen); ?>">
       </div>
       <div class="sidebar-grupo">
         <label>Destino</label>
-        <input class="sidebar-input" type="text">
+        <input class="sidebar-input" type="text" id="sb_destino" value="<?php echo htmlspecialchars($filtroDestino); ?>">
       </div>
       <div class="sidebar-grupo">
         <label>Ida fecha</label>
-        <input class="sidebar-input-date" type="date">
+        <input class="sidebar-input-date" type="date" id="sb_fechaIda" value="<?php echo htmlspecialchars($filtroFechaIda); ?>">
       </div>
       <div class="sidebar-grupo">
-        <label>Vuelta fecha</label>
-        <input class="sidebar-input-date" type="date">
+        <label>Vuelta fecha<span style="color: var(--gris);"> (opcional)</span></label>
+        <input class="sidebar-input-date" type="date" id="sb_fechaVuelta" 
+               value="<?php echo htmlspecialchars($filtroFechaVuelta); ?>"
+               title="Fecha de vuelta (opcional)">
+        <small style="color: var(--gris); font-size: .78rem;">(opcional)</small>
       </div>
       <div class="sidebar-grupo">
         <label>Cantidad pasajeros</label>
-        <input class="sidebar-input" type="number">
+        <input class="sidebar-input" type="number" id ="sb_pasajeros" placeholder="Ej: 2" min="1" value="<?php echo htmlspecialchars(isset($_GET['pasajeros']) ? $_GET['pasajeros'] : ''); ?>">
       </div>
-      <button class="btn-aplicar">Buscar</button>
+      <button class="btn-aplicar" onclick="aplicarFiltros()"> Buscar </button>
     </aside>
 
     <!-- LISTA DE VUELOS DISPONIBLES -->
@@ -253,7 +345,6 @@ $totalVuelos = mysqli_num_rows($result);
       <?php if ($totalVuelos > 0): ?>
           <?php while($vuelo = mysqli_fetch_assoc($result)): ?>
             <?php 
-              // Control definitivo: Si el id del vuelo no existe en la BD o viene vacío, le forzamos un valor para que el HTML no se rompa
               $idSeguroVuelo = !empty($vuelo['codVuelo']) ? (int)$vuelo['codVuelo'] : 0; 
             ?>
             <div class="vuelo-card">
@@ -265,14 +356,24 @@ $totalVuelos = mysqli_num_rows($result);
                   <?php endif; ?>
                 </div>
                 <div class="vuelo-ruta">
-                  <div>
+                  <div >
                     <span class="ciudad-nombre"><?php echo htmlspecialchars($vuelo['origenVuelo']); ?></span>
-                    <span class="ciudad-horario">Salida: <?php echo date('H:i', strtotime($vuelo['horaSalidaVuelo'])); ?> hs</span>
+                    <span class="ciudad-horario">Horario salida ida: <?php echo date('H:i', strtotime($vuelo['horaSalidaVuelo'])); ?> hs</span>
                   </div>
                   <div>
                     <span class="ciudad-nombre"><?php echo htmlspecialchars($vuelo['destinoVuelo']); ?></span>
-                    <span class="ciudad-horario">Fecha: <?php echo date('d/m/Y', strtotime($vuelo['fechaSalidaVuelo'])); ?></span>
+                    <span class="ciudad-horario">Fecha ida: <?php echo date('d/m/Y', strtotime($vuelo['fechaSalidaVuelo'])); ?></span>
                   </div>
+                  <?php if (!empty($vuelo['fechaVuelta']) && $vuelo['fechaVuelta'] !== '0000-00-00'): ?>
+                    <div>
+                      <span class="ciudad-nombre"> &nbsp; </span>
+                      <span class="ciudad-horario">Horario salida vuelta: <?php echo date('H:i', strtotime($vuelo['horaVuelta'])); ?> hs</span>
+                    </div>
+                    <div>
+                      <span class="ciudad-nombre"> &nbsp; </span>
+                      <span class="ciudad-horario">Fecha vuelta: <?php echo date('d/m/Y', strtotime($vuelo['fechaVuelta'])); ?></span>
+                    </div>
+                  <?php endif; ?>
                 </div>
                 <div class="vuelo-detalles-row">
                   <div>Asientos libres: <strong><?php echo $vuelo['asientosDisponibles']; ?></strong></div>
@@ -295,7 +396,8 @@ $totalVuelos = mysqli_num_rows($result);
                       data-hora="<?php echo date('H:i', strtotime($vuelo['horaSalidaVuelo'])); ?>"
                       data-precio="<?php echo $vuelo['precioVuelo']; ?>"
                       data-asientos="<?php echo $vuelo['asientosDisponibles']; ?>"
-                      data-codAerolinea="<?php echo $vuelo['codAerolinea']; ?>"
+                      data-fecha-vuelta="<?php echo $vuelo['fechaVuelta']; ?>"
+                      data-hora-vuelta="<?php echo date('H:i', strtotime($vuelo['horaVuelta'])); ?>"
                     >Editar</button>
                     <button type="button"
                       class="btn btn-danger btn-sm btn-delete w-100"
@@ -308,7 +410,14 @@ $totalVuelos = mysqli_num_rows($result);
                     >Eliminar</button>
                   </div>
                 <?php else: ?>
-                  <button class="btn-comprar">COMPRAR</button>
+                  <?php if (!empty($_SESSION) && $_SESSION ['tipoUsuario'] === 'usuario'): ?>
+                    <button type="button" class="btn-comprar"
+                    onclick="confirmarCompra(<?php echo $idSeguroVuelo; ?>)">
+                    COMPRAR
+                    </button>
+                  <?php else: ?>
+                    <a href="../LOGIN/login.php" class="btn-comprar" style="text-align: center;">COMPRAR</a>
+                  <?php endif; ?>
                 <?php endif; ?>
               </div>
             </div>
@@ -361,14 +470,18 @@ $totalVuelos = mysqli_num_rows($result);
                   <label class="form-label">Asientos Disponibles</label>
                   <input type="number" name="asientos" class="form-control" placeholder="Cantidad" min="1" max="300" inputmode="numeric" required>
                 </div>
-                <div class="col-md-6">
+                <input type="hidden" name="codAerolinea" value="<?php echo $codAerolineaCEO; ?>">
+                <div class="col-md-12">
                   <label class="form-label">Aerolínea</label>
-                  <select name="codAerolinea" class="form-select" id="aerolineaSelect" required>
-                    <option value="">Elige una aerolínea</option>
-                    <?php foreach($aerolineas as $aero): ?>
-                      <option value="<?php echo $aero['codAerolinea']; ?>"><?php echo htmlspecialchars($aero['nombreAerolinea']); ?></option>
-                    <?php endforeach; ?>
-                  </select>
+                  <input type="text" class="form-control" value="<?php echo htmlspecialchars($_SESSION['nombreUsuario'] ?? ''); ?>" disabled>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Fecha de Vuelta<span style="color: var(--gris);"> (opcional)</span></label>
+                  <input type="date" name="fechaVuelta" class="form-control">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Hora de Vuelta<span style="color: var(--gris);"> (opcional)</span></label>
+                  <input type="text" name="horaVuelta" class="form-control" placeholder="HH:MM" maxlength="5" pattern="^([01]\\d|2[0-3]):([0-5]\\d)$">
                 </div>
               </div>
             </div>
@@ -383,7 +496,7 @@ $totalVuelos = mysqli_num_rows($result);
 
     <!-- MODAL CONFIRMAR ELIMINACIÓN DE VUELO -->
     <div class="modal fade" id="modalEliminarVuelo" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-dialog-centered">
         <form action="" method="GET" id="formEliminarVuelo">
           <input type="hidden" name="eliminar" id="eliminar_vuelo_id" value="">
           <div class="modal-content text-start" style="font-weight: normal;">
@@ -403,49 +516,6 @@ $totalVuelos = mysqli_num_rows($result);
       </div>
     </div>
   <?php endif; ?>
-    <!-- LISTA VUELOS -->
-
-<div class="vuelos-lista">
-
-  <div class="vuelos-header">
-    <h2>Vuelos disponibles</h2>
-    <span class="vuelos-count"><?php echo $totalVuelos; ?></span>
-  </div>
-
-  <?php if ($totalVuelos > 0) { ?>
-    <div class="vuelo-card">
-      <div class="vuelo-info">
-        <div class="vuelo-aerolinea-row">
-          <span class="vuelo-aerolinea">Aerolíneas Argentinas</span>
-          <span class="badge-barato">MÁS BARATO</span>
-        </div>
-        <div class="vuelo-ruta">
-          <div>
-            <span class="ciudad-nombre">Buenos Aires</span>
-            <span class="ciudad-horario">Salida: 06:45 hs</span>
-          </div>
-          <div>
-            <span class="ciudad-nombre">Mendoza</span>
-            <span class="ciudad-horario">Llegada: 08:40 hs</span>
-          </div>
-        </div>
-        <div class="vuelo-detalles-row">
-          <div>Pasajeros: <strong>1</strong></div>
-          <div>Duración: <strong>1h 55m</strong></div>
-          <div>Equipaje incluido: <span class="equipaje-si">✓</span></div>
-        </div>
-      </div>
-      <div class="vuelo-precio-col">
-        <span class="precio-label">PRECIO</span>
-        <span class="precio-valor">$89.990</span>
-        <button class="btn-comprar">COMPRAR</button>
-      </div>
-    </div>
-  <?php } else { ?>
-    <p style="text-align: center; margin-top: 10px; color: var(--gris); border: 1px solid var(--borde); border-radius: 8px; padding: 40px 20px; background-color: var(--gris-claro);">No hay vuelos disponibles en este momento.</p>
-  <?php } ?>
-
-</div> </div> 
 
   <!-- FOOTER -->
 
@@ -508,60 +578,61 @@ $totalVuelos = mysqli_num_rows($result);
       var modalSubmitBtn = document.getElementById('modalSubmitBtn');
       var idInput = document.getElementById('id_vuelo_input');
       var form = document.getElementById('formCrearEditar');
-      // Hora input: allow typing digits and auto-insert colon (HH:MM)
       var horaInput = form.querySelector('input[name="hora"]');
-      if (horaInput) {
-        // enforce attributes in case browser reset
-        horaInput.setAttribute('placeholder','HH:MM');
-        horaInput.setAttribute('maxlength','5');
-        horaInput.setAttribute('pattern','^([01]\\d|2[0-3]):([0-5]\\d)$');
+        var horaVueltaInput = form.querySelector('input[name="horaVuelta"]');
+        var setupHoraInput = function(input){
+          if (!input) return;
+          input.setAttribute('placeholder','HH:MM');
+          input.setAttribute('maxlength','5');
+          input.setAttribute('pattern','^([01]\\d|2[0-3]):([0-5]\\d)$');
 
-        horaInput.addEventListener('input', function(){
-          var v = horaInput.value || '';
-          // keep only digits
-          var digits = v.replace(/\D/g, '');
-          if (digits.length > 4) digits = digits.slice(0,4);
-          if (digits.length <= 2) {
-            horaInput.value = digits;
-          } else {
-            horaInput.value = digits.slice(0,2) + ':' + digits.slice(2);
-          }
-        });
+          input.addEventListener('input', function(){
+            var v = input.value || '';
+            var digits = v.replace(/\D/g, '');
+            if (digits.length > 4) digits = digits.slice(0,4);
+            if (digits.length <= 2) {
+              input.value = digits;
+            } else {
+              input.value = digits.slice(0,2) + ':' + digits.slice(2);
+            }
+          });
 
-        horaInput.addEventListener('blur', function(){
-          var v = horaInput.value || '';
-          if (!v) return;
-          var m = v.match(/^(\d{1,2}):?(\d{1,2})$/);
-          if (m) {
-            var hh = m[1].padStart(2,'0');
-            var mm = (m[2]||'0').padStart(2,'0');
-            if (parseInt(hh,10) > 23) hh = '23';
-            if (parseInt(mm,10) > 59) mm = '59';
-            horaInput.value = hh + ':' + mm;
-          } else {
-            horaInput.value = '';
-          }
-        });
-      }
+          input.addEventListener('blur', function(){
+            var v = input.value || '';
+            if (!v) return;
+            var m = v.match(/^(\d{1,2}):?(\d{1,2})$/);
+            if (m) {
+              var hh = m[1].padStart(2,'0');
+              var mm = (m[2]||'0').padStart(2,'0');
+              if (parseInt(hh,10) > 23) hh = '23';
+              if (parseInt(mm,10) > 59) mm = '59';
+              input.value = hh + ':' + mm;
+            } else {
+              input.value = '';
+            }
+          });
+        };
 
+        setupHoraInput(horaInput);
+        setupHoraInput(horaVueltaInput);
       document.querySelectorAll('.btn-edit').forEach(function(btn){
         btn.addEventListener('click', function(){
           var dataset = btn.dataset;
-          // set header style to warning (amarillo)
+          // panel de editar vuelo con header amarilo
           modalHeader.classList.remove('bg-primary','text-white');
           modalHeader.classList.add('bg-warning','text-dark');
           modalTitle.innerHTML = '<i class="bi bi-pencil-square me-2"></i>Modificar Vuelo';
           
-          // Asignar valores al form ANTES de mostrar
+          // carga los datos del vuelo en el form antes de abrir el modal
           form.querySelector('input[name="origen"]').value = dataset.origen || '';
           form.querySelector('input[name="destino"]').value = dataset.destino || '';
           form.querySelector('input[name="fecha"]').value = dataset.fecha || '';
           form.querySelector('input[name="hora"]').value = dataset.hora || '';
           form.querySelector('input[name="precio"]').value = dataset.precio || '';
           form.querySelector('input[name="asientos"]').value = dataset.asientos || '';
-          form.querySelector('[name="codAerolinea"]').value = dataset.codAerolinea || '';
+          form.querySelector('input[name="fechaVuelta"]').value = dataset.fechaVuelta || '';
+          form.querySelector('input[name="horaVuelta"]').value = dataset.horaVuelta || '';
           
-          // set hidden id and change submit button a editar
           idInput.value = dataset.id || '';
           modalSubmitBtn.textContent = 'Actualizar Vuelo';
           modalSubmitBtn.classList.remove('btn-success');
@@ -581,7 +652,6 @@ $totalVuelos = mysqli_num_rows($result);
         });
       });
 
-      // When modal is hidden, reset to create mode
       modalEl.addEventListener('hidden.bs.modal', function(){
         modalHeader.classList.remove('bg-warning','text-dark');
         modalHeader.classList.add('bg-primary','text-white');
@@ -594,6 +664,51 @@ $totalVuelos = mysqli_num_rows($result);
         form.reset();
       });
     })();
+    function aplicarFiltros(){
+      var params = new URLSearchParams();
+      var origen = document.getElementById('sb_origen').value.trim();
+      var destino = document.getElementById('sb_destino').value.trim();
+      var fechaIda = document.getElementById('sb_fechaIda').value;
+      var fechaVuelta = document.getElementById('sb_fechaVuelta').value;
+      var pasajeros = document.getElementById('sb_pasajeros').value.trim();
+      if (origen) params.append('origen', origen);
+      if (destino) params.append('destino', destino);
+      if (fechaIda) params.append('fechaIda', fechaIda);
+      if (fechaVuelta) params.append('fechaVuelta', fechaVuelta);
+      if (pasajeros) params.append('pasajeros', pasajeros);
+      window.location.href = 'vuelos.php?' + params.toString();
+    }
+    function confirmarCompra(codVuelo) {
+    document.getElementById('codVueloComprar').value = codVuelo;
+    var modal = new bootstrap.Modal(document.getElementById('modalConfirmarCompra'));
+    modal.show();
+}
   </script>
+
+<!-- CARTELITO CONFIRMAR COMPRA  -->
+<div class="modal fade" id="modalConfirmarCompra" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:12px;border:none;">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title"><i class="bi bi-check-circle me-2"></i>Confirmar reserva</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:24px;">
+        <p style="font-size:1rem;margin:0;">¿Confirmás la reserva de este vuelo? Podrás pagar desde tu perfil en <strong>Reservas activas</strong>.</p>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form method="POST" action="vuelos.php" id="formComprar">
+          <input type="hidden" name="comprar_vuelo" value="1">
+          <input type="hidden" name="codVuelo" id="codVueloComprar" value="">
+          <button type="submit" class="btn btn-success" style="font-weight:600;">
+            <i class="bi bi-check-lg me-1"></i>Sí, reservar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
