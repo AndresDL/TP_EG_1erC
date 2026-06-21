@@ -1,5 +1,3 @@
-
-
 # Use the official PHP image with Apache
 FROM php:8.2-apache
  
@@ -12,9 +10,8 @@ RUN apt-get update \
 # Copy all project files into Apache's web root
 COPY . /var/www/html/
  
-# Point Apache document root to the INDEX subfolder (only target specific directives)
-RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/INDEX|g' /etc/apache2/sites-available/000-default.conf \
-    && sed -i 's|<Directory /var/www/html>|<Directory /var/www/html/INDEX>|g' /etc/apache2/apache2.conf
+# Copy custom Apache virtual host config
+COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
  
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www/html \
@@ -22,6 +19,7 @@ RUN chown -R www-data:www-data /var/www/html \
  
 # Expose port 80
 EXPOSE 80
+
 
 
 
