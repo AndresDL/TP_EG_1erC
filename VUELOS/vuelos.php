@@ -1,14 +1,8 @@
 <?php
-include_once(__DIR__ . '/../conexion.inc');
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$database = 'vuelaseguro';
-
-$link = mysqli_connect($host, $username, $password, $database);
-
+$link = null;
+include_once('../conexion.inc');
 if (!$link) {
-    die("Error al conectar a la base de datos: " . mysqli_connect_error());
+    die("Error de conexión a la base de datos.");
 }
 
 // Variables de control de rol
