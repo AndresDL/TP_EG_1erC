@@ -10,11 +10,18 @@ $password = getenv('DB_PASSWORD');
 $database = getenv('DB_NAME');
 $port     = (int) getenv('DB_PORT');
 
-$link = mysqli_connect($host, $username, $password, $database, $port)
-    or die("Error al conectar a la base de datos: " . mysqli_connect_error());
+mysqli_report(MYSQLI_REPORT_OFF);
 
-$db = mysqli_select_db($link, $database)
-    or die("Error al seleccionar la base de datos: " . mysqli_error($link));
+$link = mysqli_connect($host, $username, $password, $database, $port);
+
+if (!$link) {
+    die("Error al conectar a la base de datos: " . mysqli_connect_error() . " (Code: " . mysqli_connect_errno() . ")");
+}
+
+$db = mysqli_select_db($link, $database);
+if (!$db) {
+    die("Error al seleccionar la base de datos: " . mysqli_error($link));
+}
 
 mysqli_set_charset($link, 'utf8');
 ?>
