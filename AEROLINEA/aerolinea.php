@@ -66,11 +66,19 @@ if (!$link) {
     mysqli_stmt_close($stmt);
 
 
-    if (!empty($row1) || !empty($row2)) {
+    if (!empty($row1)) {
 
-      echo 'error';
+      $message = ' el nombre de la aerolinea ya está registrado.';
+
+    }
+
+    elseif(!empty($row2)) {
+
+      $message = ' el codigo IATA ya está registrado.';
 
     } else {
+
+      $_SESSION['message'] = ' aerolinea creada exitosamente.';
 
       $hashedPassword = password_hash($_POST['clave'], PASSWORD_BCRYPT);
 
@@ -88,7 +96,7 @@ if (!$link) {
       
       mysqli_stmt_close($stmt2);  
 
-      echo 'aerolinea registrada';
+      header('Location: ../AEROLINEA/aerolinea-lista.php');
     };
   }
 
@@ -148,7 +156,6 @@ if (!$link) {
       
       mysqli_stmt_close($stmt2);  
 
-      header('Location: ../AEROLINEA/aerolinea-lista.php');
   };
   
 ?>
@@ -218,6 +225,13 @@ if (!$link) {
  
       <h2>Alta de aerolinea</h2>
       <h4>Completá el formulario con los datos requeridos para continuar</h4>
+
+      <?php if (isset($message) && $message !== ''): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong><i class="bi bi-exclamation-triangle"></i> Error! </strong> <?php echo $message; $message = ''; ?>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <?php endif; ?>
 
       <?php if(empty($_POST['id'])): ?>
         <form action="aerolinea.php" method="POST">
