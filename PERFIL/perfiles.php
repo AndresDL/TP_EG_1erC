@@ -4,6 +4,59 @@
     if (!$link) {
         die("Error de conexión a la base de datos.");
     }
+
+// Pago la reserva, cambio a confirmada
+if (isset($_GET['pagar']) && !empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
+    $codReservaPagar = (int)$_GET['pagar'];
+    $codUsuarioPagar = (int)$_SESSION['codUsuario'];
+    mysqli_query($link, "UPDATE reservas SET estadoReserva = 'Confirmada' WHERE codReserva = $codReservaPagar AND codUsuario = $codUsuarioPagar AND estadoReserva = 'Pendiente de pago'");
+     header('Location: perfiles.php?msg=pagado');
+     exit;
+}
+// Cancelo reserva
+if (isset($_GET['cancelar']) && !empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
+    $codReservaCancelar = (int)$_GET['cancelar'];
+    $codUsuarioCancelar = (int)$_SESSION['codUsuario'];
+    // Recuperar asineto
+    $resReservaCancelar = mysqli_query($link, "SELECT codVuelo FROM reservas WHERE codReserva = $codReservaCancelar AND codUsuario = $codUsuarioCancelar");
+    $dataCancelar = mysqli_fetch_assoc($resReservaCancelar);
+    if ($dataCancelar) {
+        mysqli_query($link, "UPDATE vuelos SET asientosDisponibles = asientosDisponibles + 1 WHERE codVuelo = ". (int)$dataCancelar['codVuelo']);
+        mysqli_query($link, "DELETE FROM reservas WHERE codReserva =$codReservaCancelar AND codUsuario = $codUsuarioCancelar");
+    }
+    header('Location: perfiles.php?msg=cancelado');
+    exit;
+}
+
+// Los mensajeeeees
+$msgPerfil = '';
+$tipoPerfil = 'success';
+if (isset($_GET['msg'])) {
+    if ($_GET['msg'] === 'pagado') { 
+        $msgPerfil = "¡Pago confirmado! Tu reserva fue registrada exitosamente";
+      } elseif ($_GET['msg'] === 'cancelado') { 
+        $msgPerfil = "Reserva cancelada correctamente."; 
+        $tipoPerfil = "warning";
+      }
+}
+
+// Reservas activas del usuario
+$reservasActivas = [];
+if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
+    $codUsuarioRes = (int)$_SESSION['codUsuario'];
+    $resActivas = mysqli_query($link, 
+    "SELECT r.codReserva, r.estadoReserva, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo, v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo, a.nombreAerolinea
+     FROM reservas r JOIN vuelos v ON r.codVuelo = v.codVuelo 
+     LEFT JOIN aerolineas a ON v.codAerolinea = a.codAerolinea
+     WHERE r.codUsuario = $codUsuarioRes AND r.estadoReserva ='Pendiente de pago'
+     ORDER BY r.fechaReserva DESC");
+    while ($row = mysqli_fetch_assoc($resActivas)) {
+        $reservasActivas[] = $row;
+    }
+}
+
+$seccion = isset($_GET['seccion']) ? $_GET['seccion'] : '';
+
 ?>
 
 <!DOCTYPE html>
@@ -17,9 +70,22 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
     <link rel="stylesheet" href="../CONTACTO/contacto.css">
+    <link rel="stylesheet" href="../VUELOS/vuelos.css">
 </head>
 
 <body>
+<!-- se me subia el footer no se pq, si ven esto y saben como arreglarlo con los .css genial -->
+<style>
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+.footer-section {
+    margin-top: auto;
+}
+</style>
+
 <!-- ══ NAVBAR ══════════════════════════════════════════════════════════════ -->
 <header>
   <section class="navbar-section">
@@ -74,7 +140,7 @@
             
             <div class="d-flex justify-content-center">
                 <button class="btn-enviar"><i class="bi bi-airplane"></i> 
-                    <a href="../AEROLINEA/aerolinea.php" style="text-decoration: none; color:white;"> Añadir Aerolinea</a>
+                    <a href="../AEROLINEA/aerolinea.php" style="text-decoration: none; color:white;"> Reservas activas</a>
                 </button>
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 10px;">
@@ -90,21 +156,20 @@
 
 <!-- PERFIL DE USUARIO -->
 <?php elseif(!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario'): ?>
+    <?php if ($seccion !== 'reservas'): ?>
     <div class="contacto-wrapper">
         <div class="contacto-form-card">
-
             <h2>Panel de <?php echo $_SESSION['tipoUsuario'] ?></h2>
             <h4>Podes utilizar las funciones de abajo.</h4>
-            
             <div class="d-flex justify-content-center">
-                <button class="btn-enviar"><i class="bi bi-airplane"></i> 
-                    <a href="" style="text-decoration: none; color:white;"> Resevas activas</a>
+                <button class="btn-enviar"><i class="bi bi-airplane"></i>
+                    <a href="perfiles.php?seccion=reservas" style="text-decoration: none; color:white;"> Reservas activas</a>
                 </button>
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 10px;">
                 <button class="btn-enviar"><i class="bi bi-list"></i>
-                <a href="" style="text-decoration: none; color:white;"> Historial de compras</a> 
-            </button>
+                    <a href="" style="text-decoration: none; color:white;"> Historial de compras</a>
+                </button>
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 10px;">
                 <button class="btn-enviar"><i class="bi bi-journal-plus"></i>
@@ -113,6 +178,72 @@
             </div>
         </div>
     </div>
+    <?php endif; ?>
+
+        <!-- TABLA RESERVAS ACTIVAS -->
+        <?php if ($seccion === 'reservas'): ?>
+<div style="max-width:900px;margin:32px auto;padding:0 16px;">
+    <h3 style="font-family:'Sora',sans-serif;color:var(--azul-oscuro);margin-bottom:20px;">
+        <i class="bi bi-airplane me-2" style="color:var(--azul);"></i>Reservas activas
+    </h3>    
+
+                <?php if (!empty($msgPerfil)): ?>
+                <div class="alert alert-<?php echo $tipoPerfil; ?> alert-dismissible fade show" role="alert">
+                    <?php echo $msgPerfil; ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <?php endif; ?>
+
+                <?php if (empty($reservasActivas)): ?>
+                    <p style="text-align:center;color:var(--gris);padding:30px 0;">
+                        No tenés reservas pendientes. <a href="../VUELOS/vuelos.php">¡Buscá un vuelo!</a>
+                    </p>
+                <?php else: ?>
+                    <div style="display:flex;flex-direction:column;gap:16px;">
+        <?php foreach ($reservasActivas as $res): ?>
+        <div class="vuelo-card" style="display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--borde);border-radius:16px;padding:16px 20px;gap:16px;">
+        <div class="vuelo-info" style="flex:1;">
+            <div class="vuelo-aerolinea-row" style="margin-bottom:8px;">
+            <span class="vuelo-aerolinea">Aerolínea: <?php echo htmlspecialchars($res['nombreAerolinea'] ?? '—'); ?></span>
+            <span style="background:#fff3cd;color:#856404;border-radius:6px;padding:2px 10px;font-size:.78rem;font-weight:600;">Pendiente de pago</span>
+            </div>
+            <div class="vuelo-ruta">
+            <div>
+                <span class="ciudad-nombre"><?php echo htmlspecialchars($res['origenVuelo']); ?></span>
+                <span class="ciudad-horario">Salida: <?php echo date('d/m/Y', strtotime($res['fechaSalidaVuelo'])); ?> — <?php echo date('H:i', strtotime($res['horaSalidaVuelo'])); ?> hs</span>
+            </div>
+            <div>
+                <span class="ciudad-nombre"><?php echo htmlspecialchars($res['destinoVuelo']); ?></span>
+                <?php if (!empty($res['fechaVuelta']) && $res['fechaVuelta'] !== '0000-00-00'): ?>
+                <span class="ciudad-horario">Vuelta: <?php echo date('d/m/Y', strtotime($res['fechaVuelta'])); ?> — <?php echo date('H:i', strtotime($res['horaVuelta'])); ?> hs</span>
+                <?php else: ?>
+                <span class="ciudad-horario" style="color:var(--gris);">Solo ida</span>
+                <?php endif; ?>
+            </div>
+            </div>
+        </div>
+  <div class="vuelo-precio-col" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:140px;gap:8px;">
+    <span class="precio-label">PRECIO</span>
+    <span class="precio-valor">$<?php echo number_format($res['precioVuelo'], 0, ',', '.'); ?></span>
+    <button type="button"
+        class="btn btn-success btn-sm w-100"
+        style="border-radius:8px;font-weight:600;padding:8px;"
+        onclick="confirmarPago(<?php echo $res['codReserva']; ?>)">
+        <i class="bi bi-credit-card me-1"></i>Pagar
+    </button>
+    <button type="button"
+        class="btn btn-outline-danger btn-sm w-100"
+        style="border-radius:8px;font-weight:600;padding:8px;"
+        onclick="confirmarCancelar(<?php echo $res['codReserva']; ?>)">
+        <i class="bi bi-x-circle me-1"></i>Cancelar
+    </button>
+  </div>
+    </div>
+    <?php endforeach; ?>
+    </div>
+     <?php endif; ?>
+    </div>
+    <?php endif; ?>
 
 <!-- PERFIL DE CEO -->
 <?php elseif(!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'CEO'): ?>
@@ -187,5 +318,59 @@
     </footer>
 </section>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- cartel confirmar pago verde -->
+<div class="modal fade" id="modalConfirmarPago" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:12px;border:none;">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title"><i class="bi bi-credit-card me-2"></i>Confirmar pago</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:24px;">
+        <p style="font-size:1rem;margin:0;">¿Confirmás el pago de esta reserva? La reserva pasará a estado <strong>Confirmada</strong>.</p>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <a id="linkPagar" href="#" class="btn btn-success" style="font-weight:600;">
+          <i class="bi bi-check-lg me-1"></i>Sí, pagar
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- cartel confirmar cancelación rojo -->
+<div class="modal fade" id="modalConfirmarCancelar" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:12px;border:none;">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>Cancelar reserva</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:24px;">
+        <p style="font-size:1rem;margin:0;">¿Estás seguro que querés cancelar esta reserva? Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Volver</button>
+        <a id="linkCancelar" href="#" class="btn btn-danger" style="font-weight:600;">
+          <i class="bi bi-trash me-1"></i>Sí, cancelar
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function confirmarPago(codReserva) {
+    document.getElementById('linkPagar').href = 'perfiles.php?pagar=' + codReserva + '&seccion=reservas';
+    new bootstrap.Modal(document.getElementById('modalConfirmarPago')).show();
+}
+function confirmarCancelar(codReserva) {
+    document.getElementById('linkCancelar').href = 'perfiles.php?cancelar=' + codReserva;
+    new bootstrap.Modal(document.getElementById('modalConfirmarCancelar')).show();
+}
+</script>
+
 </body>
 </html>

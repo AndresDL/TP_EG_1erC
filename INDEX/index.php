@@ -106,14 +106,14 @@ function claseNovedad($tipo) {
       <input type="date" onchange="setFecha(this,'textoIda','Ida')"/>
     </div>
     <div class="fecha-wrap">
-      <div class="fecha-label" id="labelVuelta">
-        <span id="textoVuelta">Vuelta</span>
+      <div class="fecha-label" id="labelVuelta" title="Fecha de vuelta (opcional)">
+        <span id="textoVuelta" style="color: var(--gris); font-size: .78rem">Vuelta (opcional)</span>
         <i class="bi bi-calendar3" style="color:var(--gris);"></i>
       </div>
-      <input type="date" onchange="setFecha(this,'textoVuelta','Vuelta')"/>
+      <input type="date" onchange="setFecha(this,'textoVuelta','Vuelta (opcional)')"/>
     </div>
     <input class="filtro-input" type="number" placeholder="👤 Pasajeros" min="1" style="max-width:130px;"/>
-    <button class="btn-buscar-hero" onclick="alert('Buscador en construcción.')">
+    <button class="btn-buscar-hero" onclick="buscarVuelos()">
       <i class="bi bi-search me-1"></i> Buscar
     </button>
   </div>
@@ -313,8 +313,12 @@ function claseNovedad($tipo) {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+var fechaIdaVal = '';
+var fechaVueltaVal = '';
+
 function setFecha(input, labelId, fallback) {
-    const el = document.getElementById(labelId);
+
+   const el = document.getElementById(labelId);
     if (input.value) {
         const [y, m, d] = input.value.split('-');
         el.textContent = d + '/' + m + '/' + y;
@@ -323,6 +327,19 @@ function setFecha(input, labelId, fallback) {
         el.textContent = fallback;
         el.style.color = 'var(--gris)';
     }
+}
+
+function buscarVuelos() {
+    var origen = document.getElementById('origen').value.trim();
+    var destino = document.getElementById('destino').value.trim();
+    var pasajeros = document.querySelector('.filtro-input[placeholder*="Pasajeros"]').value.trim();
+    var params = new URLSearchParams();
+    if (origen) params.append('origen', origen);
+    if (destino) params.append('destino', destino);
+    if (fechaIdaVal) params.append('fechaIda', fechaIdaVal);
+    if (fechaVueltaVal) params.append('fechaVuelta', fechaVueltaVal);
+    if (pasajeros) params.append('pasajeros', pasajeros);
+    window.location.href = '../VUELOS/vuelos.php?' + params.toString();
 }
 </script>
 
