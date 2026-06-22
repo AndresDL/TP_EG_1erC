@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_vuelo']) && $es
         $asientos = (int)$_POST['asientos'];
         $codAerolinea = $codAerolineaCEO;
         if($_POST['fechaVuelta'] === '0000-00-00'){
-          $fechaVuelta = null;
+          $fechaVuelta = NULL;
         } else {
           $fechaVuelta = $_POST['fechaVuelta'];
         }
