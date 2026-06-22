@@ -198,8 +198,9 @@ body {
             </button>
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 10px;">
-                <button class="btn-enviar"><i class="bi bi-journal"></i></button>
-                <a href="admin-reporte-usuarios.php" style="text-decoration: none; color:white;">Reportes</a>
+                <button class="btn-enviar"><i class="bi bi-list"></i>
+                    <a href="../PERFIL/admin-reporte-usuarios.php" style="text-decoration: none; color:white;"> Reportes de usuarios</a> 
+                </button>
             </div>
         </div>
     </div>
@@ -245,7 +246,7 @@ body {
         <i class="bi bi-airplane me-2" style="color:var(--azul);"></i>Reservas activas
     </h3>    
 
-                <?php if (!empty($msgPerfil)): ?>
+                 <?php if (!empty($msgPerfil)): ?>
                 <div class="alert alert-<?php echo $tipoPerfil; ?> alert-dismissible fade show" role="alert">
                     <?php echo $msgPerfil; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>

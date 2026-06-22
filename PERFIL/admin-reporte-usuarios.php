@@ -6,7 +6,7 @@ if (!$link) {
 }
 
 // Solo admin puede acceder
-if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['tipoUsuario'] != 'admin') {
+if (!isset($_SESSION['tipoUsuario']) || $_SESSION['tipoUsuario'] != 'admin') {
     header("Location: ../INDEX/index.php");
     exit();
 }
@@ -87,7 +87,7 @@ function buildQuery($extras = []) {
     return '?' . http_build_query(array_merge($base, $extras));
 }
 
-$nombreAdmin = $_SESSION['usuario']['nombreUsuario'];
+$nombreAdmin = $_SESSION['nombreUsuario'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
