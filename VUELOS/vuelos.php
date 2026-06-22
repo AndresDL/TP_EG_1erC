@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_vuelo']) && $es
           $fechaVuelta = $_POST['fechaVuelta'];
         }
         $horaVuelta = $_POST['horaVuelta'];
-
+        var_dump($_POST);
         if ($precio < 0 || $precio > 10000000) {
             $mensaje = "El precio debe estar entre 0 y 10.000.000.";
             $tipo_mensaje = "danger";
