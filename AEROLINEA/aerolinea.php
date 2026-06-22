@@ -121,41 +121,49 @@ if (!$link) {
 
     foreach($array as $aero) {
 
-      if($aero['nombreAerolinea'] === $_POST['nombre'] || $aero['codigoIATA'] === $_POST['codigoIATA']){
+      if($aero['nombreAerolinea'] === $_POST['nombre']){
 
-        echo'error';
+        $message = ' el nombre de la aerolinea ya está registrado.';
 
-        return;
       }
+      else if($aero['codigoIATA'] === $_POST['codigoIATA']){
 
-    }
+        $message = ' el codigo IATA ya está registrado.';
 
-      $id = $_POST['id'];
+      } else {
 
-      $hashedPassword = password_hash($_POST['clave'], PASSWORD_BCRYPT);
+        $_SESSION['message'] = ' aerolinea editada exitosamente.';
 
-      $stmt2 = mysqli_prepare($link, 
-      'UPDATE aerolineas SET 
-        nombreAerolinea = ?,
-        codigoIATA = ?,
-        descripcionAerolinea = ?,
-        codigoPais = ?,
-        claveAerolinea = ? WHERE codAerolinea = ?'
-      );
+        $id = $_POST['id'];
 
-      mysqli_stmt_bind_param($stmt2, 'sssssi',
-      $_POST['nombre'],
-      $_POST['codigoIATA'],
-      $_POST['desc'],
-      $_POST['codigoPAIS'],
-      $hashedPassword,
-      $_POST['id']
-      );
+        $hashedPassword = password_hash($_POST['clave'], PASSWORD_BCRYPT);
 
-      mysqli_stmt_execute($stmt2);
-      
-      mysqli_stmt_close($stmt2);  
+        $stmt2 = mysqli_prepare($link, 
+        'UPDATE aerolineas SET 
+          nombreAerolinea = ?,
+          codigoIATA = ?,
+          descripcionAerolinea = ?,
+          codigoPais = ?,
+          claveAerolinea = ? WHERE codAerolinea = ?'
+        );
 
+        mysqli_stmt_bind_param($stmt2, 'sssssi',
+        $_POST['nombre'],
+        $_POST['codigoIATA'],
+        $_POST['desc'],
+        $_POST['codigoPAIS'],
+        $hashedPassword,
+        $_POST['id']
+        );
+
+        mysqli_stmt_execute($stmt2);
+        
+        mysqli_stmt_close($stmt2); 
+
+        header('Location: ../AEROLINEA/aerolinea-lista.php');
+
+      } 
+    }  
   };
   
 ?>
