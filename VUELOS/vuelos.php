@@ -1,6 +1,10 @@
 <?php
-
-include_once($_SERVER['DOCUMENT_ROOT'] . '/conexion.inc');
+$link = null;
+include_once('../conexion.inc');
+if (!$link) {
+    die("Error de conexión a la base de datos.");
+}
+// include_once($_SERVER['DOCUMENT_ROOT'] . '/conexion.inc');
 
 // Variables de control de rol
 $esCEO = (isset($_SESSION['tipoUsuario']) && $_SESSION['tipoUsuario'] === 'CEO');
