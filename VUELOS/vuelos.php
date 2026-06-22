@@ -1,15 +1,6 @@
 <?php
-include_once(__DIR__ . '/../conexion.inc');
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$database = 'vuelaseguro';
 
-$link = mysqli_connect($host, $username, $password, $database);
-
-if (!$link) {
-    die("Error al conectar a la base de datos: " . mysqli_connect_error());
-}
+include_once($_SERVER['DOCUMENT_ROOT'] . '/conexion.inc');
 
 // Variables de control de rol
 $esCEO = (isset($_SESSION['tipoUsuario']) && $_SESSION['tipoUsuario'] === 'CEO');
@@ -709,6 +700,8 @@ $totalVuelos = mysqli_num_rows($result);
     </div>
   </div>
 </div>
+
+
 
 </body>
 </html>
