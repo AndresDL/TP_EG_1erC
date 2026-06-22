@@ -227,6 +227,28 @@ if (!empty($condiciones)) {
 $sql = $sql . " ORDER BY v.fechaSalidaVuelo ASC";
 $result = mysqli_query($link, $sql);
 $totalVuelos = mysqli_num_rows($result);
+
+// Solo mostrar promos que el usuario logueado haya solicitado
+$promosMap = [];
+$codUsuarioVuelos = (int)($_SESSION['codUsuario'] ?? 0);
+if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
+    $resPromosVuelos = mysqli_query($link,
+        "SELECT p.codAerolinea, p.codPromocion, p.descripcionPromocion, p.descuentoPromocion, p.vigenciaPromocion
+         FROM promociones p
+         INNER JOIN solicitudes_promo s ON p.codPromocion = s.codPromocion
+         WHERE p.estadoPromocion = 'aprobada'
+         AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
+         AND s.codUsuario = $codUsuarioVuelos
+         ORDER BY p.descuentoPromocion DESC");
+    if ($resPromosVuelos) {
+        while ($pv = mysqli_fetch_assoc($resPromosVuelos)) {
+            $cod = $pv['codAerolinea'];
+            if (!isset($promosMap[$cod])) {
+                $promosMap[$cod] = $pv;
+            }
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -380,9 +402,28 @@ $totalVuelos = mysqli_num_rows($result);
               </div>
               
               <div class="vuelo-precio-col">
+                <?php
+                  $promoVuelo = $promosMap[$vuelo['codAerolinea']] ?? null;
+                  $precioOriginal = (float)$vuelo['precioVuelo'];
+                  $precioConDescuento = $promoVuelo
+                    ? round($precioOriginal * (1 - $promoVuelo['descuentoPromocion'] / 100))
+                    : null;
+                ?>
                 <span class="precio-label">PRECIO</span>
-                <span class="precio-valor">$<?php echo number_format($vuelo['precioVuelo'], 0, ',', '.'); ?></span>
-                
+                <?php if ($promoVuelo): ?>
+                  <span class="precio-valor" style="text-decoration:line-through; color:var(--gris); font-size:1rem;">
+                    $<?php echo number_format($precioOriginal, 0, ',', '.'); ?>
+                  </span>
+                  <span class="precio-valor" style="color:var(--verde);">
+                    $<?php echo number_format($precioConDescuento, 0, ',', '.'); ?>
+                  </span>
+                  <span style="background:#e8f8ee;color:var(--verde);border:1px solid #9dd8b5;border-radius:8px;padding:3px 10px;font-size:.78rem;font-weight:700;margin-top:2px;">
+                    <i class="bi bi-tag-fill me-1"></i><?php echo number_format($promoVuelo['descuentoPromocion'],0); ?>% OFF — <?php echo htmlspecialchars($promoVuelo['descripcionPromocion']); ?>
+                  </span>
+                <?php else: ?>
+                  <span class="precio-valor">$<?php echo number_format($precioOriginal, 0, ',', '.'); ?></span>
+                <?php endif; ?>
+
                 <?php if ($esCEO): ?>
                   <div class="d-flex flex-column gap-2 w-100 mt-2">
                     <button type="button"
@@ -411,8 +452,15 @@ $totalVuelos = mysqli_num_rows($result);
                 <?php else: ?>
                   <?php if (isset($_SESSION['tipoUsuario']) && $_SESSION ['tipoUsuario'] === 'usuario'): ?>
                     <button type="button" class="btn-comprar"
-                    onclick="confirmarCompra(<?php echo $idSeguroVuelo; ?>)">
-                    COMPRAR
+                      onclick="confirmarCompra(
+                        <?php echo $idSeguroVuelo; ?>,
+                        '<?php echo addslashes($vuelo['origenVuelo']); ?>',
+                        '<?php echo addslashes($vuelo['destinoVuelo']); ?>',
+                        <?php echo $precioOriginal; ?>,
+                        <?php echo $precioConDescuento ?? 'null'; ?>,
+                        '<?php echo $promoVuelo ? addslashes($promoVuelo['descripcionPromocion']) : ''; ?>'
+                      )">
+                      COMPRAR
                     </button>
                   <?php else: ?>
                     <a href="../LOGIN/login.php" class="btn-comprar" style="text-align: center;">COMPRAR</a>
@@ -677,14 +725,39 @@ $totalVuelos = mysqli_num_rows($result);
       if (pasajeros) params.append('pasajeros', pasajeros);
       window.location.href = 'vuelos.php?' + params.toString();
     }
-    function confirmarCompra(codVuelo) {
-    document.getElementById('codVueloComprar').value = codVuelo;
-    var modal = new bootstrap.Modal(document.getElementById('modalConfirmarCompra'));
-    modal.show();
-}
+    function confirmarCompra(codVuelo, origen, destino, precioOriginal, precioConPromo, promoDesc) {
+      document.getElementById('codVueloComprar').value = codVuelo;
+      document.getElementById('modalRutaTexto').textContent = origen + ' → ' + destino;
+
+      var bloquePromo = document.getElementById('bloquePromo');
+      var bloqueNormal = document.getElementById('bloquePrecionormal');
+
+      if (precioConPromo !== null && precioConPromo !== undefined) {
+        // Hay promo disponible
+        bloquePromo.style.display = 'block';
+        bloqueNormal.style.display = 'none';
+        document.getElementById('modalPromoDesc').textContent = promoDesc;
+        document.getElementById('modalPrecioSin').textContent = '$' + precioOriginal.toLocaleString('es-AR');
+        document.getElementById('modalPrecioConPromo').textContent = '$' + precioConPromo.toLocaleString('es-AR');
+        // Reset radio
+        document.getElementById('promoSi').checked = true;
+      } else {
+        // Sin promo
+        bloquePromo.style.display = 'none';
+        bloqueNormal.style.display = 'block';
+        document.getElementById('modalPrecioTexto').textContent = '$' + precioOriginal.toLocaleString('es-AR');
+      }
+
+      var modal = new bootstrap.Modal(document.getElementById('modalConfirmarCompra'));
+      modal.show();
+    }
+
+    function actualizarPrecioModal() {
+      // Solo visual — la lógica de descuento se puede aplicar en el servidor si se agrega un campo hidden
+    }
   </script>
 
-<!-- CARTELITO CONFIRMAR COMPRA  -->
+<!-- MODAL CONFIRMAR COMPRA -->
 <div class="modal fade" id="modalConfirmarCompra" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="border-radius:12px;border:none;">
@@ -693,7 +766,44 @@ $totalVuelos = mysqli_num_rows($result);
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" style="padding:24px;">
-        <p style="font-size:1rem;margin:0;">¿Confirmás la reserva de este vuelo? Podrás pagar desde tu perfil en <strong>Reservas activas</strong>.</p>
+        <p style="font-size:1rem;margin-bottom:12px;">
+          <strong id="modalRutaTexto"></strong>
+        </p>
+        <!-- Precio sin promo -->
+        <div id="bloquePrecionormal">
+          <p style="font-size:1rem;margin:0;">
+            Precio: <strong id="modalPrecioTexto"></strong>
+          </p>
+        </div>
+        <!-- Selector de promo si hay -->
+        <div id="bloquePromo" style="display:none; margin-top:12px; background:#e8f8ee; border:1px solid #9dd8b5; border-radius:10px; padding:14px;">
+          <p style="font-weight:700; color:var(--verde); margin-bottom:8px;">
+            <i class="bi bi-tag-fill me-1"></i> Hay una promoción disponible para este vuelo
+          </p>
+          <p id="modalPromoDesc" style="font-size:.9rem; color:#333; margin-bottom:10px;"></p>
+          <div class="d-flex gap-3 align-items-center">
+            <div>
+              <span style="font-size:.85rem; color:var(--gris);">Sin promo:</span><br>
+              <strong id="modalPrecioSin" style="text-decoration:line-through; color:var(--gris);"></strong>
+            </div>
+            <div>
+              <span style="font-size:.85rem; color:var(--verde);">Con promo:</span><br>
+              <strong id="modalPrecioConPromo" style="color:var(--verde); font-size:1.1rem;"></strong>
+            </div>
+          </div>
+          <div class="mt-3">
+            <label style="font-weight:600; font-size:.9rem;">¿Aplicar promoción?</label><br>
+            <div class="form-check form-check-inline mt-1">
+              <input class="form-check-input" type="radio" name="aplicarPromo" id="promoSi" value="si" checked onchange="actualizarPrecioModal()">
+              <label class="form-check-label" for="promoSi">Sí, aplicar descuento</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="aplicarPromo" id="promoNo" value="no" onchange="actualizarPrecioModal()">
+              <label class="form-check-label" for="promoNo">No, precio normal</label>
+            </div>
+          </div>
+        </div>
+        <p class="mt-3 mb-0" style="font-size:.88rem; color:var(--gris);">Podrás pagar desde tu perfil en <strong>Reservas activas</strong>.</p>
       </div>
       <div class="modal-footer bg-light">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

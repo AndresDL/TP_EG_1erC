@@ -103,6 +103,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['baja_promo']) && $esC
     }
 }
 
+// POST: SOLICITAR PROMO (USUARIO)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['solicitar_promo']) && $esUsuario) {
+    $codPromo = (int)$_POST['codPromocion'];
+    if ($codPromo > 0 && $codUsuario > 0) {
+        // INSERT IGNORE evita duplicados gracias al UNIQUE KEY
+        $sqlSol = "INSERT IGNORE INTO solicitudes_promo (codUsuario, codPromocion, fechaSolicitud)
+                   VALUES ($codUsuario, $codPromo, CURDATE())";
+        if (mysqli_query($link, $sqlSol)) {
+            if (mysqli_affected_rows($link) > 0) {
+                $mensaje = "¡Promoción solicitada! El descuento se aplicará en tus vuelos.";
+                $tipo_mensaje = "success";
+            } else {
+                $mensaje = "Ya tenés esta promoción solicitada.";
+                $tipo_mensaje = "info";
+            }
+        } else {
+            $mensaje = "Error al solicitar: " . mysqli_error($link);
+            $tipo_mensaje = "danger";
+        }
+    }
+}
+
 // POST: APROBAR / RECHAZAR (ADMIN)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aprobar_promo']) && $esAdmin) {
     $id = (int)$_POST['id'];
@@ -336,10 +358,29 @@ function estadoBadge($estado) {
                 <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión para solicitar
               </a>
             <?php elseif ($esUsuario): ?>
-              <button class="btn-solicitar"
-                      onclick="alert('Promoción solicitada. Un asesor se comunicará con usted.')">
-                SOLICITAR
-              </button>
+              <?php
+                // Ver si el usuario ya solicitó esta promo
+                $yaSolicito = false;
+                if ($codUsuario > 0) {
+                    $chkSol = mysqli_query($link, "SELECT codSolicitud FROM solicitudes_promo
+                        WHERE codUsuario=$codUsuario AND codPromocion={$promo['codPromocion']} LIMIT 1");
+                    $yaSolicito = $chkSol && mysqli_num_rows($chkSol) > 0;
+                }
+              ?>
+              <?php if ($yaSolicito): ?>
+                <button class="btn-solicitar" disabled
+                        style="background:var(--verde); cursor:default; opacity:.85;">
+                  <i class="bi bi-check-circle me-1"></i> Promoción activa
+                </button>
+              <?php else: ?>
+                <form method="POST" action="promociones.php">
+                  <input type="hidden" name="solicitar_promo" value="1">
+                  <input type="hidden" name="codPromocion" value="<?= $promo['codPromocion'] ?>">
+                  <button type="submit" class="btn-solicitar">
+                    SOLICITAR
+                  </button>
+                </form>
+              <?php endif; ?>
             <?php elseif ($esCEO && $promo['codAerolinea'] == $codUsuario): ?>
               <div class="mt-2 d-flex gap-2 align-items-center">
                 <?= estadoBadge($promo['estadoPromocion']) ?>
