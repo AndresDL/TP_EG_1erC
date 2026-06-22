@@ -49,11 +49,18 @@ if (isset($_GET['msg'])) {
 $reservasActivas = [];
 if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
     $codUsuarioRes = (int)$_SESSION['codUsuario'];
-    $resActivas = mysqli_query($link, 
-    "SELECT r.codReserva, r.estadoReserva, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo, v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo, a.nombreAerolinea
-     FROM reservas r JOIN vuelos v ON r.codVuelo = v.codVuelo 
+    $resActivas = mysqli_query($link,
+    "SELECT r.codReserva, r.estadoReserva, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo, v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo, v.codAerolinea, a.nombreAerolinea,
+            p.descuentoPromocion, p.descripcionPromocion
+     FROM reservas r
+     JOIN vuelos v ON r.codVuelo = v.codVuelo
      LEFT JOIN aerolineas a ON v.codAerolinea = a.codAerolinea
-     WHERE r.codUsuario = $codUsuarioRes AND r.estadoReserva ='Pendiente de pago'
+     LEFT JOIN solicitudes_promo sp ON sp.codUsuario = r.codUsuario
+     LEFT JOIN promociones p ON p.codPromocion = sp.codPromocion
+         AND p.codAerolinea = v.codAerolinea
+         AND p.estadoPromocion = 'aprobada'
+         AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
+     WHERE r.codUsuario = $codUsuarioRes AND r.estadoReserva = 'Pendiente de pago'
      ORDER BY r.fechaReserva DESC");
     while ($row = mysqli_fetch_assoc($resActivas)) {
         $reservasActivas[] = $row;
@@ -79,9 +86,16 @@ if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
     $offset = ($paginaActual - 1) * $porPagina;
 
     $resHistorial = mysqli_query($link,
-    "SELECT r.codReserva, r.estadoReserva, r.fechaReserva, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo, v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo, a.nombreAerolinea
-     FROM reservas r JOIN vuelos v ON r.codVuelo = v.codVuelo
+    "SELECT r.codReserva, r.estadoReserva, r.fechaReserva, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo, v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo, v.codAerolinea, a.nombreAerolinea,
+            p.descuentoPromocion, p.descripcionPromocion
+     FROM reservas r
+     JOIN vuelos v ON r.codVuelo = v.codVuelo
      LEFT JOIN aerolineas a ON v.codAerolinea = a.codAerolinea
+     LEFT JOIN solicitudes_promo sp ON sp.codUsuario = r.codUsuario
+     LEFT JOIN promociones p ON p.codPromocion = sp.codPromocion
+         AND p.codAerolinea = v.codAerolinea
+         AND p.estadoPromocion = 'aprobada'
+         AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
      WHERE r.codUsuario = $codUsuarioHist AND r.estadoReserva = 'Confirmada'
      ORDER BY r.fechaReserva DESC
      LIMIT $porPagina OFFSET $offset");
@@ -259,7 +273,25 @@ body {
         </div>
   <div class="vuelo-precio-col" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:140px;gap:8px;">
     <span class="precio-label">PRECIO</span>
-    <span class="precio-valor">$<?php echo number_format($res['precioVuelo'], 0, ',', '.'); ?></span>
+    <?php
+      $descRes = !empty($res['descuentoPromocion']) ? (float)$res['descuentoPromocion'] : 0;
+      $precioFinalRes = $descRes > 0
+        ? round((float)$res['precioVuelo'] * (1 - $descRes / 100))
+        : (float)$res['precioVuelo'];
+    ?>
+    <?php if ($descRes > 0): ?>
+      <span style="text-decoration:line-through;color:var(--gris);font-size:.9rem;">
+        $<?php echo number_format((float)$res['precioVuelo'], 0, ',', '.'); ?>
+      </span>
+      <span class="precio-valor" style="color:var(--verde);">
+        $<?php echo number_format($precioFinalRes, 0, ',', '.'); ?>
+      </span>
+      <span style="background:#e8f8ee;color:var(--verde);border:1px solid #9dd8b5;border-radius:8px;padding:2px 8px;font-size:.75rem;font-weight:700;">
+        <?php echo number_format($descRes, 0); ?>% OFF
+      </span>
+    <?php else: ?>
+      <span class="precio-valor">$<?php echo number_format((float)$res['precioVuelo'], 0, ',', '.'); ?></span>
+    <?php endif; ?>
     <button type="button"
         class="btn btn-success btn-sm w-100"
         style="border-radius:8px;font-weight:600;padding:8px;"
@@ -320,7 +352,25 @@ body {
         </div>
   <div class="vuelo-precio-col" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:140px;gap:8px;">
     <span class="precio-label">PRECIO</span>
-    <span class="precio-valor">$<?php echo number_format($com['precioVuelo'], 0, ',', '.'); ?></span>
+    <?php
+      $descCom = !empty($com['descuentoPromocion']) ? (float)$com['descuentoPromocion'] : 0;
+      $precioFinalCom = $descCom > 0
+        ? round((float)$com['precioVuelo'] * (1 - $descCom / 100))
+        : (float)$com['precioVuelo'];
+    ?>
+    <?php if ($descCom > 0): ?>
+      <span style="text-decoration:line-through;color:var(--gris);font-size:.9rem;">
+        $<?php echo number_format((float)$com['precioVuelo'], 0, ',', '.'); ?>
+      </span>
+      <span class="precio-valor" style="color:var(--verde);">
+        $<?php echo number_format($precioFinalCom, 0, ',', '.'); ?>
+      </span>
+      <span style="background:#e8f8ee;color:var(--verde);border:1px solid #9dd8b5;border-radius:8px;padding:2px 8px;font-size:.75rem;font-weight:700;">
+        <?php echo number_format($descCom, 0); ?>% OFF — <?php echo htmlspecialchars($com['descripcionPromocion']); ?>
+      </span>
+    <?php else: ?>
+      <span class="precio-valor">$<?php echo number_format((float)$com['precioVuelo'], 0, ',', '.'); ?></span>
+    <?php endif; ?>
   </div>
     </div>
     <?php endforeach; ?>
