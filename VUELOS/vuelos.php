@@ -96,7 +96,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_vuelo']) && $es
         $precio = (float)$_POST['precio'];
         $asientos = (int)$_POST['asientos'];
         $codAerolinea = $codAerolineaCEO;
-        $fechaVuelta = $_POST['fechaVuelta'];
+        if($_POST['fechaVuelta'] === '0000-00-00'){
+          $fechaVuelta = null;
+        } else {
+          $fechaVuelta = $_POST['fechaVuelta'];
+        }
         $horaVuelta = $_POST['horaVuelta'];
 
         if ($precio < 0 || $precio > 10000000) {
