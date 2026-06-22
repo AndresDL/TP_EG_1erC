@@ -51,6 +51,7 @@ mysqli_stmt_close($stmt);
     <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
      
@@ -66,7 +67,7 @@ mysqli_stmt_close($stmt);
             <div class="nav-links">
             <a href="../INDEX/index.php">Inicio</a>
             <a href="../VUELOS/vuelos.php">Vuelos</a>
-            <a href="../NOVEDADES/novedades.php" class="active">Novedades</a>
+            <a href="../NOVEDADES/novedades.php">Novedades</a>
             <a href="../PROMOCIONES/promociones.php">Promociones</a>
             </div>
             

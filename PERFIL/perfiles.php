@@ -209,6 +209,14 @@ body {
     <?php if ($seccion !== 'reservas' && $seccion !== 'historial'): ?>
     <div class="contacto-wrapper">
         <div class="contacto-form-card">
+            
+            <?php if (isset($_SESSION['message']) && $_SESSION['message'] !== ''): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong><i class="bi bi-check-circle"></i> Éxito!</strong> <?php echo $_SESSION['message']; $_SESSION['message'] = ''; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
+
             <h2>Panel de <?php echo $_SESSION['tipoUsuario'] ?></h2>
             <h4>Podes utilizar las funciones de abajo.</h4>
             <div class="d-flex justify-content-center">

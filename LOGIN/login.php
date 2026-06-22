@@ -5,6 +5,10 @@ if (!$link) {
     die("Error de conexión a la base de datos.");
 }
 
+  if(isset($_SESSION['codUsuario'])){
+    header('Location: ../INDEX/index.php');
+  }
+
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
     $message = '';
@@ -71,6 +75,7 @@ if (!$link) {
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
     <link rel="stylesheet" href="login.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
  
@@ -205,6 +210,6 @@ if (!$link) {
     </footer>
   </section>
  
-  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
