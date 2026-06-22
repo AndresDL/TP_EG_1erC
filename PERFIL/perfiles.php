@@ -199,7 +199,7 @@ body {
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 10px;">
                 <button class="btn-enviar"><i class="bi bi-journal"></i></button>
-                <a href="admin-reporte-usuarios.php" style="text-decoration: none; color:white;"> Listado de Aerolineas</a>
+                <a href="admin-reporte-usuarios.php" style="text-decoration: none; color:white;">Reportes</a>
             </div>
         </div>
     </div>
