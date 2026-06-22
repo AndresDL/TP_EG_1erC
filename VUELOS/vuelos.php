@@ -1,15 +1,10 @@
 <?php
-include_once(__DIR__ . '/../conexion.inc');
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$database = 'vuelaseguro';
-
-$link = mysqli_connect($host, $username, $password, $database);
-
+$link = null;
+include_once('../conexion.inc');
 if (!$link) {
-    die("Error al conectar a la base de datos: " . mysqli_connect_error());
+    die("Error de conexión a la base de datos.");
 }
+// include_once($_SERVER['DOCUMENT_ROOT'] . '/conexion.inc');
 
 // Variables de control de rol
 $esCEO = (isset($_SESSION['tipoUsuario']) && $_SESSION['tipoUsuario'] === 'CEO');
@@ -105,9 +100,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_vuelo']) && $es
         $precio = (float)$_POST['precio'];
         $asientos = (int)$_POST['asientos'];
         $codAerolinea = $codAerolineaCEO;
-        $fechaVuelta = $_POST['fechaVuelta'];
+        if($_POST['fechaVuelta'] === ''){
+          $fechaVuelta = NULL;
+        } else {
+          $fechaVuelta = $_POST['fechaVuelta'];
+        }
         $horaVuelta = $_POST['horaVuelta'];
-
+        var_dump($_POST);
         if ($precio < 0 || $precio > 10000000) {
             $mensaje = "El precio debe estar entre 0 y 10.000.000.";
             $tipo_mensaje = "danger";
@@ -709,6 +708,8 @@ $totalVuelos = mysqli_num_rows($result);
     </div>
   </div>
 </div>
+
+
 
 </body>
 </html>

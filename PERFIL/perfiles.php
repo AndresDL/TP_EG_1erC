@@ -5,6 +5,11 @@
         die("Error de conexión a la base de datos.");
     }
 
+$porPagina   = 6;
+$paginaActual = isset($_GET['pagina']) && is_numeric($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
+if ($paginaActual < 1) $paginaActual = 1;
+$offset = ($paginaActual - 1) * $porPagina;
+
 // Pago la reserva, cambio a confirmada
 if (isset($_GET['pagar']) && !empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
     $codReservaPagar = (int)$_GET['pagar'];
@@ -52,6 +57,36 @@ if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
      ORDER BY r.fechaReserva DESC");
     while ($row = mysqli_fetch_assoc($resActivas)) {
         $reservasActivas[] = $row;
+    }
+}
+
+// Historial de compras del usuario (reservas confirmadas, es decir ya pagadas)
+$historialCompras = [];
+$totalHistorial = 0;
+$totalPaginasHistorial = 1;
+if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
+    $codUsuarioHist = (int)$_SESSION['codUsuario'];
+
+    // Cuento el total de compras confirmadas para calcular la cantidad de páginas
+    $resConteo = mysqli_query($link,
+    "SELECT COUNT(*) AS total
+     FROM reservas r
+     WHERE r.codUsuario = $codUsuarioHist AND r.estadoReserva = 'Confirmada'");
+    $filaConteo = mysqli_fetch_assoc($resConteo);
+    $totalHistorial = (int)$filaConteo['total'];
+    $totalPaginasHistorial = max(1, (int)ceil($totalHistorial / $porPagina));
+    if ($paginaActual > $totalPaginasHistorial) $paginaActual = $totalPaginasHistorial;
+    $offset = ($paginaActual - 1) * $porPagina;
+
+    $resHistorial = mysqli_query($link,
+    "SELECT r.codReserva, r.estadoReserva, r.fechaReserva, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo, v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo, a.nombreAerolinea
+     FROM reservas r JOIN vuelos v ON r.codVuelo = v.codVuelo
+     LEFT JOIN aerolineas a ON v.codAerolinea = a.codAerolinea
+     WHERE r.codUsuario = $codUsuarioHist AND r.estadoReserva = 'Confirmada'
+     ORDER BY r.fechaReserva DESC
+     LIMIT $porPagina OFFSET $offset");
+    while ($row = mysqli_fetch_assoc($resHistorial)) {
+        $historialCompras[] = $row;
     }
 }
 
@@ -156,7 +191,7 @@ body {
 
 <!-- PERFIL DE USUARIO -->
 <?php elseif(!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario'): ?>
-    <?php if ($seccion !== 'reservas'): ?>
+    <?php if ($seccion !== 'reservas' && $seccion !== 'historial'): ?>
     <div class="contacto-wrapper">
         <div class="contacto-form-card">
             <h2>Panel de <?php echo $_SESSION['tipoUsuario'] ?></h2>
@@ -168,7 +203,7 @@ body {
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 10px;">
                 <button class="btn-enviar"><i class="bi bi-list"></i>
-                    <a href="" style="text-decoration: none; color:white;"> Historial de compras</a>
+                    <a href="perfiles.php?seccion=historial" style="text-decoration: none; color:white;"> Historial de compras</a>
                 </button>
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 10px;">
@@ -180,7 +215,7 @@ body {
     </div>
     <?php endif; ?>
 
-        <!-- TABLA RESERVAS ACTIVAS -->
+<!-- TABLA RESERVAS ACTIVAS -->
         <?php if ($seccion === 'reservas'): ?>
 <div style="max-width:900px;margin:32px auto;padding:0 16px;">
     <h3 style="font-family:'Sora',sans-serif;color:var(--azul-oscuro);margin-bottom:20px;">
@@ -245,6 +280,77 @@ body {
     </div>
     <?php endif; ?>
 
+<!-- TABLA HISTORIAL DE COMPRAS --------------------------------------->
+        <?php if ($seccion === 'historial'): ?>
+<div style="max-width:900px;margin:32px auto;padding:0 16px;">
+    <h3 style="font-family:'Sora',sans-serif;color:var(--azul-oscuro);margin-bottom:20px;">
+        <i class="bi bi-bag-check me-2" style="color:var(--azul);"></i>Historial de compras
+    </h3>
+
+                <?php if (empty($historialCompras)): ?>
+                    <p style="text-align:center;color:var(--gris);padding:30px 0;">
+                        Todavía no tenés compras confirmadas. <a href="../VUELOS/vuelos.php">¡Buscá un vuelo!</a>
+                    </p>
+                <?php else: ?>
+                    <div style="display:flex;flex-direction:column;gap:16px;">
+        <?php foreach ($historialCompras as $com): ?>
+        <div class="vuelo-card" style="display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--borde);border-radius:16px;padding:16px 20px;gap:16px;">
+        <div class="vuelo-info" style="flex:1;">
+            <div class="vuelo-aerolinea-row" style="margin-bottom:8px;">
+            <span class="vuelo-aerolinea">Aerolínea: <?php echo htmlspecialchars($com['nombreAerolinea'] ?? '—'); ?></span>
+            <span style="background:#d4edda;color:#155724;border-radius:6px;padding:2px 10px;font-size:.78rem;font-weight:600;">Confirmada</span>
+            </div>
+            <div class="vuelo-ruta">
+            <div>
+                <span class="ciudad-nombre"><?php echo htmlspecialchars($com['origenVuelo']); ?></span>
+                <span class="ciudad-horario">Salida: <?php echo date('d/m/Y', strtotime($com['fechaSalidaVuelo'])); ?> — <?php echo date('H:i', strtotime($com['horaSalidaVuelo'])); ?> hs</span>
+            </div>
+            <div>
+                <span class="ciudad-nombre"><?php echo htmlspecialchars($com['destinoVuelo']); ?></span>
+                <?php if (!empty($com['fechaVuelta']) && $com['fechaVuelta'] !== '0000-00-00'): ?>
+                <span class="ciudad-horario">Vuelta: <?php echo date('d/m/Y', strtotime($com['fechaVuelta'])); ?> — <?php echo date('H:i', strtotime($com['horaVuelta'])); ?> hs</span>
+                <?php else: ?>
+                <span class="ciudad-horario" style="color:var(--gris);">Solo ida</span>
+                <?php endif; ?>
+            </div>
+            </div>
+            <div style="margin-top:8px;">
+                <span class="ciudad-horario" style="color:var(--gris);">Comprado el <?php echo date('d/m/Y', strtotime($com['fechaReserva'])); ?> — Reserva #<?php echo $com['codReserva']; ?></span>
+            </div>
+        </div>
+  <div class="vuelo-precio-col" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:140px;gap:8px;">
+    <span class="precio-label">PRECIO</span>
+    <span class="precio-valor">$<?php echo number_format($com['precioVuelo'], 0, ',', '.'); ?></span>
+  </div>
+    </div>
+    <?php endforeach; ?>
+    </div>
+
+                    <?php if ($totalPaginasHistorial > 1): ?>
+                    <nav aria-label="Paginación historial de compras" style="margin-top:24px;">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item <?php echo $paginaActual <= 1 ? 'disabled' : ''; ?>">
+                                <a class="page-link" href="perfiles.php?seccion=historial&pagina=<?php echo $paginaActual - 1; ?>">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                            <?php for ($p = 1; $p <= $totalPaginasHistorial; $p++): ?>
+                            <li class="page-item <?php echo $p === $paginaActual ? 'active' : ''; ?>">
+                                <a class="page-link" href="perfiles.php?seccion=historial&pagina=<?php echo $p; ?>"><?php echo $p; ?></a>
+                            </li>
+                            <?php endfor; ?>
+                            <li class="page-item <?php echo $paginaActual >= $totalPaginasHistorial ? 'disabled' : ''; ?>">
+                                <a class="page-link" href="perfiles.php?seccion=historial&pagina=<?php echo $paginaActual + 1; ?>">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <?php endif; ?>
+     <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
 <!-- PERFIL DE CEO -->
 <?php elseif(!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'CEO'): ?>
     <div class="contacto-wrapper">
@@ -267,7 +373,7 @@ body {
 <?php endif; ?>
 
 
-<!-- FOOTER -->
+<!-- FOOTER -------------------------------------->
 <section class="footer-section">
     <footer>
         <div class="row">
@@ -319,7 +425,7 @@ body {
 </section>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- cartel confirmar pago verde -->
+    <!-- boton confirmar pago -->
 <div class="modal fade" id="modalConfirmarPago" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="border-radius:12px;border:none;">
@@ -340,7 +446,7 @@ body {
   </div>
 </div>
 
-<!-- cartel confirmar cancelación rojo -->
+<!--- boton cancelar --->
 <div class="modal fade" id="modalConfirmarCancelar" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="border-radius:12px;border:none;">
