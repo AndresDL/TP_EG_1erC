@@ -48,54 +48,56 @@ mysqli_stmt_close($stmt);
     <title>Aerolineas-listado</title>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
     <link rel="stylesheet" href="aerolinea.css">
+    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
      
 <!-- ══ NAVBAR ══════════════════════════════════════════════════════════════ -->
-<header>
-  <section class="navbar-section">
-    <div class="header-wrapper">
-      <nav class="navbar-custom">
-        <div class="logo-wrap">
-          <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
-        </div>
+    <header>
+    <section class="navbar-section">
+        <div class="header-wrapper">
+        <nav class="navbar-custom">
+            <div class="logo-wrap">
+            <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+            </div>
 
-        <div class="nav-links">
-          <a href="../INDEX/index.php">Inicio</a>
-          <a href="../VUELOS/vuelos.php">Vuelos</a>
-          <a href="../NOVEDADES/novedades.php" class="active">Novedades</a>
-          <a href="../PROMOCIONES/promociones.php">Promociones</a>
-        </div>
-        
-        <div class="nav-right">
-          <div class="foto-perfil" title="Perfil">
-            <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="21" cy="10" r="9" fill="#ffffff"/>
-              <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
-            </svg>
-          </div>
-          
-          <?php if (!empty($_SESSION)): ?>
-              <span class="text-white me-2"><a href="../PERFIL/perfiles.php" style="text-decoration: none; color: white">Hola, <strong><?php echo htmlspecialchars($_SESSION['nombreUsuario']); ?><a></strong></span>
-              <a href="../LOGIN/logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Cerrar sesion</a>
-          <?php else: ?>
-              <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration: none; color: white;">Iniciar sesión</a>
-          <?php endif; ?>
-        </div>
-      </nav>
-
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="../INDEX/index.php">Inicio</a></li>
-                <li class="breadcrumb-item"><a href="../PERFIL/perfiles.php">Perfil</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Listado de aerolineas</li>
-            </ol>
+            <div class="nav-links">
+            <a href="../INDEX/index.php">Inicio</a>
+            <a href="../VUELOS/vuelos.php">Vuelos</a>
+            <a href="../NOVEDADES/novedades.php">Novedades</a>
+            <a href="../PROMOCIONES/promociones.php">Promociones</a>
+            </div>
+            
+            <div class="nav-right">
+            <div class="foto-perfil" title="Perfil">
+                <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="21" cy="10" r="9" fill="#ffffff"/>
+                <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
+                </svg>
+            </div>
+            
+            <?php if (!empty($_SESSION)): ?>
+                <span class="text-white me-2"><a href="../PERFIL/perfiles.php" style="text-decoration: none; color: white">Hola, <strong><?php echo htmlspecialchars($_SESSION['nombreUsuario']); ?><a></strong></span>
+                <a href="../LOGIN/logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Cerrar sesion</a>
+            <?php else: ?>
+                <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration: none; color: white;">Iniciar sesión</a>
+            <?php endif; ?>
+            </div>
         </nav>
-    </div>
-  </section>
-</header>
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="../INDEX/index.php">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="../PERFIL/perfiles.php">Perfil</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Listado de aerolineas</li>
+                </ol>
+            </nav>
+        </div>
+    </section>
+    </header>
 
     <div class="aerolineas-wrapper">
         <div class="aerolineas-header">
@@ -104,6 +106,12 @@ mysqli_stmt_close($stmt);
                 <i class="bi bi-plus-circle"></i><a href="aerolinea.php" style="text-decoration: none; color: white;"> Agregar</a>
             </button>
         </div>
+        <?php if (isset($_SESSION['message']) && $_SESSION['message'] !== ''): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong><i class="bi bi-check-circle"></i> Éxito!</strong> <?php echo $_SESSION['message']; $_SESSION['message'] = ''; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
         <div class="d-flex flex-column gap-3">
             <?php foreach($array as $aero){
                 echo   

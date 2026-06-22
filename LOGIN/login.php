@@ -5,7 +5,13 @@ if (!$link) {
     die("Error de conexión a la base de datos.");
 }
 
+  if(isset($_SESSION['codUsuario'])){
+    header('Location: ../INDEX/index.php');
+  }
+
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
+
+    $message = '';
 
     $validarQuery = 'SELECT * FROM usuarios WHERE emailUsuario = ?';
 
@@ -45,13 +51,13 @@ if (!$link) {
 
       } else {
 
-        echo 'Contraseña incorrecta';
+        $message = ' la contraseña es incorrecta.';
 
       }
 
     } else {
       
-      echo 'Usuario no existente';
+      $message = ' el email no está registrado.';
 
     };
   }
@@ -69,6 +75,7 @@ if (!$link) {
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
     <link rel="stylesheet" href="login.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
  
@@ -108,6 +115,20 @@ if (!$link) {
   <div class="contacto-wrapper">
  
     <div class="contacto-form-card">
+      
+      <?php if (isset($_SESSION['message']) && $_SESSION['message'] !== ''): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <strong><i class="bi bi-check-circle"></i> Éxito!</strong> <?php echo $_SESSION['message']; $_SESSION['message'] = ''; ?>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <?php endif; ?>
+
+      <?php if (isset($message) && $message !== ''): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong><i class="bi bi-exclamation-triangle"></i> Error!</strong> <?php echo $message; $message = ''; ?>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <?php endif; ?>
  
       <h2>Ingresa a tu cuenta</h2>
       <h4>Completa con los datos de tu cuenta</h4>
@@ -189,6 +210,6 @@ if (!$link) {
     </footer>
   </section>
  
-  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
