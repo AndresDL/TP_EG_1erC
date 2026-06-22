@@ -45,8 +45,17 @@
         $rta = mysqli_stmt_get_result($stmt);
 
         if (mysqli_num_rows($rta) > 0) {
-            echo "<script>alert('El email ya está registrado por otro usuario. Por favor, elige otro.');</script>";
+
+          $message = 'El email ingresado ya está registrado por otro usuario. Por favor, utiliza un email diferente.';
+            
         } else {
+
+            $_SESSION['nombreUsuario'] = $nombre;
+
+            $_SESSION['emailUsuario'] = $email;
+
+            $_SESSION['telefonoUsuario'] = $telefono;
+
             $updateQuery = 'UPDATE usuarios SET nombreUsuario = ?, emailUsuario = ?, telefonoUsuario = ? WHERE codUsuario = ?';
 
             $stmt = mysqli_prepare($link, $updateQuery);
@@ -54,9 +63,15 @@
             mysqli_stmt_bind_param($stmt, "sssi", $nombre, $email, $telefono, $id);
 
             if (mysqli_stmt_execute($stmt)) {
-                echo "<script>alert('Perfil actualizado exitosamente.'); window.location.href='perfiles.php';</script>";
+                
+              $_SESSION['message'] = ' Perfil editato exitosamente!';
+
+              header('Location: ../PERFIL/perfiles.php');
+
             } else {
-                echo "<script>alert('Error al actualizar el perfil. Por favor, intenta nuevamente.');</script>";
+
+              $message = 'Error al actualizar el perfil, intente nuevamente mas tarde';
+
             }
 
             mysqli_stmt_close($stmt);
@@ -75,6 +90,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
     <link rel="stylesheet" href="perfiles.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
 <!-- ══ NAVBAR ══════════════════════════════════════════════════════════════ -->
@@ -123,6 +139,13 @@
   <div class="contacto-wrapper">
  
     <div class="contacto-form-card">
+
+      <?php if (isset($message) && $message !== ''): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong><i class="bi bi-exclamation-triangle"></i> Error!</strong> <?php echo $message; $message = ''; ?>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <?php endif; ?>
  
       <h2>Modificación de perfil</h2>
       <h4>Completá el formulario con los datos requeridos para continuar</h4>

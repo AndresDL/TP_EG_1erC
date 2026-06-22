@@ -189,7 +189,7 @@ body {
             
             <div class="d-flex justify-content-center">
                 <button class="btn-enviar"><i class="bi bi-airplane"></i> 
-                    <a href="../AEROLINEA/aerolinea.php" style="text-decoration: none; color:white;"> Reservas activas</a>
+                    <a href="../AEROLINEA/aerolinea.php" style="text-decoration: none; color:white;"> Alta de Aerolineas</a>
                 </button>
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 10px;">
@@ -198,8 +198,9 @@ body {
             </button>
             </div>
             <div class="d-flex justify-content-center" style="margin-top: 10px;">
-                <button class="btn-enviar"><i class="bi bi-journal"></i></button>
-                <a href="admin-reporte-usuarios.php" style="text-decoration: none; color:white;">Reportes</a>
+                <button class="btn-enviar"><i class="bi bi-list"></i>
+                    <a href="../PERFIL/admin-reporte-usuarios.php" style="text-decoration: none; color:white;"> Reportes de usuarios</a> 
+                </button>
             </div>
         </div>
     </div>
@@ -209,6 +210,14 @@ body {
     <?php if ($seccion !== 'reservas' && $seccion !== 'historial'): ?>
     <div class="contacto-wrapper">
         <div class="contacto-form-card">
+            
+            <?php if (isset($_SESSION['message']) && $_SESSION['message'] !== ''): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong><i class="bi bi-check-circle"></i> Éxito!</strong> <?php echo $_SESSION['message']; $_SESSION['message'] = ''; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
+
             <h2>Panel de <?php echo $_SESSION['tipoUsuario'] ?></h2>
             <h4>Podes utilizar las funciones de abajo.</h4>
             <div class="d-flex justify-content-center">
@@ -237,7 +246,7 @@ body {
         <i class="bi bi-airplane me-2" style="color:var(--azul);"></i>Reservas activas
     </h3>    
 
-                <?php if (!empty($msgPerfil)): ?>
+                 <?php if (!empty($msgPerfil)): ?>
                 <div class="alert alert-<?php echo $tipoPerfil; ?> alert-dismissible fade show" role="alert">
                     <?php echo $msgPerfil; ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>

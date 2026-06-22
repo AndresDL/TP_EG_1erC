@@ -221,38 +221,34 @@ function estadoBadge($estado) {
 <!-- NAVBAR -->
 <div class="header-wrapper">
   <nav class="navbar-custom">
-    <div class="logo-wrap">
-      <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
-    </div>
-    <div class="nav-links">
-      <a href="../INDEX/index.php">Inicio</a>
-      <a href="../VUELOS/vuelos.php">Vuelos</a>
-      <a href="../NOVEDADES/novedades.php"  >Novedades</a>
-      <a href="../PROMOCIONES/promociones.php" class="active">Promociones</a>
-    </div>
-    <div class="nav-right">
-      <?php if (!empty($_SESSION)): ?>
-          <div class="foto-perfil">
-              <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="21" cy="10" r="9" fill="#ffffff"/>
-                <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
-              </svg>
-          </div>
-        <span class="text-white me-2"><a href="../PERFIL/perfiles.php" style="text-decoration: none; color: white">Hola, <strong><?php echo htmlspecialchars($_SESSION['nombreUsuario']); ?><a></strong></span>
-        <a href="../LOGIN/logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Cerrar sesion</a>
-      <?php else: ?>
-        <div class="foto-perfil">
-          <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="21" cy="10" r="9" fill="#ffffff"/>
-            <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
-          </svg>
+
+        <div class="logo-wrap">
+          <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
         </div>
-        <?php if(empty($_SESSION)): ?>
-          <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration:none;">Iniciar sesión</a>
-        <?php endif; ?>
-      <?php endif; ?>
-    </div>
-  </nav>
+
+        <div class="nav-links">
+          <a href="../INDEX/index.php">Inicio</a>
+          <a href="../VUELOS/vuelos.php">Vuelos</a>
+          <a href="../NOVEDADES/novedades.php" >Novedades</a>
+          <a href="../PROMOCIONES/promociones.php" class="active">Promociones</a>
+        </div>
+        
+        <div class="nav-right">
+          <div class="foto-perfil" title="Perfil">
+            <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="21" cy="10" r="9" fill="#ffffff"/>
+              <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
+            </svg>
+          </div>
+          
+          <?php if (isset($_SESSION['nombreUsuario'])): ?>
+              <span class="text-white me-2"><a href="../PERFIL/perfiles.php" style="text-decoration: none; color: white">Hola, <strong><?php echo htmlspecialchars($_SESSION['nombreUsuario']); ?></strong></a></span>
+              <a href="../LOGIN/logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Cerrar sesion</a>
+          <?php else: ?>
+              <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration: none; color: white;">Iniciar sesión</a>
+          <?php endif; ?>
+        </div>
+    </nav>
 
   <nav aria-label="breadcrumb">
       <ol class="breadcrumb">

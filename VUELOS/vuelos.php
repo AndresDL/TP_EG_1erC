@@ -290,8 +290,8 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
             </svg>
           </div>
           
-          <?php if (!empty($_SESSION)): ?>
-              <span class="text-white me-2"><a href="../PERFIL/perfiles.php" style="text-decoration: none; color: white">Hola, <strong><?php echo htmlspecialchars($_SESSION['nombreUsuario']); ?><a></strong></span>
+          <?php if (isset($_SESSION['nombreUsuario'])): ?>
+              <span class="text-white me-2"><a href="../PERFIL/perfiles.php" style="text-decoration: none; color: white">Hola, <strong><?php echo htmlspecialchars($_SESSION['nombreUsuario']); ?></strong></a></span>
               <a href="../LOGIN/logout.php" class="btn-registro" style="text-decoration:none;background:#dc3545;">Cerrar sesion</a>
           <?php else: ?>
               <a href="../LOGIN/login.php" class="btn-registro" style="text-decoration: none; color: white;">Iniciar sesión</a>
@@ -450,7 +450,7 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
                     >Eliminar</button>
                   </div>
                 <?php else: ?>
-                  <?php if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario'): ?>
+                  <?php if (isset($_SESSION['tipoUsuario']) && $_SESSION ['tipoUsuario'] === 'usuario'): ?>
                     <button type="button" class="btn-comprar"
                       onclick="confirmarCompra(
                         <?php echo $idSeguroVuelo; ?>,
