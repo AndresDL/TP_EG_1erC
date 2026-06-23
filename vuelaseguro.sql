@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-06-2026 a las 16:12:10
+-- Tiempo de generación: 22-06-2026 a las 21:47:16
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -95,7 +95,9 @@ CREATE TABLE `promociones` (
 --
 
 INSERT INTO `promociones` (`codPromocion`, `descripcionPromocion`, `descuentoPromocion`, `codAerolinea`, `estadoPromocion`, `imagenPromocion`, `vigenciaPromocion`, `codCEO`) VALUES
-(1, '25% OFF en Vuelos a el Cusco', 25, 2, 'aprobada', 'https://www.boletomachupicchu.com/gutblt/wp-content/uploads/2025/11/viaje-cusco-full.jpg', '2026-07-25', 2);
+(1, '25% OFF en Vuelos a el Cusco', 25, 2, 'denegada', 'https://www.boletomachupicchu.com/gutblt/wp-content/uploads/2025/11/viaje-cusco-full.jpg', '2026-07-25', 2),
+(2, '25% OFF en Vuelos de Caribe Travel', 25, 2, 'aprobada', 'https://www.civitatis.com/blog/wp-content/uploads/2024/01/shutterstock_607235345-scaled.jpg', '2026-07-25', 2),
+(3, '10% OFF en Vuelos de AndesMensuales', 10, 1, 'aprobada', 'https://upload.wikimedia.org/wikipedia/commons/f/f3/Panoramic_view_Andes-Chile.jpg', '2026-09-11', 1);
 
 -- --------------------------------------------------------
 
@@ -127,7 +129,29 @@ INSERT INTO `reservas` (`codReserva`, `codUsuario`, `codVuelo`, `fechaReserva`, 
 (12, 8, 10, '2026-06-21', 'Confirmada'),
 (15, 8, 8, '2026-06-21', 'Confirmada'),
 (16, 7, 14, '2026-06-21', 'Confirmada'),
-(17, 8, 16, '2026-06-21', 'Confirmada');
+(17, 8, 16, '2026-06-21', 'Confirmada'),
+(20, 5, 8, '2026-06-22', 'Pendiente de pago'),
+(21, 5, 11, '2026-06-22', 'Pendiente de pago');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `solicitudes_promo`
+--
+
+CREATE TABLE `solicitudes_promo` (
+  `codSolicitud` int(11) NOT NULL,
+  `codUsuario` int(11) NOT NULL,
+  `codPromocion` int(11) NOT NULL,
+  `fechaSolicitud` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `solicitudes_promo`
+--
+
+INSERT INTO `solicitudes_promo` (`codSolicitud`, `codUsuario`, `codPromocion`, `fechaSolicitud`) VALUES
+(1, 5, 3, '2026-06-22');
 
 -- --------------------------------------------------------
 
@@ -182,8 +206,8 @@ CREATE TABLE `vuelos` (
 --
 
 INSERT INTO `vuelos` (`codVuelo`, `codAerolinea`, `origenVuelo`, `destinoVuelo`, `fechaSalidaVuelo`, `horaSalidaVuelo`, `fechaVuelta`, `horaVuelta`, `precioVuelo`, `asientosDisponibles`) VALUES
-(8, 2, 'España', 'Arabia Saudita', '2026-06-28', '12:00:00.00000', '0000-00-00', '00:00:00.00000', 1000000, 296),
-(11, 1, 'Uruguay', 'Cabo Verde', '2026-06-21', '19:00:00.00000', '0000-00-00', '00:00:00.00000', 300000, 199),
+(8, 2, 'España', 'Arabia Saudita', '2026-06-28', '12:00:00.00000', '0000-00-00', '00:00:00.00000', 1000000, 295),
+(11, 1, 'Uruguay', 'Cabo Verde', '2026-06-21', '19:00:00.00000', '0000-00-00', '00:00:00.00000', 300000, 198),
 (12, 1, 'Nueva Zelanda', 'Egipto', '2026-06-21', '22:00:00.00000', '2026-07-05', '08:00:00.00000', 400000, 250),
 (13, 1, 'Nueva Zelanda', 'Egipto', '2026-06-21', '19:00:00.00000', '2026-07-05', '10:00:00.00000', 350000, 130),
 (14, 1, 'Argentina', 'Austria', '2026-06-22', '14:00:00.00000', '0000-00-00', '00:00:00.00000', 10000000, 99),
@@ -219,6 +243,13 @@ ALTER TABLE `reservas`
   ADD PRIMARY KEY (`codReserva`);
 
 --
+-- Indices de la tabla `solicitudes_promo`
+--
+ALTER TABLE `solicitudes_promo`
+  ADD PRIMARY KEY (`codSolicitud`),
+  ADD UNIQUE KEY `uq_usuario_promo` (`codUsuario`,`codPromocion`);
+
+--
 -- Indices de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -250,13 +281,19 @@ ALTER TABLE `novedades`
 -- AUTO_INCREMENT de la tabla `promociones`
 --
 ALTER TABLE `promociones`
-  MODIFY `codPromocion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `codPromocion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `reservas`
 --
 ALTER TABLE `reservas`
-  MODIFY `codReserva` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `codReserva` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT de la tabla `solicitudes_promo`
+--
+ALTER TABLE `solicitudes_promo`
+  MODIFY `codSolicitud` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`

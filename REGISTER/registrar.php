@@ -11,8 +11,12 @@
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
-    $validarQuery = 'SELECT emailUsuario FROM usuarios WHERE emailUsuario = ?';
+    $_SESSION['message'] = ' su cuenta ha sido creada exitosamente.';
 
+    $message = '';
+
+    $validarQuery = 'SELECT emailUsuario FROM usuarios WHERE emailUsuario = ?';
+    
     $email = $_POST['email'];
 
     $stmt = mysqli_prepare($link, $validarQuery);
