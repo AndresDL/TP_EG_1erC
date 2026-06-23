@@ -1,9 +1,13 @@
 <?php
-$link = null;
-include_once('../conexion.inc');
-if (!$link) {
-    die("Error de conexión a la base de datos.");
-}
+
+  $link = null;
+  include_once('../conexion.inc');
+  include_once('../mailer.inc');
+  if (!$link) {
+      die("Error de conexión a la base de datos.");
+  }
+
+  $message = '';
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
@@ -25,27 +29,50 @@ if (!$link) {
 
     if ($row) {
 
-      echo 'error';
+      $message = 'el email ya está registrado.';
 
     } else {
+
       $hashedPassword = password_hash($_POST['clave'], PASSWORD_BCRYPT);
 
       $fullname = "{$_POST['nombre1']} {$_POST['nombre2']}";
 
-      $stmt2 = mysqli_prepare($link, 
-      'INSERT INTO usuarios VALUES (NULL, ?, ?, "usuario", ?, ?)');
+      $tokenVerificacion = bin2hex(random_bytes(32));
 
-      mysqli_stmt_bind_param($stmt2, 'ssss',
+      $stmt2 = mysqli_prepare($link,
+      'INSERT INTO usuarios (codUsuario, nombreUsuario, claveUsuario, tipoUsuario, emailUsuario, telefonoUsuario, emailVerificado, tokenVerificacion)
+       VALUES (NULL, ?, ?, "usuario", ?, ?, 0, ?)');
+
+      mysqli_stmt_bind_param($stmt2, 'sssss',
       $fullname,
       $hashedPassword,
       $_POST['email'],
-      $_POST['telefono']);
+      $_POST['telefono'],
+      $tokenVerificacion);
 
-      mysqli_stmt_execute($stmt2);
-      
-      mysqli_stmt_close($stmt2);  
+      if (mysqli_stmt_execute($stmt2)) {
 
-      header('Location: ../LOGIN/login.php');
+        mysqli_stmt_close($stmt2);
+
+        $linkVerificacion = urlBase() . '/REGISTER/verificar.php?token=' . $tokenVerificacion;
+
+        $html = plantillaMail(
+          '¡Bienvenido a VuelaSeguro!',
+          'Gracias por registrarte, ' . htmlspecialchars($fullname) . '. Para activar tu cuenta y poder iniciar sesión, confirmá tu email haciendo clic en el siguiente botón:',
+          'Verificar mi cuenta',
+          $linkVerificacion
+        );
+
+        enviarMail($_POST['email'], 'Confirmá tu cuenta en VuelaSeguro', $html);
+
+        $_SESSION['message'] = 'Tu cuenta fue creada. Te enviamos un mail para verificar tu dirección de correo antes de poder iniciar sesión.';
+
+        header('Location: ../LOGIN/login.php');
+        exit;
+
+      } else {
+        $message = 'ocurrió un error al crear la cuenta. Intentá de nuevo.';
+      }
     };
   }
 ?>
@@ -56,13 +83,15 @@ if (!$link) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VuelaSeguro – Contacto</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
     <link rel="stylesheet" href="register.css">
 </head>
 <body>
+
+
   <!-- NAVBAR -->
   <section class="navbar-section">
     <div class="header-wrapper">
@@ -86,7 +115,7 @@ if (!$link) {
           <button class="btn-registro"><a href="../LOGIN/login.php" style="text-decoration: none; color: white;">Iniciar sesión</a></button>
         </div>
       </nav>
- 
+
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="../INDEX/index.php">Inicio</a></li>
@@ -95,16 +124,23 @@ if (!$link) {
       </nav>
     </div>
   </section>
- 
+
   <div class="contacto-wrapper">
- 
+
     <div class="contacto-form-card">
- 
+
       <h2>Creación de cuenta</h2>
       <h4>Completá el formulario con los datos requeridos para continuar</h4>
- 
+
+      <?php if($message): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong><i class="bi bi-exclamation-triangle"></i> Error!</strong> <?php echo $message;?>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <?php endif; ?>
+
       <form action="registrar.php" method="POST">
- 
+
         <div class="mb-3">
           <label class="form-label">Nombre</label>
           <input type="text" class="form-control" name="nombre1" placeholder="Tu nombre" required>
@@ -114,7 +150,7 @@ if (!$link) {
           <label class="form-label">Apellido</label>
           <input type="text" class="form-control" name="nombre2" placeholder="Tu apellido" required>
         </div>
- 
+
         <div class="mb-3">
           <label class="form-label">Contraseña</label>
           <input type="password" class="form-control" name="clave" placeholder="Tu contraseña" required>
@@ -129,17 +165,17 @@ if (!$link) {
           <label class="form-label">Telefono</label>
           <input type="tel" class="form-control" name="telefono" placeholder="Tu telefono" required>
         </div>
- 
+
         <div class="d-flex justify-content-end">
           <button type="submit" class="btn-enviar">Enviar</button>
         </div>
-        
+
       </form>
- 
+
     </div>
- 
+
   </div>
- 
+
   <!-- FOOTER -->
   <section class="footer-section">
     <footer>
@@ -190,7 +226,7 @@ if (!$link) {
       </p>
     </footer>
   </section>
- 
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

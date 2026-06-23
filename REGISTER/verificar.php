@@ -1,76 +1,46 @@
 <?php
-$link = null;
-include_once('../conexion.inc');
-if (!$link) {
-    die("Error de conexión a la base de datos.");
-}
 
-$message = '';
+  $link = null;
+  include_once('../conexion.inc');
+  if (!$link) {
+      die("Error de conexión a la base de datos.");
+  }
 
-if (isset($_SESSION['message'])) {
-    $message = $_SESSION['message'];
-    unset($_SESSION['message']);
-}
+  $exito = false;
+  $mensaje = '';
 
-  if($_SERVER['REQUEST_METHOD'] === 'POST'){
+  if (isset($_GET['token']) && $_GET['token'] !== '') {
 
-    $validarQuery = 'SELECT * FROM usuarios WHERE emailUsuario = ?';
+    $token = $_GET['token'];
 
-    $email = $_POST['mail'];
+    $buscarQuery = 'SELECT codUsuario, emailVerificado FROM usuarios WHERE tokenVerificacion = ?';
 
-    $clave = $_POST['clave'];
-
-    $stmt = mysqli_prepare($link, $validarQuery);
-
-    mysqli_stmt_bind_param($stmt, "s", $email);
-
+    $stmt = mysqli_prepare($link, $buscarQuery);
+    mysqli_stmt_bind_param($stmt, "s", $token);
     mysqli_stmt_execute($stmt);
-
     $rta = mysqli_stmt_get_result($stmt);
-
     $row = mysqli_fetch_assoc($rta);
-
     mysqli_stmt_close($stmt);
 
     if ($row) {
 
-      $claveHash = $row['claveUsuario'];
+      $updateQuery = 'UPDATE usuarios SET emailVerificado = 1, tokenVerificacion = NULL WHERE codUsuario = ?';
+      $stmt2 = mysqli_prepare($link, $updateQuery);
+      mysqli_stmt_bind_param($stmt2, "i", $row['codUsuario']);
+      mysqli_stmt_execute($stmt2);
+      mysqli_stmt_close($stmt2);
 
-      if(password_verify($clave, $claveHash)){
-
-        if (isset($row['emailVerificado']) && $row['emailVerificado'] == 0) {
-
-          $message = 'Tenés que verificar tu email antes de iniciar sesión. Revisá tu casilla de correo.';
-
-        } else {
-
-          $_SESSION['codUsuario'] = $row['codUsuario'];
-
-          $_SESSION['nombreUsuario'] = $row['nombreUsuario'];
-
-          $_SESSION['tipoUsuario'] = $row['tipoUsuario'];
-
-          $_SESSION['emailUsuario'] = $row['emailUsuario'];
-
-          $_SESSION['telefonoUsuario'] = $row['telefonoUsuario'];
-
-          header('Location: ../INDEX/index.php');
-          exit;
-
-        }
-
-      } else {
-
-        $message = 'Contraseña incorrecta';
-
-      }
+      $exito = true;
+      $mensaje = 'Tu cuenta fue verificada correctamente. Ya podés iniciar sesión.';
 
     } else {
+      $mensaje = 'El link de verificación no es válido o ya fue utilizado.';
+    }
 
-      $message = 'Usuario no existente';
-
-    };
+  } else {
+    $mensaje = 'Falta el token de verificación.';
   }
+
 ?>
 
 <!DOCTYPE html>
@@ -78,16 +48,15 @@ if (isset($_SESSION['message'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VuelaSeguro – Contacto</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+    <title>VuelaSeguro – Verificación de cuenta</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="register.css">
 </head>
 <body>
- 
+
   <!-- NAVBAR -->
   <section class="navbar-section">
     <div class="header-wrapper">
@@ -108,61 +77,39 @@ if (isset($_SESSION['message'])) {
               <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
             </svg>
           </div>
-          <button class="btn-registro">Iniciar sesión</button>
+          <button class="btn-registro"><a href="../LOGIN/login.php" style="text-decoration: none; color: white;">Iniciar sesión</a></button>
         </div>
       </nav>
- 
+
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="../INDEX/index.php">Inicio</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Inicio de sesión</li>
+          <li class="breadcrumb-item active" aria-current="page">Verificación de cuenta</li>
         </ol>
       </nav>
     </div>
   </section>
- 
+
   <div class="contacto-wrapper">
- 
-    <div class="contacto-form-card">
- 
-      <h2>Ingresa a tu cuenta</h2>
-      <h4>Completa con los datos de tu cuenta</h4>
 
-      <?php if($message): ?>
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          <?php echo htmlspecialchars($message); ?>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="contacto-form-card" style="text-align:center;">
+
+      <?php if ($exito): ?>
+        <i class="bi bi-check-circle-fill" style="font-size: 3rem; color: var(--verde);"></i>
+        <h2 style="margin-top: 16px;">¡Cuenta verificada!</h2>
+        <h4 style="border-bottom:none;"><?php echo htmlspecialchars($mensaje); ?></h4>
+        <a href="../LOGIN/login.php" class="btn-enviar" style="text-decoration:none; display:inline-block; margin-top: 10px;">Iniciar sesión</a>
+      <?php else: ?>
+        <i class="bi bi-x-circle-fill" style="font-size: 3rem; color: var(--rojo);"></i>
+        <h2 style="margin-top: 16px;">No pudimos verificar tu cuenta</h2>
+        <h4 style="border-bottom:none;"><?php echo htmlspecialchars($mensaje); ?></h4>
+        <a href="../REGISTER/registrar.php" class="btn-enviar" style="text-decoration:none; display:inline-block; margin-top: 10px;">Volver a registrarme</a>
       <?php endif; ?>
- 
-      <form action="login.php" method="POST">
- 
-        <div class="mb-3">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-control" name="mail" placeholder="Tu email" required>
-        </div>
- 
-        <div class="mb-3">
-          <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" name="clave" placeholder="Tu contraseña" required>
-        </div>
 
-        <div class="form-text" id="basic-addon4">No tenes una cuenta? <a href="../REGISTER/registrar.php">Registrate aquí</a></div>
-
-        <div class="form-text" id="basic-addon4">Representas a una aerolinea? <a href="../AEROLINEA/aerolinea-login.php">Ingresa aquí</a></div>
-
-        <div class="form-text" id="basic-addon4">Olvidaste tu contraseña? <a href="olvide-clave.php">Recuperala aquí</a></div>
- 
-        <div class="d-flex justify-content-end">
-          <button type="submit" class="btn-enviar">Enviar</button>
-        </div>
-        
-      </form>
- 
     </div>
- 
+
   </div>
- 
+
   <!-- FOOTER -->
   <section class="footer-section">
     <footer>
@@ -213,7 +160,7 @@ if (isset($_SESSION['message'])) {
       </p>
     </footer>
   </section>
- 
-  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

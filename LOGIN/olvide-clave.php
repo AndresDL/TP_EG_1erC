@@ -1,75 +1,54 @@
 <?php
-$link = null;
-include_once('../conexion.inc');
-if (!$link) {
-    die("Error de conexión a la base de datos.");
-}
 
-$message = '';
+  $link = null;
+  include_once('../conexion.inc');
+  include_once('../mailer.inc');
+  if (!$link) {
+      die("Error de conexión a la base de datos.");
+  }
 
-if (isset($_SESSION['message'])) {
-    $message = $_SESSION['message'];
-    unset($_SESSION['message']);
-}
+  $message = '';
+  $enviado = false;
 
-  if($_SERVER['REQUEST_METHOD'] === 'POST'){
-
-    $validarQuery = 'SELECT * FROM usuarios WHERE emailUsuario = ?';
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $email = $_POST['mail'];
 
-    $clave = $_POST['clave'];
+    $buscarQuery = 'SELECT codUsuario, nombreUsuario FROM usuarios WHERE emailUsuario = ?';
 
-    $stmt = mysqli_prepare($link, $validarQuery);
-
+    $stmt = mysqli_prepare($link, $buscarQuery);
     mysqli_stmt_bind_param($stmt, "s", $email);
-
     mysqli_stmt_execute($stmt);
-
     $rta = mysqli_stmt_get_result($stmt);
-
     $row = mysqli_fetch_assoc($rta);
-
     mysqli_stmt_close($stmt);
+
+    // Por seguridad mostramos el mismo mensaje exista o no el email,
+    // así no revelamos qué direcciones están registradas.
+    $message = 'Si el email ingresado existe en nuestro sistema, te enviamos un link para restablecer tu contraseña.';
+    $enviado = true;
 
     if ($row) {
 
-      $claveHash = $row['claveUsuario'];
+      $tokenReset = bin2hex(random_bytes(32));
 
-      if(password_verify($clave, $claveHash)){
+      $updateQuery = 'UPDATE usuarios SET tokenReset = ?, tokenResetExpira = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE codUsuario = ?';
+      $stmt2 = mysqli_prepare($link, $updateQuery);
+      mysqli_stmt_bind_param($stmt2, "si", $tokenReset, $row['codUsuario']);
+      mysqli_stmt_execute($stmt2);
+      mysqli_stmt_close($stmt2);
 
-        if (isset($row['emailVerificado']) && $row['emailVerificado'] == 0) {
+      $linkReset = urlBase() . '/LOGIN/reset-clave.php?token=' . $tokenReset;
 
-          $message = 'Tenés que verificar tu email antes de iniciar sesión. Revisá tu casilla de correo.';
+      $html = plantillaMail(
+        'Restablecé tu contraseña',
+        'Hola ' . htmlspecialchars($row['nombreUsuario']) . ', recibimos una solicitud para restablecer tu contraseña en VuelaSeguro. Este link es válido por 1 hora. Si no fuiste vos, podés ignorar este mail.',
+        'Restablecer contraseña',
+        $linkReset
+      );
 
-        } else {
-
-          $_SESSION['codUsuario'] = $row['codUsuario'];
-
-          $_SESSION['nombreUsuario'] = $row['nombreUsuario'];
-
-          $_SESSION['tipoUsuario'] = $row['tipoUsuario'];
-
-          $_SESSION['emailUsuario'] = $row['emailUsuario'];
-
-          $_SESSION['telefonoUsuario'] = $row['telefonoUsuario'];
-
-          header('Location: ../INDEX/index.php');
-          exit;
-
-        }
-
-      } else {
-
-        $message = 'Contraseña incorrecta';
-
-      }
-
-    } else {
-
-      $message = 'Usuario no existente';
-
-    };
+      enviarMail($email, 'Restablecé tu contraseña – VuelaSeguro', $html);
+    }
   }
 ?>
 
@@ -78,16 +57,15 @@ if (isset($_SESSION['message'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VuelaSeguro – Contacto</title>
+    <title>VuelaSeguro – Recuperar contraseña</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="../INDEX/estilos-globales.css">
     <link rel="stylesheet" href="login.css">
 </head>
 <body>
- 
+
   <!-- NAVBAR -->
   <section class="navbar-section">
     <div class="header-wrapper">
@@ -108,61 +86,52 @@ if (isset($_SESSION['message'])) {
               <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
             </svg>
           </div>
-          <button class="btn-registro">Iniciar sesión</button>
+          <button class="btn-registro"><a href="login.php" style="text-decoration:none; color:white;">Iniciar sesión</a></button>
         </div>
       </nav>
- 
+
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="../INDEX/index.php">Inicio</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Inicio de sesión</li>
+          <li class="breadcrumb-item active" aria-current="page">Recuperar contraseña</li>
         </ol>
       </nav>
     </div>
   </section>
- 
-  <div class="contacto-wrapper">
- 
-    <div class="contacto-form-card">
- 
-      <h2>Ingresa a tu cuenta</h2>
-      <h4>Completa con los datos de tu cuenta</h4>
 
-      <?php if($message): ?>
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <div class="contacto-wrapper">
+
+    <div class="contacto-form-card">
+
+      <h2>Recuperar contraseña</h2>
+      <h4>Ingresá el email de tu cuenta y te mandamos un link para restablecerla</h4>
+
+      <?php if($enviado): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
           <?php echo htmlspecialchars($message); ?>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       <?php endif; ?>
- 
-      <form action="login.php" method="POST">
- 
+
+      <?php if(!$enviado): ?>
+      <form action="olvide-clave.php" method="POST">
+
         <div class="mb-3">
           <label class="form-label">Email</label>
           <input type="email" class="form-control" name="mail" placeholder="Tu email" required>
         </div>
- 
-        <div class="mb-3">
-          <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" name="clave" placeholder="Tu contraseña" required>
-        </div>
 
-        <div class="form-text" id="basic-addon4">No tenes una cuenta? <a href="../REGISTER/registrar.php">Registrate aquí</a></div>
-
-        <div class="form-text" id="basic-addon4">Representas a una aerolinea? <a href="../AEROLINEA/aerolinea-login.php">Ingresa aquí</a></div>
-
-        <div class="form-text" id="basic-addon4">Olvidaste tu contraseña? <a href="olvide-clave.php">Recuperala aquí</a></div>
- 
         <div class="d-flex justify-content-end">
-          <button type="submit" class="btn-enviar">Enviar</button>
+          <button type="submit" class="btn-enviar">Enviar link</button>
         </div>
-        
+
       </form>
- 
+      <?php endif; ?>
+
     </div>
- 
+
   </div>
- 
+
   <!-- FOOTER -->
   <section class="footer-section">
     <footer>
@@ -213,7 +182,7 @@ if (isset($_SESSION['message'])) {
       </p>
     </footer>
   </section>
- 
+
   <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

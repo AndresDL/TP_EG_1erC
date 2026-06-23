@@ -4,13 +4,16 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+include_once('../mailer.inc');
+
+
 $mensaje      = "";
 $tipo_mensaje = "";
 $enviado      = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre  = trim($_POST['nombre']  ?? '');
-    $email   = trim($_POST['email']   ?? '');
+    $nombre          = trim($_POST['nombre']  ?? '');
+    $email           = trim($_POST['email']   ?? '');
     $mensaje_usuario = trim($_POST['mensaje'] ?? '');
 
     if ($nombre === '' || $email === '' || $mensaje_usuario === '') {
@@ -20,17 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensaje      = "El email ingresado no es válido.";
         $tipo_mensaje = "warning";
     } else {
-        $destinatario = "vuelaseguro.support@gmail.com";
-        $asunto       = "Nueva consulta de contacto – VuelaSeguro";
-        $cuerpo       = "Recibiste una nueva consulta desde el formulario de contacto.\n\n";
-        $cuerpo      .= "Nombre:  $nombre\n";
-        $cuerpo      .= "Email:   $email\n\n";
-        $cuerpo      .= "Mensaje:\n$mensaje_usuario\n";
-        $headers      = "From: no-reply@vuelaseguro.com\r\n";
-        $headers     .= "Reply-To: $email\r\n";
-        $headers     .= "Content-Type: text/plain; charset=UTF-8\r\n";
+        $html = plantillaMail(
+            'Nueva consulta de contacto',
+            '<strong>Nombre:</strong> ' . htmlspecialchars($nombre) . '<br>' .
+            '<strong>Email:</strong> ' . htmlspecialchars($email) . '<br><br>' .
+            '<strong>Mensaje:</strong><br>' . nl2br(htmlspecialchars($mensaje_usuario)),
+            'Responder a ' . htmlspecialchars($nombre),
+            'mailto:' . rawurlencode($email)
+        );
 
-        if (mail($destinatario, $asunto, $cuerpo, $headers)) {
+        if (enviarMail(MAIL_REMITENTE_EMAIL, 'Nueva consulta de contacto – VuelaSeguro', $html)) {
             $enviado      = true;
             $tipo_mensaje = "success";
         } else {
