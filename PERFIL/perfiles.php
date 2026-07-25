@@ -55,12 +55,16 @@ if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
      FROM reservas r
      JOIN vuelos v ON r.codVuelo = v.codVuelo
      LEFT JOIN aerolineas a ON v.codAerolinea = a.codAerolinea
-     LEFT JOIN solicitudes_promo sp ON sp.codUsuario = r.codUsuario
-     LEFT JOIN promociones p ON p.codPromocion = sp.codPromocion
-         AND p.codAerolinea = v.codAerolinea
+     LEFT JOIN promociones p ON p.codAerolinea = v.codAerolinea
          AND p.estadoPromocion = 'aprobada'
          AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
+         AND p.codPromocion = (
+             SELECT sp2.codPromocion FROM solicitudes_promo sp2
+             WHERE sp2.codUsuario = r.codUsuario AND sp2.codPromocion = p.codPromocion
+             LIMIT 1
+         )
      WHERE r.codUsuario = $codUsuarioRes AND r.estadoReserva = 'Pendiente de pago'
+     GROUP BY r.codReserva
      ORDER BY r.fechaReserva DESC");
     while ($row = mysqli_fetch_assoc($resActivas)) {
         $reservasActivas[] = $row;
@@ -76,7 +80,7 @@ if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
 
     // Cuento el total de compras confirmadas para calcular la cantidad de páginas
     $resConteo = mysqli_query($link,
-    "SELECT COUNT(*) AS total
+    "SELECT COUNT(DISTINCT r.codReserva) AS total
      FROM reservas r
      WHERE r.codUsuario = $codUsuarioHist AND r.estadoReserva = 'Confirmada'");
     $filaConteo = mysqli_fetch_assoc($resConteo);
@@ -91,12 +95,16 @@ if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
      FROM reservas r
      JOIN vuelos v ON r.codVuelo = v.codVuelo
      LEFT JOIN aerolineas a ON v.codAerolinea = a.codAerolinea
-     LEFT JOIN solicitudes_promo sp ON sp.codUsuario = r.codUsuario
-     LEFT JOIN promociones p ON p.codPromocion = sp.codPromocion
-         AND p.codAerolinea = v.codAerolinea
+     LEFT JOIN promociones p ON p.codAerolinea = v.codAerolinea
          AND p.estadoPromocion = 'aprobada'
          AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
+         AND p.codPromocion = (
+             SELECT sp2.codPromocion FROM solicitudes_promo sp2
+             WHERE sp2.codUsuario = r.codUsuario AND sp2.codPromocion = p.codPromocion
+             LIMIT 1
+         )
      WHERE r.codUsuario = $codUsuarioHist AND r.estadoReserva = 'Confirmada'
+     GROUP BY r.codReserva
      ORDER BY r.fechaReserva DESC
      LIMIT $porPagina OFFSET $offset");
     while ($row = mysqli_fetch_assoc($resHistorial)) {

@@ -20,30 +20,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
     header('Location: ../LOGIN/login.php');
     exit;
   }
-  $codVueloCompra = (int)$_POST['codVuelo'];
-  $codUsuarioCompra = (int)$_SESSION['codUsuario'];
+  $codVueloCompra    = (int)$_POST['codVuelo'];
+  $codUsuarioCompra  = (int)$_SESSION['codUsuario'];
+  $cantidadPasajeros = max(1, min(9, (int)($_POST['cantidadPasajeros'] ?? 1)));
 
-  $resVuelo = mysqli_query($link, "SELECT asientosDisponibles FROM vuelos WHERE codVuelo = $codVueloCompra");
+  $resVuelo  = mysqli_query($link, "SELECT asientosDisponibles FROM vuelos WHERE codVuelo = $codVueloCompra");
   $vueloData = mysqli_fetch_assoc($resVuelo);
 
-  if (!$vueloData || $vueloData ['asientosDisponibles'] < 1) {
-    $mensaje = "Lo sentimos, no hay asientos disponibles para este vuelo.";
+  if (!$vueloData || $vueloData['asientosDisponibles'] < $cantidadPasajeros) {
+    $asientosRestantes = $vueloData['asientosDisponibles'] ?? 0;
+    $mensaje = "Lo sentimos, no hay suficientes asientos disponibles para este vuelo. Asientos disponibles: $asientosRestantes.";
     $tipo_mensaje = "danger";
   } else {
     $resExiste = mysqli_query($link, "SELECT codReserva FROM reservas WHERE codUsuario = $codUsuarioCompra AND codVuelo = $codVueloCompra AND estadoReserva = 'Pendiente de pago'");
     if (mysqli_num_rows($resExiste) > 0) {
-      $mensaje = "Ya tienes una reserva pendiente de pago para este vuelo. Revisá tu perfil.";
+      $mensaje = "Ya tenés una reserva pendiente de pago para este vuelo. Revisá tu perfil.";
       $tipo_mensaje = "warning";
     } else {
       $hoy = date('Y-m-d');
-      $sqlInsertReserva = "INSERT INTO reservas (codUsuario, codVuelo, fechaReserva, estadoReserva) VALUES ($codUsuarioCompra, $codVueloCompra, '$hoy', 'Pendiente de pago')";
+      $sqlInsertReserva = "INSERT INTO reservas (codUsuario, codVuelo, fechaReserva, estadoReserva, cantidadPasajeros) VALUES ($codUsuarioCompra, $codVueloCompra, '$hoy', 'Pendiente de pago', $cantidadPasajeros)";
       if (mysqli_query($link, $sqlInsertReserva)) {
-        // Decremento asientos
-        mysqli_query($link, "UPDATE vuelos SET asientosDisponibles = asientosDisponibles - 1 WHERE codVuelo = $codVueloCompra");
+        // Decremento asientos según cantidad elegida
+        mysqli_query($link, "UPDATE vuelos SET asientosDisponibles = asientosDisponibles - $cantidadPasajeros WHERE codVuelo = $codVueloCompra");
         header('Location: vuelos.php?msg=reservado');
         exit;
       } else {
-        $mensaje = "Error al procesar la reserva. Por favor, inténtalo nuevamente.";
+        $mensaje = "Error al procesar la reserva. Por favor, intentalo nuevamente.";
         $tipo_mensaje = "danger";
       }
     }
@@ -106,7 +108,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_vuelo']) && $es
           $fechaVuelta = $_POST['fechaVuelta'];
         }
         $horaVuelta = $_POST['horaVuelta'];
-        var_dump($_POST);
         if ($precio < 0 || $precio > 10000000) {
             $mensaje = "El precio debe estar entre 0 y 10.000.000.";
             $tipo_mensaje = "danger";
@@ -200,6 +201,9 @@ $filtroFechaVuelta = isset($_GET['fechaVuelta']) ? $_GET['fechaVuelta'] : '';
 $condiciones = [];
 if ($esCEO) {
     $condiciones[] = "v.codAerolinea = $codAerolineaCEO";
+} else {
+    // Usuarios y visitantes solo ven vuelos futuros o de hoy
+    $condiciones[] = "v.fechaSalidaVuelo >= CURDATE()";
 }
 if ($filtroOrigen) {
     $filtroOrigenEsc = mysqli_real_escape_string($link, $filtroOrigen);
@@ -803,13 +807,19 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
             </div>
           </div>
         </div>
+        <div class="mt-3">
+          <label for="cantidadPasajeros" style="font-weight:600; font-size:.9rem;">Cantidad de pasajeros</label>
+          <input type="number" class="form-control mt-1" id="cantidadPasajeros" name="cantidadPasajeros" min="1" max="9" value="1" style="width:120px;">
+          <div id="errorPasajeros" class="text-danger mt-1" style="font-size:.85rem; display:none;">Ingresá una cantidad válida (entre 1 y 9).</div>
+        </div>
         <p class="mt-3 mb-0" style="font-size:.88rem; color:var(--gris);">Podrás pagar desde tu perfil en <strong>Reservas activas</strong>.</p>
       </div>
       <div class="modal-footer bg-light">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <form method="POST" action="vuelos.php" id="formComprar">
+        <form method="POST" action="vuelos.php" id="formComprar" onsubmit="var c=document.getElementById('cantidadPasajeros'),e=document.getElementById('errorPasajeros'),v=parseInt(c.value);if(!v||v<1||v>9){e.style.display='block';return false;}e.style.display='none';document.getElementById('cantidadPasajerosHidden').value=v;">
           <input type="hidden" name="comprar_vuelo" value="1">
           <input type="hidden" name="codVuelo" id="codVueloComprar" value="">
+          <input type="hidden" name="cantidadPasajeros" id="cantidadPasajerosHidden" value="1">
           <button type="submit" class="btn btn-success" style="font-weight:600;">
             <i class="bi bi-check-lg me-1"></i>Sí, reservar
           </button>

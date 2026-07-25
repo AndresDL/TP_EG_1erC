@@ -122,12 +122,22 @@
 
         <div class="mb-3">
           <label class="form-label">Nueva contraseña</label>
-          <input type="password" class="form-control" name="clave" placeholder="Nueva contraseña" required minlength="6">
+          <div class="input-group">
+            <input type="password" class="form-control" name="clave" id="clave" placeholder="Nueva contraseña" required minlength="6">
+            <button type="button" class="btn btn-outline-secondary" onclick="var i=document.getElementById('clave');i.type=i.type==='password'?'text':'password';this.querySelector('i').className=i.type==='password'?'bi bi-eye':'bi bi-eye-slash';" tabindex="-1" aria-label="Mostrar u ocultar contraseña">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Confirmar contraseña</label>
-          <input type="password" class="form-control" name="clave_confirmar" placeholder="Repetí la contraseña" required minlength="6">
+          <div class="input-group">
+            <input type="password" class="form-control" name="clave_confirmar" id="clave_confirmar" placeholder="Repetí la contraseña" required minlength="6">
+            <button type="button" class="btn btn-outline-secondary" onclick="var i=document.getElementById('clave_confirmar');i.type=i.type==='password'?'text':'password';this.querySelector('i').className=i.type==='password'?'bi bi-eye':'bi bi-eye-slash';" tabindex="-1" aria-label="Mostrar u ocultar contraseña">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
         </div>
 
         <div class="d-flex justify-content-end">

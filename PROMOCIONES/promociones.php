@@ -154,7 +154,9 @@ $whereBusq = $busqueda !== '' ? "AND a.nombreAerolinea LIKE '%$busqueda%'" : '';
 
 $sqlTotal       = "SELECT COUNT(*) AS total FROM promociones p
                    LEFT JOIN aerolineas a ON p.codAerolinea = a.codAerolinea
-                   WHERE p.estadoPromocion = 'aprobada' $whereBusq";
+                   WHERE p.estadoPromocion = 'aprobada'
+                   AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
+                   $whereBusq";
 $resTotal       = mysqli_query($link, $sqlTotal);
 $totalRegistros = $resTotal ? (int)mysqli_fetch_assoc($resTotal)['total'] : 0;
 $totalPaginas   = max(1, ceil($totalRegistros / $porPagina));
@@ -164,7 +166,9 @@ $offset         = ($paginaActual - 1) * $porPagina;
 $resultPromos = mysqli_query($link,
     "SELECT p.*, a.nombreAerolinea FROM promociones p
      LEFT JOIN aerolineas a ON p.codAerolinea = a.codAerolinea
-     WHERE p.estadoPromocion = 'aprobada' $whereBusq
+     WHERE p.estadoPromocion = 'aprobada'
+     AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
+     $whereBusq
      ORDER BY p.codPromocion DESC
      LIMIT $porPagina OFFSET $offset");
 

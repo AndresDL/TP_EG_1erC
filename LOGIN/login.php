@@ -164,7 +164,12 @@ if (isset($_SESSION['message'])) {
  
         <div class="mb-3">
           <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" name="clave" placeholder="Tu contraseña" required>
+          <div class="input-group">
+            <input type="password" class="form-control" name="clave" id="clave" placeholder="Tu contraseña" required>
+            <button type="button" class="btn btn-outline-secondary" onclick="var i=document.getElementById('clave');i.type=i.type==='password'?'text':'password';this.querySelector('i').className=i.type==='password'?'bi bi-eye':'bi bi-eye-slash';" tabindex="-1" aria-label="Mostrar u ocultar contraseña">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
         </div>
 
         <div class="form-text" id="basic-addon4">No tenes una cuenta? <a href="../REGISTER/registrar.php">Registrate aquí</a></div>

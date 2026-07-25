@@ -45,7 +45,7 @@
 
       $stmt2 = mysqli_prepare($link,
       'INSERT INTO usuarios (codUsuario, nombreUsuario, claveUsuario, tipoUsuario, emailUsuario, telefonoUsuario, emailVerificado, tokenVerificacion)
-       VALUES (NULL, ?, ?, "usuario", ?, ?, 0, ?)');
+       VALUES (NULL, ?, ?, "usuario", ?, ?, 0, ?)'); 
 
       mysqli_stmt_bind_param($stmt2, 'sssss',
       $fullname,
@@ -147,31 +147,66 @@
 
         <div class="mb-3">
           <label class="form-label">Nombre</label>
-          <input type="text" class="form-control" name="nombre1" placeholder="Tu nombre" required>
+          <input type="text" class="form-control" name="nombre1"
+                 placeholder="Tu nombre"
+                 pattern="[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]{2,50}"
+                 minlength="2" maxlength="50"
+                 title="Solo letras y espacios, entre 2 y 50 caracteres"
+                 required>
+          <div class="form-text text-muted">Solo letras, mínimo 2 caracteres.</div>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Apellido</label>
-          <input type="text" class="form-control" name="nombre2" placeholder="Tu apellido" required>
+          <input type="text" class="form-control" name="nombre2"
+                 placeholder="Tu apellido"
+                 pattern="[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]{2,50}"
+                 minlength="2" maxlength="50"
+                 title="Solo letras y espacios, entre 2 y 50 caracteres"
+                 required>
+          <div class="form-text text-muted">Solo letras, mínimo 2 caracteres.</div>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" name="clave" placeholder="Tu contraseña" required>
+          <div class="input-group">
+            <input type="password" class="form-control" name="clave" id="claveReg"
+                   placeholder="Mínimo 8 caracteres"
+                   minlength="8" maxlength="72"
+                   pattern="(?=.*[0-9])(?=.*[A-Za-z]).{8,}"
+                   title="Mínimo 8 caracteres, debe incluir al menos una letra y un número"
+                   required>
+            <button type="button" class="btn btn-outline-secondary" tabindex="-1"
+                    onclick="var i=document.getElementById('claveReg');i.type=i.type==='password'?'text':'password';this.querySelector('i').className=i.type==='password'?'bi bi-eye':'bi bi-eye-slash';"
+                    aria-label="Mostrar u ocultar contraseña">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+          <div class="form-text text-muted">Mínimo 8 caracteres con al menos una letra y un número.</div>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Email</label>
-          <input type="email" class="form-control" name="email" placeholder="Tu email" required>
+          <input type="email" class="form-control" name="email"
+                 placeholder="ejemplo@correo.com"
+                 maxlength="100"
+                 title="Ingresá un email válido, por ejemplo: nombre@correo.com"
+                 required>
         </div>
 
         <div class="mb-3">
-          <label class="form-label">Telefono</label>
-          <input type="tel" class="form-control" name="telefono" placeholder="Tu telefono" required>
+          <label class="form-label">Teléfono</label>
+          <input type="tel" class="form-control" name="telefono"
+                 placeholder="Ej: 3411234567"
+                 pattern="[0-9\+\-\s]{7,20}"
+                 minlength="7" maxlength="20"
+                 title="Solo números, espacios, + o -, entre 7 y 20 caracteres. Ej: 3411234567"
+                 required>
+          <div class="form-text text-muted">Solo números, entre 7 y 20 dígitos.</div>
         </div>
 
         <div class="d-flex justify-content-end">
-          <button type="submit" class="btn-enviar">Enviar</button>
+          <button type="submit" class="btn-enviar">Crear cuenta</button>
         </div>
 
       </form>

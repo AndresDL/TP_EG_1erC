@@ -128,7 +128,14 @@ if (!$link) {
  
         <div class="mb-3">
           <label class="form-label">Contraseña</label>
-          <input type="password" class="form-control" name="clave" placeholder="Contraseña proveida por administrador" required>
+          <div class="input-group">
+            <input type="password" class="form-control" name="clave" id="claveLogin" placeholder="Contraseña provista por el administrador" required>
+            <button type="button" class="btn btn-outline-secondary" tabindex="-1"
+                    onclick="var i=document.getElementById('claveLogin');i.type=i.type==='password'?'text':'password';this.querySelector('i').className=i.type==='password'?'bi bi-eye':'bi bi-eye-slash';"
+                    aria-label="Mostrar u ocultar contraseña">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
         </div>
  
         <div class="d-flex justify-content-end">
