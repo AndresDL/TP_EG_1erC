@@ -24,12 +24,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
   $codUsuarioCompra  = (int)$_SESSION['codUsuario'];
   $cantidadPasajeros = max(1, min(9, (int)($_POST['cantidadPasajeros'] ?? 1)));
 
-  $resVuelo  = mysqli_query($link, "SELECT asientosDisponibles FROM vuelos WHERE codVuelo = $codVueloCompra");
+  $resVuelo  = mysqli_query($link, "SELECT asientosDisponibles, fechaSalidaVuelo, horaSalidaVuelo FROM vuelos WHERE codVuelo = $codVueloCompra");
   $vueloData = mysqli_fetch_assoc($resVuelo);
 
-  if (!$vueloData || $vueloData['asientosDisponibles'] < $cantidadPasajeros) {
-    $asientosRestantes = $vueloData['asientosDisponibles'] ?? 0;
-    $mensaje = "Lo sentimos, no hay suficientes asientos disponibles para este vuelo. Asientos disponibles: $asientosRestantes.";
+  $fechaHoraVuelo = $vueloData ? strtotime($vueloData['fechaSalidaVuelo'] . ' ' . $vueloData['horaSalidaVuelo']) : false;
+
+  if (!$vueloData || $fechaHoraVuelo < time()) {
+    $mensaje = "No es posible reservar este vuelo porque su fecha de salida ya pasó.";
+    $tipo_mensaje = "danger";
+  } elseif ($vueloData['asientosDisponibles'] < $cantidadPasajeros) {
+    $mensaje = "Lo sentimos, no hay suficientes asientos disponibles para este vuelo. Asientos disponibles: {$vueloData['asientosDisponibles']}.";
     $tipo_mensaje = "danger";
   } else {
     $resExiste = mysqli_query($link, "SELECT codReserva FROM reservas WHERE codUsuario = $codUsuarioCompra AND codVuelo = $codVueloCompra AND estadoReserva = 'Pendiente de pago'");
