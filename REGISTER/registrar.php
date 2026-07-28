@@ -11,8 +11,6 @@
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
-    $_SESSION['message'] = ' su cuenta ha sido creada exitosamente.';
-
     $message = '';
 
     $validarQuery = 'SELECT emailUsuario FROM usuarios WHERE emailUsuario = ?';
@@ -47,6 +45,10 @@
       'INSERT INTO usuarios (codUsuario, nombreUsuario, claveUsuario, tipoUsuario, emailUsuario, telefonoUsuario, emailVerificado, tokenVerificacion)
        VALUES (NULL, ?, ?, "usuario", ?, ?, 0, ?)'); 
 
+      if (!$stmt2) {
+        $message = 'Error al preparar la consulta: ' . mysqli_error($link);
+      } else {
+
       mysqli_stmt_bind_param($stmt2, 'sssss',
       $fullname,
       $hashedPassword,
@@ -75,7 +77,8 @@
         exit;
 
       } else {
-        $message = 'ocurrió un error al crear la cuenta. Intentá de nuevo.';
+        $message = 'Ocurrió un error al crear la cuenta: ' . mysqli_stmt_error($stmt2);
+      }
       }
     };
   }
