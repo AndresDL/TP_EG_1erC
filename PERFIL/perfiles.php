@@ -59,7 +59,9 @@ if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
          AND p.estadoPromocion = 'aprobada'
          AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
      WHERE r.codUsuario = $codUsuarioRes AND r.estadoReserva = 'Pendiente de pago'
-     GROUP BY r.codReserva
+     GROUP BY r.codReserva, r.estadoReserva, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo,
+              v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo, v.codAerolinea,
+              a.nombreAerolinea, p.descuentoPromocion, p.descripcionPromocion
      ORDER BY r.fechaReserva DESC");
     if (!$resActivas) {
         die("Error SQL (reservas activas): " . mysqli_error($link));
@@ -100,7 +102,9 @@ if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
          AND p.estadoPromocion = 'aprobada'
          AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
      WHERE r.codUsuario = $codUsuarioHist AND r.estadoReserva = 'Confirmada'
-     GROUP BY r.codReserva
+     GROUP BY r.codReserva, r.estadoReserva, r.fechaReserva, v.origenVuelo, v.destinoVuelo,
+              v.fechaSalidaVuelo, v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo,
+              v.codAerolinea, a.nombreAerolinea, p.descuentoPromocion, p.descripcionPromocion
      ORDER BY r.fechaReserva DESC
      LIMIT $porPagina OFFSET $offset");
     if (!$resHistorial) {
