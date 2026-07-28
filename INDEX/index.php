@@ -4,14 +4,13 @@ include_once('../conexion.inc');
 if (!$link) {
     die("Error de conexión a la base de datos.");
 }
-// Últimas 3 novedades vigentes
+
 $resNovedades = mysqli_query($link,
     "SELECT * FROM novedades
      WHERE fechaExpiracionNovedad >= CURDATE()
      ORDER BY fechaPublicacionNovedad DESC
      LIMIT 3");
 
-// Ultimas 3 promociones aprobadas para el carrusel
 $resPromos = mysqli_query($link,
     "SELECT p.*, a.nombreAerolinea FROM promociones p
      LEFT JOIN aerolineas a ON p.codAerolinea = a.codAerolinea
@@ -265,7 +264,7 @@ function claseNovedad($tipo) {
   <footer>
     <div class="row">
       <div class="col">
-        <h3><strong>Contactanos</strong><div class="subrayado"></div></h3>
+        <h3><strong>Contactanos</strong><span class="subrayado"></span></h3>
         <ul>
           <li><i class="bi bi-envelope-at"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
           <li><i class="bi bi-whatsapp"></i><a href="#">+54 9 341 234 5678</a></li>
@@ -273,7 +272,7 @@ function claseNovedad($tipo) {
         </ul>
       </div>
       <div class="col">
-        <h3><strong>Mapa de sitio</strong><div class="subrayado"></div></h3>
+        <h3><strong>Mapa de sitio</strong><span class="subrayado"></span></h3>
         <ul>
           <li><a href="index.php">Inicio</a></li>
           <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
@@ -283,7 +282,7 @@ function claseNovedad($tipo) {
         </ul>
       </div>
       <div class="col">
-        <h3><strong>Ubicación</strong><div class="subrayado"></div></h3>
+        <h3><strong>Ubicación</strong><span class="subrayado"></span></h3>
         <ul>
           <li><a href="https://maps.app.goo.gl/UvsGpUXHgk9GkpYP9" target="_blank">Zeballos 1341</a></li>
           <li><a href="https://maps.app.goo.gl/87YMeSLAp74gH9mc7" target="_blank">Rosario, Santa Fe</a></li>
@@ -291,7 +290,7 @@ function claseNovedad($tipo) {
         </ul>
       </div>
       <div class="col">
-        <h3><strong>Newsletter</strong><div class="subrayado"></div></h3>
+        <h3><strong>Newsletter</strong><span class="subrayado"></span></h3>
         <form>
           <i class="bi bi-envelope"></i>
           <input type="email" placeholder="Ingrese su mail">
