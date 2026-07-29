@@ -85,6 +85,12 @@ body {
     flex: 1;
     justify-content: space-between;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    list-style: none;
+}
+
+.nav-links li {
+    display: flex;
+    flex: 1;
 }
 
 .nav-links a {
