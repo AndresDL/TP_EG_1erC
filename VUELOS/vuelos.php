@@ -328,31 +328,33 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
   <div class="resultados-wrapper">
 
     <aside class="sidebar">
-      <h3>MODIFICAR BÚSQUEDA</h3>
-      <div class="sidebar-grupo">
-        <label for="sb_origen">Origen</label>
-        <input class="sidebar-input" type="text" id="sb_origen" value="<?php echo htmlspecialchars($filtroOrigen); ?>">
-      </div>
-      <div class="sidebar-grupo">
-        <label for="sb_destino">Destino</label>
-        <input class="sidebar-input" type="text" id="sb_destino" value="<?php echo htmlspecialchars($filtroDestino); ?>">
-      </div>
-      <div class="sidebar-grupo">
-        <label for="sb_fechaIda">Ida fecha</label>
-        <input class="sidebar-input-date" type="date" id="sb_fechaIda" value="<?php echo htmlspecialchars($filtroFechaIda); ?>">
-      </div>
-      <div class="sidebar-grupo">
-        <label for="sb_fechaVuelta">Vuelta fecha<span style="color: var(--gris);"> (opcional)</span></label>
-        <input class="sidebar-input-date" type="date" id="sb_fechaVuelta" 
-               value="<?php echo htmlspecialchars($filtroFechaVuelta); ?>"
-               title="Fecha de vuelta (opcional)">
-        <small style="color: var(--gris); font-size: .78rem;">(opcional)</small>
-      </div>
-      <div class="sidebar-grupo">
-        <label for="sb_pasajeros">Cantidad pasajeros</label>
-        <input class="sidebar-input" type="number" id ="sb_pasajeros" placeholder="Ej: 2" min="1" value="<?php echo htmlspecialchars(isset($_GET['pasajeros']) ? $_GET['pasajeros'] : ''); ?>">
-      </div>
-      <button class="btn-aplicar" onclick="aplicarFiltros()"> Buscar </button>
+      <form role="search" aria-label="Modificar búsqueda de vuelos" onsubmit="event.preventDefault(); aplicarFiltros();">
+        <h3>MODIFICAR BÚSQUEDA</h3>
+        <div class="sidebar-grupo">
+          <label for="sb_origen">Origen</label>
+          <input class="sidebar-input" type="text" id="sb_origen" value="<?php echo htmlspecialchars($filtroOrigen); ?>">
+        </div>
+        <div class="sidebar-grupo">
+          <label for="sb_destino">Destino</label>
+          <input class="sidebar-input" type="text" id="sb_destino" value="<?php echo htmlspecialchars($filtroDestino); ?>">
+        </div>
+        <div class="sidebar-grupo">
+          <label for="sb_fechaIda">Ida fecha</label>
+          <input class="sidebar-input-date" type="date" id="sb_fechaIda" value="<?php echo htmlspecialchars($filtroFechaIda); ?>">
+        </div>
+        <div class="sidebar-grupo">
+          <label for="sb_fechaVuelta">Vuelta fecha<span style="color: var(--gris);"> (opcional)</span></label>
+          <input class="sidebar-input-date" type="date" id="sb_fechaVuelta" 
+                 value="<?php echo htmlspecialchars($filtroFechaVuelta); ?>"
+                 title="Fecha de vuelta (opcional)">
+          <small style="color: var(--gris); font-size: .78rem;">(opcional)</small>
+        </div>
+        <div class="sidebar-grupo">
+          <label for="sb_pasajeros">Cantidad pasajeros</label>
+          <input class="sidebar-input" type="number" id ="sb_pasajeros" placeholder="Ej: 2" min="1" value="<?php echo htmlspecialchars(isset($_GET['pasajeros']) ? $_GET['pasajeros'] : ''); ?>">
+        </div>
+        <button type="submit" class="btn-aplicar"> Buscar </button>
+      </form>
     </aside>
 
     <!-- LISTA DE VUELOS DISPONIBLES -->
@@ -385,21 +387,21 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
                   <?php endif; ?>
                 </div>
                 <div class="vuelo-ruta">
-                  <div >
-                    <span class="ciudad-nombre"><?php echo htmlspecialchars($vuelo['origenVuelo']); ?></span>
+                  <div>
+                    <span class="ciudad-nombre"><span class="visually-hidden">Origen: </span><?php echo htmlspecialchars($vuelo['origenVuelo']); ?></span>
                     <span class="ciudad-horario">Horario salida ida: <?php echo date('H:i', strtotime($vuelo['horaSalidaVuelo'])); ?> hs</span>
                   </div>
                   <div>
-                    <span class="ciudad-nombre"><?php echo htmlspecialchars($vuelo['destinoVuelo']); ?></span>
+                    <span class="ciudad-nombre"><span class="visually-hidden">Destino: </span><?php echo htmlspecialchars($vuelo['destinoVuelo']); ?></span>
                     <span class="ciudad-horario">Fecha ida: <?php echo date('d/m/Y', strtotime($vuelo['fechaSalidaVuelo'])); ?></span>
                   </div>
                   <?php if (!empty($vuelo['fechaVuelta']) && $vuelo['fechaVuelta'] !== '0000-00-00'): ?>
                     <div>
-                      <span class="ciudad-nombre"> &nbsp; </span>
+                      <span class="ciudad-nombre" aria-hidden="true">&nbsp;</span>
                       <span class="ciudad-horario">Horario salida vuelta: <?php echo date('H:i', strtotime($vuelo['horaVuelta'])); ?> hs</span>
                     </div>
                     <div>
-                      <span class="ciudad-nombre"> &nbsp; </span>
+                      <span class="ciudad-nombre" aria-hidden="true">&nbsp;</span>
                       <span class="ciudad-horario">Fecha vuelta: <?php echo date('d/m/Y', strtotime($vuelo['fechaVuelta'])); ?></span>
                     </div>
                   <?php endif; ?>
@@ -817,14 +819,14 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
         </div>
         <div class="mt-3">
           <label for="cantidadPasajeros" style="font-weight:600; font-size:.9rem;">Cantidad de pasajeros</label>
-          <input type="number" class="form-control mt-1" id="cantidadPasajeros" name="cantidadPasajeros" min="1" max="9" value="1" style="width:120px;">
-          <div id="errorPasajeros" class="text-danger mt-1" style="font-size:.85rem; display:none;">Ingresá una cantidad válida (entre 1 y 9).</div>
+          <input type="number" class="form-control mt-1" id="cantidadPasajeros" name="cantidadPasajeros" min="1" max="9" value="1" style="width:120px;" aria-describedby="errorPasajeros" aria-invalid="false">
+          <div id="errorPasajeros" class="text-danger mt-1" role="alert" style="font-size:.85rem; display:none;">Ingresá una cantidad válida (entre 1 y 9).</div>
         </div>
         <p class="mt-3 mb-0" style="font-size:.88rem; color:var(--gris);">Podrás pagar desde tu perfil en <strong>Reservas activas</strong>.</p>
       </div>
       <div class="modal-footer bg-light">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <form method="POST" action="vuelos.php" id="formComprar" onsubmit="var c=document.getElementById('cantidadPasajeros'),e=document.getElementById('errorPasajeros'),v=parseInt(c.value);if(!v||v<1||v>9){e.style.display='block';return false;}e.style.display='none';document.getElementById('cantidadPasajerosHidden').value=v;">
+        <form method="POST" action="vuelos.php" id="formComprar" onsubmit="var c=document.getElementById('cantidadPasajeros'),e=document.getElementById('errorPasajeros'),v=parseInt(c.value);if(!v||v<1||v>9){e.style.display='block';c.setAttribute('aria-invalid','true');c.focus();return false;}e.style.display='none';c.setAttribute('aria-invalid','false');document.getElementById('cantidadPasajerosHidden').value=v;">
           <input type="hidden" name="comprar_vuelo" value="1">
           <input type="hidden" name="codVuelo" id="codVueloComprar" value="">
           <input type="hidden" name="cantidadPasajeros" id="cantidadPasajerosHidden" value="1">
