@@ -230,16 +230,16 @@ function estadoBadge($estado) {
           <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
         </div>
 
-        <div class="nav-links">
-          <a href="../INDEX/index.php">Inicio</a>
-          <a href="../VUELOS/vuelos.php">Vuelos</a>
-          <a href="../NOVEDADES/novedades.php" >Novedades</a>
-          <a href="../PROMOCIONES/promociones.php" class="active">Promociones</a>
-        </div>
+        <ul class="nav-links">
+          <li><a href="../INDEX/index.php">Inicio</a></li>
+          <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
+          <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
+          <li><a href="../PROMOCIONES/promociones.php" class="active" aria-current="page">Promociones</a></li>
+        </ul>
         
         <div class="nav-right">
-          <div class="foto-perfil" title="Perfil">
-            <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+          <div class="foto-perfil" aria-hidden="true">
+            <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg" focusable="false">
               <circle cx="21" cy="10" r="9" fill="#ffffff"/>
               <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
             </svg>
@@ -268,7 +268,7 @@ function estadoBadge($estado) {
   <?php if ($mensaje !== ''): ?>
     <div class="alert alert-<?= $tipo_mensaje ?> alert-dismissible fade show" role="alert">
       <?= htmlspecialchars($mensaje) ?>
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
     </div>
   <?php endif; ?>
 
@@ -283,15 +283,15 @@ function estadoBadge($estado) {
     <div class="d-flex gap-2 align-items-center flex-wrap">
       <?php if ($esCEO): ?>
         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCrearPromo">
-          <i class="bi bi-plus-circle me-1"></i> Nueva Promoción
+          <i class="bi bi-plus-circle me-1" aria-hidden="true"></i> Nueva Promoción
         </button>
         <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalMisPromos">
-          <i class="bi bi-list-ul me-1"></i> Mis Promociones
+          <i class="bi bi-list-ul me-1" aria-hidden="true"></i> Mis Promociones
         </button>
       <?php endif; ?>
       <?php if ($esAdmin): ?>
         <button class="btn btn-warning btn-sm position-relative" data-bs-toggle="modal" data-bs-target="#modalPendientes">
-          <i class="bi bi-hourglass-split me-1"></i> Pendientes
+          <i class="bi bi-hourglass-split me-1" aria-hidden="true"></i> Pendientes
           <?php if ($cantPendientes > 0): ?>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
               <?= $cantPendientes ?>
@@ -306,18 +306,18 @@ function estadoBadge($estado) {
   <div class="promociones-filtro">
     <form method="GET" action="promociones.php" class="d-flex gap-3 align-items-end flex-wrap">
       <div style="flex:1;min-width:200px;">
-        <label class="form-label mb-1">Filtrar por aerolínea</label>
-        <input type="text" name="buscar" class="filtro-input-promo"
+        <label class="form-label mb-1" for="buscarAerolinea">Filtrar por aerolínea</label>
+        <input type="text" name="buscar" id="buscarAerolinea" class="filtro-input-promo"
                placeholder="Ej: Aerolíneas Argentinas"
                value="<?= htmlspecialchars($busqueda) ?>">
       </div>
       <div class="d-flex gap-2">
         <button type="submit" class="btn btn-primary px-4">
-          <i class="bi bi-search me-1"></i> Buscar
+          <i class="bi bi-search me-1" aria-hidden="true"></i> Buscar
         </button>
         <?php if ($busqueda !== ''): ?>
           <a href="promociones.php" class="btn btn-outline-secondary">
-            <i class="bi bi-x-lg"></i> Limpiar
+            <i class="bi bi-x-lg" aria-hidden="true"></i> Limpiar
           </a>
         <?php endif; ?>
       </div>
@@ -327,7 +327,7 @@ function estadoBadge($estado) {
   <!-- Grid -->
   <?php if (!$resultPromos || mysqli_num_rows($resultPromos) === 0): ?>
     <div class="text-center py-5" style="color:var(--gris);">
-      <i class="bi bi-tags fs-1 d-block mb-3"></i>
+      <i class="bi bi-tags fs-1 d-block mb-3" aria-hidden="true"></i>
       <p class="fs-5">No hay promociones aprobadas<?= $busqueda ? ' para "' . htmlspecialchars($busqueda) . '"' : '' ?>.</p>
     </div>
   <?php else: ?>
@@ -337,10 +337,10 @@ function estadoBadge($estado) {
       ?>
         <div class="promo-card">
           <?php if ($imgSrc): ?>
-            <img src="<?= $imgSrc ?>" alt="Imagen promoción" onerror="this.style.display='none'">
+            <img src="<?= $imgSrc ?>" alt="<?= htmlspecialchars($promo['descripcionPromocion']) ?>" onerror="this.style.display='none'">
           <?php else: ?>
             <div class="promo-sin-imagen">
-              <i class="bi bi-image fs-1"></i>
+              <i class="bi bi-image fs-1" aria-hidden="true"></i>
               <span style="font-size:.85rem;">Sin imagen</span>
             </div>
           <?php endif; ?>
@@ -348,18 +348,18 @@ function estadoBadge($estado) {
             <h5 class="card-title"><?= htmlspecialchars($promo['nombreAerolinea'] ?? 'Sin aerolínea') ?></h5>
             <p class="card-text"><?= htmlspecialchars($promo['descripcionPromocion']) ?></p>
             <div class="promo-descuento">
-              <i class="bi bi-percent me-1"></i>
+              <i class="bi bi-percent me-1" aria-hidden="true"></i>
               <?= number_format($promo['descuentoPromocion'], 0) ?>% de descuento
             </div>
             <?php if (!empty($promo['vigenciaPromocion'])): ?>
               <p class="promo-vigencia">
-                <i class="bi bi-clock me-1"></i>Vigencia hasta: <?= date('d/m/Y', strtotime($promo['vigenciaPromocion'])) ?>
+                <i class="bi bi-clock me-1" aria-hidden="true"></i>Vigencia hasta: <?= date('d/m/Y', strtotime($promo['vigenciaPromocion'])) ?>
               </p>
             <?php endif; ?>
 
             <?php if ($tipoUsuario === 'no_registrado'): ?>
               <a href="../LOGIN/login.php" class="btn-solicitar">
-                <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión para solicitar
+                <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i> Iniciar sesión para solicitar
               </a>
             <?php elseif ($esUsuario): ?>
               <?php
@@ -374,7 +374,7 @@ function estadoBadge($estado) {
               <?php if ($yaSolicito): ?>
                 <button class="btn-solicitar" disabled
                         style="background:var(--verde); cursor:default; opacity:.85;">
-                  <i class="bi bi-check-circle me-1"></i> Promoción activa
+                  <i class="bi bi-check-circle me-1" aria-hidden="true"></i> Promoción activa
                 </button>
               <?php else: ?>
                 <form method="POST" action="promociones.php">
@@ -390,13 +390,15 @@ function estadoBadge($estado) {
                 <?= estadoBadge($promo['estadoPromocion']) ?>
                 <button class="btn btn-sm btn-outline-primary"
                         data-bs-toggle="modal"
-                        data-bs-target="#modalEditar<?= $promo['codPromocion'] ?>">
-                  <i class="bi bi-pencil"></i>
+                        data-bs-target="#modalEditar<?= $promo['codPromocion'] ?>"
+                        aria-label="Editar promoción">
+                  <i class="bi bi-pencil" aria-hidden="true"></i>
                 </button>
                 <button class="btn btn-sm btn-outline-danger"
                         data-bs-toggle="modal"
-                        data-bs-target="#modalBaja<?= $promo['codPromocion'] ?>">
-                  <i class="bi bi-arrow-down-circle"></i>
+                        data-bs-target="#modalBaja<?= $promo['codPromocion'] ?>"
+                        aria-label="Dar de baja la promoción">
+                  <i class="bi bi-arrow-down-circle" aria-hidden="true"></i>
                 </button>
               </div>
             <?php elseif ($esCEO): ?>
@@ -415,29 +417,29 @@ function estadoBadge($estado) {
               <input type="hidden" name="id" value="<?= $promo['codPromocion'] ?>">
               <div class="modal-content">
                 <div class="modal-header" style="background:var(--azul);color:#fff;">
-                  <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Editar Promoción</h5>
-                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                  <h5 class="modal-title"><i class="bi bi-pencil-square me-2" aria-hidden="true"></i>Editar Promoción</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body row g-3">
                   <div class="col-md-8">
-                    <label class="form-label fw-bold">Descripción</label>
-                    <textarea class="form-control" name="descripcionPromocion" rows="3" required><?= htmlspecialchars($promo['descripcionPromocion']) ?></textarea>
+                    <label class="form-label fw-bold" for="descEditarPromo<?= $promo['codPromocion'] ?>">Descripción</label>
+                    <textarea class="form-control" id="descEditarPromo<?= $promo['codPromocion'] ?>" name="descripcionPromocion" rows="3" required><?= htmlspecialchars($promo['descripcionPromocion']) ?></textarea>
                   </div>
                   <div class="col-md-4">
-                    <label class="form-label fw-bold">Descuento (%)</label>
-                    <input type="number" class="form-control" name="descuentoPromocion" min="1" max="100" step="0.01" value="<?= $promo['descuentoPromocion'] ?>" required>
+                    <label class="form-label fw-bold" for="descuentoEditarPromo<?= $promo['codPromocion'] ?>">Descuento (%)</label>
+                    <input type="number" id="descuentoEditarPromo<?= $promo['codPromocion'] ?>" class="form-control" name="descuentoPromocion" min="1" max="100" step="0.01" value="<?= $promo['descuentoPromocion'] ?>" required>
                   </div>
                   <div class="col-md-6">
-                    <label class="form-label fw-bold">Vigencia hasta</label>
-                    <input type="date" class="form-control" name="vigenciaPromocion" value="<?= $promo['vigenciaPromocion'] ?>" required>
+                    <label class="form-label fw-bold" for="vigenciaEditarPromo<?= $promo['codPromocion'] ?>">Vigencia hasta</label>
+                    <input type="date" id="vigenciaEditarPromo<?= $promo['codPromocion'] ?>" class="form-control" name="vigenciaPromocion" value="<?= $promo['vigenciaPromocion'] ?>" required>
                   </div>
                   <div class="col-12">
-                    <label class="form-label fw-bold">Imagen (subir archivo)</label>
-                    <input type="file" class="form-control" name="imagenFile" accept="image/*">
+                    <label class="form-label fw-bold" for="imagenFileEditar<?= $promo['codPromocion'] ?>">Imagen (subir archivo)</label>
+                    <input type="file" id="imagenFileEditar<?= $promo['codPromocion'] ?>" class="form-control" name="imagenFile" accept="image/*">
                   </div>
                   <div class="col-12">
-                    <label class="form-label fw-bold">— o URL de imagen</label>
-                    <input type="url" class="form-control" name="imagenUrl" placeholder="https://...">
+                    <label class="form-label fw-bold" for="imagenUrlEditar<?= $promo['codPromocion'] ?>">— o URL de imagen</label>
+                    <input type="url" id="imagenUrlEditar<?= $promo['codPromocion'] ?>" class="form-control" name="imagenUrl" placeholder="https://...">
                   </div>
                 </div>
                 <div class="modal-footer">
@@ -456,7 +458,7 @@ function estadoBadge($estado) {
               <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
                   <h5 class="modal-title">Dar de baja</h5>
-                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
                   <p>¿Dar de baja <strong>"<?= htmlspecialchars($promo['descripcionPromocion']) ?>"</strong>?</p>
@@ -503,19 +505,19 @@ function estadoBadge($estado) {
     <form method="POST" action="promociones.php" enctype="multipart/form-data">
       <div class="modal-content">
         <div class="modal-header" style="background:var(--azul);color:#fff;">
-          <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Solicitar Nueva Promoción</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          <h5 class="modal-title"><i class="bi bi-plus-circle me-2" aria-hidden="true"></i>Solicitar Nueva Promoción</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body">
           <p class="text-muted small mb-3">
-            <i class="bi bi-info-circle me-1"></i>
+            <i class="bi bi-info-circle me-1" aria-hidden="true"></i>
             La promoción quedará <strong>pendiente</strong> hasta que el administrador la apruebe.
           </p>
           <div class="row g-3">
             <div class="col-md-6">
-              <label class="form-label fw-bold">Aerolínea</label>
+              <label class="form-label fw-bold" for="aerolineaCrear">Aerolínea</label>
               <?php if ($aerolineasRes && mysqli_num_rows($aerolineasRes) > 0): ?>
-                <select class="form-select" name="codAerolinea">
+                <select class="form-select" id="aerolineaCrear" name="codAerolinea">
                   <option value="0">Sin aerolínea específica</option>
                   <?php mysqli_data_seek($aerolineasRes, 0); while ($al = mysqli_fetch_assoc($aerolineasRes)): ?>
                     <option value="<?= $al['codAerolinea'] ?>"><?= htmlspecialchars($al['nombreAerolinea']) ?></option>
@@ -523,32 +525,32 @@ function estadoBadge($estado) {
                 </select>
               <?php else: ?>
                 <input type="hidden" name="codAerolinea" value="0">
-                <input type="text" class="form-control" value="Sin aerolíneas en BD" disabled>
+                <input type="text" id="aerolineaCrear" class="form-control" value="Sin aerolíneas en BD" disabled>
               <?php endif; ?>
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-bold">Descuento (%) <span class="text-danger">*</span></label>
+              <label class="form-label fw-bold" for="descuentoCrear">Descuento (%) <span class="text-danger">*</span></label>
               <div class="input-group">
-                <input type="number" class="form-control" name="descuentoPromocion" min="1" max="100" step="0.01" placeholder="Ej: 30" required>
+                <input type="number" id="descuentoCrear" class="form-control" name="descuentoPromocion" min="1" max="100" step="0.01" placeholder="Ej: 30" required>
                 <span class="input-group-text">%</span>
               </div>
             </div>
             <div class="col-12">
-              <label class="form-label fw-bold">Descripción <span class="text-danger">*</span></label>
-              <textarea class="form-control" name="descripcionPromocion" rows="3" placeholder="Ej: 30% OFF en vuelos nacionales" required></textarea>
+              <label class="form-label fw-bold" for="descripcionCrearPromo">Descripción <span class="text-danger">*</span></label>
+              <textarea class="form-control" id="descripcionCrearPromo" name="descripcionPromocion" rows="3" placeholder="Ej: 30% OFF en vuelos nacionales" required></textarea>
             </div>
             <div class="col-md-6">
-              <label class="form-label fw-bold">Vigencia hasta <span class="text-danger">*</span></label>
-              <input type="date" class="form-control" name="vigenciaPromocion" min="<?= date('Y-m-d') ?>" required>
+              <label class="form-label fw-bold" for="vigenciaCrear">Vigencia hasta <span class="text-danger">*</span></label>
+              <input type="date" id="vigenciaCrear" class="form-control" name="vigenciaPromocion" min="<?= date('Y-m-d') ?>" required>
             </div>
             <div class="col-12">
-              <label class="form-label fw-bold">Imagen — subir archivo</label>
-              <input type="file" class="form-control" name="imagenFile" accept="image/*"
+              <label class="form-label fw-bold" for="imagenFileCrear">Imagen — subir archivo</label>
+              <input type="file" id="imagenFileCrear" class="form-control" name="imagenFile" accept="image/*"
                      onchange="previewImg(this,'prevCrear')">
             </div>
             <div class="col-12">
-              <label class="form-label fw-bold">— o pegar URL</label>
-              <input type="url" class="form-control" name="imagenUrl"
+              <label class="form-label fw-bold" for="imagenUrlCrear">— o pegar URL</label>
+              <input type="url" id="imagenUrlCrear" class="form-control" name="imagenUrl"
                      placeholder="https://ejemplo.com/imagen.jpg"
                      oninput="previewUrl(this.value,'prevCrear')">
               <div class="form-text">Si subís archivo, la URL se ignora.</div>
@@ -563,7 +565,7 @@ function estadoBadge($estado) {
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
           <button type="submit" name="crear_promo" value="1" class="btn btn-primary">
-            <i class="bi bi-send me-1"></i> Enviar solicitud
+            <i class="bi bi-send me-1" aria-hidden="true"></i> Enviar solicitud
           </button>
         </div>
       </div>
@@ -576,14 +578,14 @@ function estadoBadge($estado) {
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header" style="background:var(--azul-oscuro);color:#fff;">
-        <h5 class="modal-title"><i class="bi bi-list-ul me-2"></i>Mis Promociones</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title"><i class="bi bi-list-ul me-2" aria-hidden="true"></i>Mis Promociones</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body p-0">
         <div class="table-responsive">
           <table class="table table-hover align-middle mb-0">
             <thead class="table-dark">
-              <tr><th>#</th><th>Aerolínea</th><th>Descripción</th><th>Descuento</th><th>Estado</th></tr>
+              <tr><th scope="col">#</th><th scope="col">Aerolínea</th><th scope="col">Descripción</th><th scope="col">Descuento</th><th scope="col">Estado</th></tr>
             </thead>
             <tbody>
               <?php if ($misPromosRes && mysqli_num_rows($misPromosRes) > 0):
@@ -616,14 +618,14 @@ function estadoBadge($estado) {
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header bg-warning text-dark">
-        <h5 class="modal-title"><i class="bi bi-hourglass-split me-2"></i>Promociones Pendientes</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title"><i class="bi bi-hourglass-split me-2" aria-hidden="true"></i>Promociones Pendientes</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body p-0">
         <div class="table-responsive">
           <table class="table table-hover align-middle mb-0">
             <thead class="table-dark">
-              <tr><th>#</th><th>Aerolínea</th><th>Descripción</th><th>Descuento</th><th>Imagen</th><th>Acciones</th></tr>
+              <tr><th scope="col">#</th><th scope="col">Aerolínea</th><th scope="col">Descripción</th><th scope="col">Descuento</th><th scope="col">Imagen</th><th scope="col">Acciones</th></tr>
             </thead>
             <tbody>
               <?php if ($pendientesRes && mysqli_num_rows($pendientesRes) > 0):
@@ -637,17 +639,17 @@ function estadoBadge($estado) {
                   <td><?= number_format($pend['descuentoPromocion'], 0) ?>%</td>
                   <td>
                     <?php if ($imgP): ?>
-                      <img src="<?= $imgP ?>" style="height:48px;width:70px;object-fit:cover;border-radius:6px;" onerror="this.replaceWith('N/A')">
+                      <img src="<?= $imgP ?>" alt="Imagen de la promoción de <?= htmlspecialchars($pend['nombreAerolinea'] ?? 'la aerolínea') ?>" style="height:48px;width:70px;object-fit:cover;border-radius:6px;" onerror="this.replaceWith('N/A')">
                     <?php else: ?><span class="text-muted small">Sin imagen</span><?php endif; ?>
                   </td>
                   <td>
                     <button type="button" class="btn btn-sm btn-success"
                             onclick="accionPromo('aprobar', <?= $pend['codPromocion'] ?>)">
-                      <i class="bi bi-check-lg"></i> Aprobar
+                      <i class="bi bi-check-lg" aria-hidden="true"></i> Aprobar
                     </button>
                     <button type="button" class="btn btn-sm btn-danger ms-1"
                             onclick="accionPromo('rechazar', <?= $pend['codPromocion'] ?>)">
-                      <i class="bi bi-x-lg"></i> Rechazar
+                      <i class="bi bi-x-lg" aria-hidden="true"></i> Rechazar
                     </button>
                   </td>
                 </tr>
@@ -673,9 +675,9 @@ function estadoBadge($estado) {
       <div class="col">
         <h3><strong>Contactanos</strong><div class="subrayado"></div></h3>
         <ul>
-          <li><i class="bi bi-envelope-at"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
-          <li><i class="bi bi-whatsapp"></i><a href="#">+54 9 341 234 5678</a></li>
-          <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.php">Formulario de Contacto</a></li>
+          <li><i class="bi bi-envelope-at" aria-hidden="true"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
+          <li><i class="bi bi-whatsapp" aria-hidden="true"></i><a href="#">+54 9 341 234 5678</a></li>
+          <li><i class="bi bi-pen" aria-hidden="true"></i><a href="../CONTACTO/contacto.php">Formulario de Contacto</a></li>
         </ul>
       </div>
       <div class="col">
@@ -698,14 +700,17 @@ function estadoBadge($estado) {
       <div class="col">
         <h3><strong>Newsletter</strong><div class="subrayado"></div></h3>
         <form>
-          <i class="bi bi-envelope"></i>
-          <input type="email" placeholder="Ingrese su mail">
-          <button type="submit"><i class="bi bi-arrow-return-left"></i></button>
+          <label for="newsletterEmail" class="visually-hidden">Correo electrónico para el newsletter</label>
+          <i class="bi bi-envelope" aria-hidden="true"></i>
+          <input type="email" id="newsletterEmail" placeholder="Ingrese su mail">
+          <button type="submit" aria-label="Suscribirse al newsletter">
+            <i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+          </button>
         </form>
         <div class="iconos-redes">
-          <i class="bi bi-facebook"></i>
-          <i class="bi bi-instagram"></i>
-          <i class="bi bi-twitter-x"></i>
+          <i class="bi bi-facebook" aria-hidden="true"></i>
+          <i class="bi bi-instagram" aria-hidden="true"></i>
+          <i class="bi bi-twitter-x" aria-hidden="true"></i>
         </div>
       </div>
     </div>
