@@ -109,8 +109,8 @@ function claseNovedad($tipo) {
       <input type="date" id="inputFechaIda" onchange="setFecha(this,'textoIda','Ida')"/>
     </div>
     <div class="fecha-wrap">
-      <label for="inputFechaVuelta" class="fecha-label" id="labelVuelta" title="Fecha de vuelta (opcional)">
-        <span id="textoVuelta" style="color: var(--gris); font-size: .78rem">Vuelta (opcional)</span>
+      <label for="inputFechaVuelta" class="fecha-label" id="labelVuelta" title="Fecha de vuelta">
+        <span id="textoVuelta" style="color: var(--gris); font-size: .78rem">Vuelta</span>
         <i class="bi bi-calendar3" aria-hidden="true" style="color:var(--gris);"></i>
       </label>
       <input type="date" id="inputFechaVuelta" onchange="setFecha(this,'textoVuelta','Vuelta')"/>

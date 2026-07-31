@@ -343,11 +343,11 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
           <input class="sidebar-input-date" type="date" id="sb_fechaIda" value="<?php echo htmlspecialchars($filtroFechaIda); ?>">
         </div>
         <div class="sidebar-grupo">
-          <label for="sb_fechaVuelta">Vuelta fecha<span style="color: var(--gris);"> (opcional)</span></label>
+          <label for="sb_fechaVuelta">Vuelta fecha<span style="color: var(--gris);"></span></label>
           <input class="sidebar-input-date" type="date" id="sb_fechaVuelta" 
                  value="<?php echo htmlspecialchars($filtroFechaVuelta); ?>"
-                 title="Fecha de vuelta (opcional)">
-          <small style="color: var(--gris); font-size: .78rem;">(opcional)</small>
+                 title="Fecha de vuelta ">
+          <small style="color: var(--gris); font-size: .78rem;"></small>
         </div>
         <div class="sidebar-grupo">
           <label for="sb_pasajeros">Cantidad pasajeros</label>
@@ -537,7 +537,7 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
                   <input type="date" id="v_fechaVuelta" name="fechaVuelta" class="form-control">
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label" for="v_horaVuelta">Hora de Vuelta<span style="color: var(--gris);"> (opcional)</span></label>
+                  <label class="form-label" for="v_horaVuelta">Hora de Vuelta<span style="color: var(--gris);"></span></label>
                   <input type="text" id="v_horaVuelta" name="horaVuelta" class="form-control" placeholder="HH:MM" maxlength="5" pattern="^([01]\\d|2[0-3]):([0-5]\\d)$">
                 </div>
               </div>
