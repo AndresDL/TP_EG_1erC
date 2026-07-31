@@ -533,7 +533,7 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
                   <input type="text" id="v_aerolinea" class="form-control" value="<?php echo htmlspecialchars($_SESSION['nombreUsuario'] ?? ''); ?>" disabled>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label" for="v_fechaVuelta">Fecha de Vuelta<span style="color: var(--gris);"> (opcional)</span></label>
+                  <label class="form-label" for="v_fechaVuelta">Fecha de Vuelta<span style="color: var(--gris);"></span></label>
                   <input type="date" id="v_fechaVuelta" name="fechaVuelta" class="form-control">
                 </div>
                 <div class="col-md-6">

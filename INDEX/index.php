@@ -113,7 +113,7 @@ function claseNovedad($tipo) {
         <span id="textoVuelta" style="color: var(--gris); font-size: .78rem">Vuelta (opcional)</span>
         <i class="bi bi-calendar3" aria-hidden="true" style="color:var(--gris);"></i>
       </label>
-      <input type="date" id="inputFechaVuelta" onchange="setFecha(this,'textoVuelta','Vuelta (opcional)')"/>
+      <input type="date" id="inputFechaVuelta" onchange="setFecha(this,'textoVuelta','Vuelta')"/>
     </div>
 
     <label for="pasajeros" class="visually-hidden">Cantidad de pasajeros</label>
