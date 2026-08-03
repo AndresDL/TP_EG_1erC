@@ -6,7 +6,7 @@ if (!$link) {
 }
 // include_once($_SERVER['DOCUMENT_ROOT'] . '/conexion.inc');
 
-// Variables de control de rol
+// Variables de control de rol estamos probando
 $esCEO = (isset($_SESSION['tipoUsuario']) && $_SESSION['tipoUsuario'] === 'CEO');
 $codAerolineaCEO = $esCEO ? $_SESSION['codUsuario'] : null;
 
