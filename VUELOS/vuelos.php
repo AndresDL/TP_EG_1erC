@@ -349,10 +349,6 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
                  title="Fecha de vuelta ">
           <small style="color: var(--gris); font-size: .78rem;"></small>
         </div>
-        <div class="sidebar-grupo">
-          <label for="sb_pasajeros">Cantidad pasajeros</label>
-          <input class="sidebar-input" type="number" id ="sb_pasajeros" placeholder="Ej: 2" min="1" value="<?php echo htmlspecialchars(isset($_GET['pasajeros']) ? $_GET['pasajeros'] : ''); ?>">
-        </div>
         <button type="submit" class="btn-aplicar"> Buscar </button>
       </form>
     </aside>
