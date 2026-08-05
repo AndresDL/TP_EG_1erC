@@ -1,8 +1,15 @@
 <?php
 
   $link = null;
-  include_once('../conexion.inc');
-  include_once('../mailer.inc');
+  include_once __DIR__ . '/../conexion.inc';
+  $mailerFile = realpath(__DIR__ . '/../mailer.inc');
+  if (!$mailerFile || !is_readable($mailerFile)) {
+      die('Error: no se puede cargar mailer.inc');
+  }
+  require_once $mailerFile;
+  if (!function_exists('plantillaMail') || !function_exists('enviarMail') || !function_exists('urlBase')) {
+      die('Error: no se pudieron cargar las funciones de mail.');
+  }
   if (!$link) {
       die("Error de conexión a la base de datos.");
   }
