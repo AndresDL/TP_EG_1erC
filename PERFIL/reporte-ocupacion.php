@@ -15,6 +15,13 @@
     $fechaDesde = isset($_GET['fechaDesde']) ? $_GET['fechaDesde'] : '';
     $fechaHasta = isset($_GET['fechaHasta']) ? $_GET['fechaHasta'] : '';
 
+    // Si el usuario invierte el rango (Hasta más vieja que Desde), lo corregimos
+    if ($fechaDesde !== '' && $fechaHasta !== '' && $fechaDesde > $fechaHasta) {
+        $tmp = $fechaDesde;
+        $fechaDesde = $fechaHasta;
+        $fechaHasta = $tmp;
+    }
+
     $sql = "SELECT v.codVuelo, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo,
                    v.horaSalidaVuelo, v.asientosDisponibles,
                    COALESCE((SELECT COUNT(*) FROM reservas r
@@ -149,22 +156,69 @@
         <span class="filtro-titulo"><i class="bi bi-funnel"></i> Filtrar por fecha de salida</span>
 
         <div class="fecha-container">
-            <input type="date" name="fechaDesde" class="fecha-input" value="<?php echo htmlspecialchars($fechaDesde); ?>">
+            <input type="date" name="fechaDesde" id="fechaDesde" class="fecha-input" value="<?php echo htmlspecialchars($fechaDesde); ?>" <?php if ($fechaHasta !== ''): ?>max="<?php echo htmlspecialchars($fechaHasta); ?>"<?php endif; ?>>
             <div class="fecha-espejo">
-                <span class="label-texto"><i class="bi bi-calendar-event"></i> Desde</span>
+                <span class="label-texto" id="labelDesde"><i class="bi bi-calendar-event"></i> Desde</span>
             </div>
         </div>
 
         <div class="fecha-container">
-            <input type="date" name="fechaHasta" class="fecha-input" value="<?php echo htmlspecialchars($fechaHasta); ?>">
+            <input type="date" name="fechaHasta" id="fechaHasta" class="fecha-input" value="<?php echo htmlspecialchars($fechaHasta); ?>" <?php if ($fechaDesde !== ''): ?>min="<?php echo htmlspecialchars($fechaDesde); ?>"<?php endif; ?>>
             <div class="fecha-espejo">
-                <span class="label-texto"><i class="bi bi-calendar-event"></i> Hasta</span>
+                <span class="label-texto" id="labelHasta"><i class="bi bi-calendar-event"></i> Hasta</span>
             </div>
         </div>
 
         <button type="submit" class="btn-buscar"><i class="bi bi-search"></i> Buscar</button>
         <a href="reporte-ocupacion.php" class="btn-buscar" style="background: var(--gris); text-decoration:none; display:flex; align-items:center;"><i class="bi bi-x-circle"></i></a>
     </form>
+
+    <script>
+        (function () {
+            function formatearFecha(valor) {
+                const partes = valor.split('-');
+                if (partes.length !== 3) return valor;
+                return partes[2] + '/' + partes[1] + '/' + partes[0];
+            }
+
+            function sincronizarEspejo(input, label, textoBase) {
+                const icono = '<i class="bi bi-calendar-event"></i> ';
+                if (input.value) {
+                    label.innerHTML = icono + formatearFecha(input.value);
+                } else {
+                    label.innerHTML = icono + textoBase;
+                }
+            }
+
+            const inputDesde = document.getElementById('fechaDesde');
+            const inputHasta = document.getElementById('fechaHasta');
+            const labelDesde = document.getElementById('labelDesde');
+            const labelHasta = document.getElementById('labelHasta');
+
+            sincronizarEspejo(inputDesde, labelDesde, 'Desde');
+            sincronizarEspejo(inputHasta, labelHasta, 'Hasta');
+
+            inputDesde.addEventListener('change', function () {
+                sincronizarEspejo(inputDesde, labelDesde, 'Desde');
+                // No permitir elegir un "Hasta" anterior al "Desde"
+                inputHasta.min = inputDesde.value || '';
+                if (inputHasta.value && inputDesde.value && inputHasta.value < inputDesde.value) {
+                    inputHasta.value = inputDesde.value;
+                    sincronizarEspejo(inputHasta, labelHasta, 'Hasta');
+                }
+            });
+
+            inputHasta.addEventListener('change', function () {
+                sincronizarEspejo(inputHasta, labelHasta, 'Hasta');
+                // No permitir elegir un "Desde" posterior al "Hasta"
+                inputDesde.max = inputHasta.value || '';
+                if (inputDesde.value && inputHasta.value && inputDesde.value > inputHasta.value) {
+                    inputDesde.value = inputHasta.value;
+                    sincronizarEspejo(inputDesde, labelDesde, 'Desde');
+                }
+            });
+        })();
+    </script>
 
    
     <div class="row" style="margin: 0 1.5rem 1.5rem;">
