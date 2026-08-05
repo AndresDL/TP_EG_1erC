@@ -10,7 +10,7 @@ if (!is_readable(__DIR__ . '/../mailer.inc')) {
 require_once __DIR__ . '/../mailer.inc';
 
 if (!defined('MAIL_REMITENTE_EMAIL')) {
-    define('MAIL_REMITENTE_EMAIL', 'vuela@seguro.com.ar');
+    define('MAIL_REMITENTE_EMAIL', 'vuelaseguro.soporte@gmail.com');
 }
 
 if (!function_exists('enviarMail')) {
