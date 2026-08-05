@@ -227,7 +227,9 @@ function estadoBadge($estado) {
   <nav class="navbar-custom">
 
         <div class="logo-wrap">
-          <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+          <a href="../INDEX/index.php">
+            <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+          </a>
         </div>
 
         <ul class="nav-links">
@@ -687,7 +689,11 @@ function estadoBadge($estado) {
           <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
           <li><a href="promociones.php">Promociones</a></li>
           <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
-	  <li><a href="">Mi Perfil</a></li>
+	        <?php if (isset($_SESSION['nombreUsuario'])): ?>
+            <li><a href="../PERFIL/perfiles.php">Mi Perfil</a></li>
+          <?php else: ?>
+            <li><a href="../LOGIN/login.php">Mi Perfil</a></li>
+          <?php endif; ?>
         </ul>
       </div>
       <div class="col">

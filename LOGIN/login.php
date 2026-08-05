@@ -100,9 +100,13 @@ if (isset($_SESSION['message']) && $_SESSION['message'] !== '') {
   <section class="navbar-section">
     <div class="header-wrapper">
       <nav class="navbar-custom">
+
         <div class="logo-wrap">
-          <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+          <a href="../INDEX/index.php">
+            <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+          </a>
         </div>
+
         <div class="nav-links">
           <a href="../INDEX/index.php">Inicio</a>
           <a href="../VUELOS/vuelos.php">Vuelos</a>
@@ -202,7 +206,11 @@ if (isset($_SESSION['message']) && $_SESSION['message'] !== '') {
             <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
             <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
             <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
-            <li><a href="">Mi Perfil</a></li>
+            <?php if (isset($_SESSION['nombreUsuario'])): ?>
+            <li><a href="../PERFIL/perfiles.php">Mi Perfil</a></li>
+            <?php else: ?>
+              <li><a href="../LOGIN/login.php">Mi Perfil</a></li>
+            <?php endif; ?>
           </ul>
         </div>
         <div class="col">

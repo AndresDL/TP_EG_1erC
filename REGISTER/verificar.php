@@ -61,9 +61,13 @@
   <section class="navbar-section">
     <div class="header-wrapper">
       <nav class="navbar-custom">
+
         <div class="logo-wrap">
-          <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+          <a href="../INDEX/index.php">
+            <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+          </a>
         </div>
+
         <div class="nav-links">
           <a href="../INDEX/index.php">Inicio</a>
           <a href="../VUELOS/vuelos.php">Vuelos</a>
