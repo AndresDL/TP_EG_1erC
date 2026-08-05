@@ -24,9 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
   $codUsuarioCompra  = (int)$_SESSION['codUsuario'];
   $cantidadPasajeros = max(1, min(9, (int)($_POST['cantidadPasajeros'] ?? 1)));
 
-  $resVuelo  = mysqli_query($link, "SELECT asientosDisponibles, fechaSalidaVuelo, horaSalidaVuelo FROM vuelos WHERE codVuelo = $codVueloCompra");
+  $resVuelo  = mysqli_query($link, "SELECT asientosDisponibles, fechaSalidaVuelo, horaSalidaVuelo, precioVuelo FROM vuelos WHERE codVuelo = $codVueloCompra");
   $vueloData = mysqli_fetch_assoc($resVuelo);
 
+  $precioFinal = $vueloData ? $vueloData['precioVuelo'] * $cantidadPasajeros : 0;
   $fechaHoraVuelo = $vueloData ? strtotime($vueloData['fechaSalidaVuelo'] . ' ' . $vueloData['horaSalidaVuelo']) : false;
 
   if (!$vueloData || $fechaHoraVuelo < time()) {
@@ -41,6 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
       $mensaje = "Ya tenés una reserva pendiente de pago para este vuelo. Revisá tu perfil.";
       $tipo_mensaje = "warning";
     } else {
+      $hoy = date('Y-m-d');
+      $sqlInsertReserva = "INSERT INTO reservas (codUsuario, codVuelo, fechaReserva, estadoReserva, cantidadPasajeros, codPromocion, precioFinal) VALUES ($codUsuarioCompra, $codVueloCompra, '$hoy', 'Pendiente de pago', $cantidadPasajeros, NULL, $precioFinal)";
       $hoy           = date('Y-m-d');
       $aplicarPromo  = ($_POST['aplicarPromo'] ?? 'no') === 'si';
       $codPromoUsar  = (int)($_POST['codPromoUsar'] ?? 0);
@@ -316,7 +319,9 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
     <div class="header-wrapper">
       <nav class="navbar-custom">
         <div class="logo-wrap">
-          <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+          <a href="../INDEX/index.php">
+            <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+          </a>
         </div>
 
         <ul class="nav-links">
@@ -626,7 +631,11 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
           <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
           <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
           <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
-          <li><a href="">Mi Perfil</a></li>
+          <?php if (isset($_SESSION['nombreUsuario'])): ?>
+            <li><a href="../PERFIL/perfiles.php">Mi Perfil</a></li>
+          <?php else: ?>
+            <li><a href="../LOGIN/login.php">Mi Perfil</a></li>
+          <?php endif; ?>
         </ul>
       </div>
       <div class="col">
@@ -832,7 +841,7 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
         <!-- Precio sin promo -->
         <div id="bloquePrecionormal">
           <p style="font-size:1rem;margin:0;">
-            Precio: <strong id="modalPrecioTexto"></strong>
+            Precio: <strong id="modalPrecioTexto"></strong> por pasajero.
           </p>
         </div>
         <!-- Selector de promo si hay -->
