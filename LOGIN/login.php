@@ -7,12 +7,14 @@ if (!$link) {
 
 $message = '';
 
-if (isset($_SESSION['message'])) {
-    $message = $_SESSION['message'];
+$successMessage = '';
+if (isset($_SESSION['message']) && $_SESSION['message'] !== '') {
+    $successMessage = $_SESSION['message'];
     unset($_SESSION['message']);
 }
   if(isset($_SESSION['codUsuario'])){
     header('Location: ../INDEX/index.php');
+    exit;
   }
 
   if($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -131,29 +133,22 @@ if (isset($_SESSION['message'])) {
  
     <div class="contacto-form-card">
       
-      <?php if (isset($_SESSION['message']) && $_SESSION['message'] !== ''): ?>
+      <?php if ($successMessage !== ''): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-          <strong><i class="bi bi-check-circle"></i> Éxito!</strong> <?php echo $_SESSION['message']; $_SESSION['message'] = ''; ?>
+          <strong><i class="bi bi-check-circle"></i> Éxito!</strong> <?php echo htmlspecialchars($successMessage); ?>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       <?php endif; ?>
 
-      <?php if (isset($message) && $message !== ''): ?>
+      <?php if ($message !== ''): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-          <strong><i class="bi bi-exclamation-triangle"></i> Error!</strong> <?php echo $message; $message = ''; ?>
+          <strong><i class="bi bi-exclamation-triangle"></i> Error!</strong> <?php echo htmlspecialchars($message); ?>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
       <?php endif; ?>
  
       <h2>Ingresa a tu cuenta</h2>
       <h4>Completa con los datos de tu cuenta</h4>
-
-      <?php if($message): ?>
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-          <?php echo htmlspecialchars($message); ?>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      <?php endif; ?>
  
       <form action="login.php" method="POST">
  

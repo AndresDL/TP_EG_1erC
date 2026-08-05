@@ -4,14 +4,13 @@ include_once('../conexion.inc');
 if (!$link) {
     die("Error de conexión a la base de datos.");
 }
-// Últimas 3 novedades vigentes
+
 $resNovedades = mysqli_query($link,
     "SELECT * FROM novedades
      WHERE fechaExpiracionNovedad >= CURDATE()
      ORDER BY fechaPublicacionNovedad DESC
      LIMIT 3");
 
-// Ultimas 3 promociones aprobadas para el carrusel
 $resPromos = mysqli_query($link,
     "SELECT p.*, a.nombreAerolinea FROM promociones p
      LEFT JOIN aerolineas a ON p.codAerolinea = a.codAerolinea
@@ -24,8 +23,8 @@ $tipoUsuario = $usuario ? $usuario['tipoUsuario'] : 'no_registrado';
 
 function badgeNovedad($tipo) {
     return match($tipo) {
-        'Importante'  => '<span class="badge-nov badge-imp"><i class="bi bi-star-fill me-1"></i>Importante</span>',
-        'Alerta'      => '<span class="badge-nov badge-alt"><i class="bi bi-cloud-lightning me-1"></i>Alerta</span>',
+        'Importante'  => '<span class="badge-nov badge-imp"><i class="bi bi-star-fill me-1" aria-hidden="true"></i>Importante</span>',
+        'Alerta'      => '<span class="badge-nov badge-alt"><i class="bi bi-cloud-lightning me-1" aria-hidden="true"></i>Alerta</span>',
         'Informativa' => '<span class="badge-nov badge-info">Informativa</span>',
         default       => '<span class="badge-nov badge-info">' . htmlspecialchars($tipo) . '</span>',
     };
@@ -63,16 +62,16 @@ function claseNovedad($tipo) {
           <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
         </div>
 
-        <div class="nav-links">
-          <a href="../INDEX/index.php" class="active">Inicio</a>
-          <a href="../VUELOS/vuelos.php">Vuelos</a>
-          <a href="../NOVEDADES/novedades.php" >Novedades</a>
-          <a href="../PROMOCIONES/promociones.php">Promociones</a>
-        </div>
+        <ul class="nav-links">
+          <li><a href="../INDEX/index.php" class="active" aria-current="page">Inicio</a></li>
+          <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
+          <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
+          <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
+        </ul>
         
         <div class="nav-right">
-          <div class="foto-perfil" title="Perfil">
-            <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+          <div class="foto-perfil" aria-hidden="true">
+            <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg" focusable="false">
               <circle cx="21" cy="10" r="9" fill="#ffffff"/>
               <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
             </svg>
@@ -96,25 +95,32 @@ function claseNovedad($tipo) {
   <p>Buscá vuelos, consultá novedades y aprovechá las mejores promociones.</p>
 
   <div class="filtro-hero">
+    <label for="origen" class="visually-hidden">Origen</label>
     <input class="filtro-input" type="text" placeholder="✈ Origen" id="origen"/>
+
+    <label for="destino" class="visually-hidden">Destino</label>
     <input class="filtro-input" type="text" placeholder="✈ Destino" id="destino"/>
+
     <div class="fecha-wrap">
-      <div class="fecha-label" id="labelIda">
+      <label for="inputFechaIda" class="fecha-label" id="labelIda">
         <span id="textoIda">Ida</span>
-        <i class="bi bi-calendar3" style="color:var(--gris);"></i>
-      </div>
+        <i class="bi bi-calendar3" aria-hidden="true" style="color:var(--gris);"></i>
+      </label>
       <input type="date" id="inputFechaIda" onchange="setFecha(this,'textoIda','Ida')"/>
     </div>
     <div class="fecha-wrap">
-      <div class="fecha-label" id="labelVuelta" title="Fecha de vuelta (opcional)">
-        <span id="textoVuelta" style="color: var(--gris); font-size: .78rem">Vuelta (opcional)</span>
-        <i class="bi bi-calendar3" style="color:var(--gris);"></i>
-      </div>
-      <input type="date" id="inputFechaVuelta" onchange="setFecha(this,'textoVuelta','Vuelta (opcional)')"/>
+      <label for="inputFechaVuelta" class="fecha-label" id="labelVuelta" title="Fecha de vuelta">
+        <span id="textoVuelta" style="color: var(--gris); font-size: .78rem">Vuelta</span>
+        <i class="bi bi-calendar3" aria-hidden="true" style="color:var(--gris);"></i>
+      </label>
+      <input type="date" id="inputFechaVuelta" onchange="setFecha(this,'textoVuelta','Vuelta')"/>
     </div>
-    <input class="filtro-input" type="number" placeholder="👤 Pasajeros" min="1" style="max-width:130px;"/>
+
+    <label for="pasajeros" class="visually-hidden">Cantidad de pasajeros</label>
+    <input class="filtro-input" type="number" placeholder="👤 Pasajeros" min="1" id="pasajeros" style="max-width:130px;"/>
+
     <button class="btn-buscar-hero" onclick="buscarVuelos()">
-      <i class="bi bi-search me-1"></i> Buscar
+      <i class="bi bi-search me-1" aria-hidden="true"></i> Buscar
     </button>
   </div>
 </section>
@@ -150,8 +156,8 @@ function claseNovedad($tipo) {
   <!-- NOVEDADES -->
   <section class="seccion-bloque">
     <div class="seccion-titulo">
-      <h2><i class="bi bi-newspaper me-2" style="color:var(--azul);"></i>Novedades</h2>
-      <a href="../NOVEDADES/novedades.php">Ver todas <i class="bi bi-arrow-right"></i></a>
+      <h2><i class="bi bi-newspaper me-2" aria-hidden="true" style="color:var(--azul);"></i>Novedades</h2>
+      <a href="../NOVEDADES/novedades.php">Ver todas <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
     </div>
 
     <?php if (!$resNovedades || mysqli_num_rows($resNovedades) === 0): ?>
@@ -165,8 +171,8 @@ function claseNovedad($tipo) {
               <div class="nov-titulo-card"><?= htmlspecialchars($nov['TituloNovedad']) ?></div>
               <p class="nov-texto"><?= htmlspecialchars($nov['textoNovedad']) ?></p>
               <div class="nov-fecha">
-                <span><i class="bi bi-calendar3"></i> <?= date('d/m/Y', strtotime($nov['fechaPublicacionNovedad'])) ?></span>
-                <span class="nov-vence"><i class="bi bi-clock"></i> Vence: <?= date('d/m', strtotime($nov['fechaExpiracionNovedad'])) ?></span>
+                <span><i class="bi bi-calendar3" aria-hidden="true"></i> <?= date('d/m/Y', strtotime($nov['fechaPublicacionNovedad'])) ?></span>
+                <span class="nov-vence"><i class="bi bi-clock" aria-hidden="true"></i> Vence: <?= date('d/m', strtotime($nov['fechaExpiracionNovedad'])) ?></span>
               </div>
             </div>
           </div>
@@ -178,8 +184,8 @@ function claseNovedad($tipo) {
   <!-- PROMOCIONES DESTACADAS -->
   <section class="seccion-bloque">
     <div class="seccion-titulo">
-      <h2><i class="bi bi-tags me-2" style="color:var(--azul);"></i>Promociones Destacadas</h2>
-      <a href="../PROMOCIONES/promociones.php">Ver todas <i class="bi bi-arrow-right"></i></a>
+      <h2><i class="bi bi-tags me-2" aria-hidden="true" style="color:var(--azul);"></i>Promociones Destacadas</h2>
+      <a href="../PROMOCIONES/promociones.php">Ver todas <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
     </div>
 
     <?php
@@ -191,7 +197,7 @@ function claseNovedad($tipo) {
 
     <?php if (empty($promos)): ?>
       <div style="background:var(--blanco);border:1px solid var(--borde);border-radius:16px;padding:48px;text-align:center;color:var(--gris);">
-        <i class="bi bi-tags fs-1 d-block mb-3" style="opacity:.3;"></i>
+        <i class="bi bi-tags fs-1 d-block mb-3" aria-hidden="true" style="opacity:.3;"></i>
         <p>No hay promociones activas por el momento.</p>
         <a href="../PROMOCIONES/promociones.php" style="color:var(--azul);font-weight:600;">Ver sección de promociones</a>
       </div>
@@ -225,7 +231,7 @@ function claseNovedad($tipo) {
                 <?php endif; ?>
                 <?php if (!$imgSrc): ?>
                   <div class="promo-placeholder">
-                    <i class="bi bi-image fs-1"></i>
+                    <i class="bi bi-image fs-1" aria-hidden="true"></i>
                     <span style="font-size:.9rem;">Sin imagen</span>
                   </div>
                 <?php endif; ?>
@@ -235,7 +241,7 @@ function claseNovedad($tipo) {
                   <p><?= htmlspecialchars($promo['descripcionPromocion']) ?></p>
                   <?php if (!empty($promo['vigenciaPromocion'])): ?>
                     <div class="vigencia">
-                      <i class="bi bi-clock me-1"></i>
+                      <i class="bi bi-clock me-1" aria-hidden="true"></i>
                       Vigencia hasta <?= date('d/m/Y', strtotime($promo['vigenciaPromocion'])) ?>
                     </div>
                   <?php endif; ?>
@@ -246,10 +252,12 @@ function claseNovedad($tipo) {
 
           <?php if (count($promos) > 1): ?>
           <button class="carousel-control-prev" type="button" data-bs-target="#carouselInicio" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Promoción anterior</span>
           </button>
           <button class="carousel-control-next" type="button" data-bs-target="#carouselInicio" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Promoción siguiente</span>
           </button>
           <?php endif; ?>
 
@@ -265,15 +273,15 @@ function claseNovedad($tipo) {
   <footer>
     <div class="row">
       <div class="col">
-        <h3><strong>Contactanos</strong><div class="subrayado"></div></h3>
+        <h3><strong>Contactanos</strong><span class="subrayado"></span></h3>
         <ul>
-          <li><i class="bi bi-envelope-at"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
-          <li><i class="bi bi-whatsapp"></i><a href="#">+54 9 341 234 5678</a></li>
-          <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.php">Formulario de Contacto</a></li>
+          <li><i class="bi bi-envelope-at" aria-hidden="true"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
+          <li><i class="bi bi-whatsapp" aria-hidden="true"></i><a href="#">+54 9 341 234 5678</a></li>
+          <li><i class="bi bi-pen" aria-hidden="true"></i><a href="../CONTACTO/contacto.php">Formulario de Contacto</a></li>
         </ul>
       </div>
       <div class="col">
-        <h3><strong>Mapa de sitio</strong><div class="subrayado"></div></h3>
+        <h3><strong>Mapa de sitio</strong><span class="subrayado"></span></h3>
         <ul>
           <li><a href="index.php">Inicio</a></li>
           <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
@@ -283,7 +291,7 @@ function claseNovedad($tipo) {
         </ul>
       </div>
       <div class="col">
-        <h3><strong>Ubicación</strong><div class="subrayado"></div></h3>
+        <h3><strong>Ubicación</strong><span class="subrayado"></span></h3>
         <ul>
           <li><a href="https://maps.app.goo.gl/UvsGpUXHgk9GkpYP9" target="_blank">Zeballos 1341</a></li>
           <li><a href="https://maps.app.goo.gl/87YMeSLAp74gH9mc7" target="_blank">Rosario, Santa Fe</a></li>
@@ -291,16 +299,19 @@ function claseNovedad($tipo) {
         </ul>
       </div>
       <div class="col">
-        <h3><strong>Newsletter</strong><div class="subrayado"></div></h3>
+        <h3><strong>Newsletter</strong><span class="subrayado"></span></h3>
         <form>
-          <i class="bi bi-envelope"></i>
-          <input type="email" placeholder="Ingrese su mail">
-          <button type="submit"><i class="bi bi-arrow-return-left"></i></button>
+          <label for="newsletterEmail" class="visually-hidden">Correo electrónico para el newsletter</label>
+          <i class="bi bi-envelope" aria-hidden="true"></i>
+          <input type="email" id="newsletterEmail" placeholder="Ingrese su mail">
+          <button type="submit" aria-label="Suscribirse al newsletter">
+            <i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+          </button>
         </form>
         <div class="iconos-redes">
-          <i class="bi bi-facebook"></i>
-          <i class="bi bi-instagram"></i>
-          <i class="bi bi-twitter-x"></i>
+          <i class="bi bi-facebook" aria-hidden="true"></i>
+          <i class="bi bi-instagram" aria-hidden="true"></i>
+          <i class="bi bi-twitter-x" aria-hidden="true"></i>
         </div>
       </div>
     </div>
@@ -332,7 +343,7 @@ function setFecha(input, labelId, fallback) {
 function buscarVuelos() {
     var origen = document.getElementById('origen').value.trim();
     var destino = document.getElementById('destino').value.trim();
-    var pasajeros = document.querySelector('.filtro-input[placeholder*="Pasajeros"]').value.trim();
+    var pasajeros = document.getElementById('pasajeros').value.trim();
     var fechaIda = document.getElementById ('inputFechaIda').value;
     var fechaVuelta = document.getElementById ('inputFechaVuelta').value;
     var params = new URLSearchParams();

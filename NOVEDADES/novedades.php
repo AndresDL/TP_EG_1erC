@@ -109,9 +109,9 @@ $novedades = $stmt->get_result();
 // ─── HELPERS ───────────────────────────────────────────────────────────────────
 function badgeNovedad(string $tipo): string {
     return match($tipo) {
-        'Importante'  => '<span class="badge-nov badge-imp"><i class="bi bi-star-fill me-1"></i>Importante</span>',
-        'Alerta'      => '<span class="badge-nov badge-alt"><i class="bi bi-cloud-lightning me-1"></i>Alerta</span>',
-        default       => '<span class="badge-nov badge-info"><i class="bi bi-info-circle me-1"></i>Informativa</span>',
+        'Importante'  => '<span class="badge-nov badge-imp"><i class="bi bi-star-fill me-1" aria-hidden="true"></i>Importante</span>',
+        'Alerta'      => '<span class="badge-nov badge-alt"><i class="bi bi-cloud-lightning me-1" aria-hidden="true"></i>Alerta</span>',
+        default       => '<span class="badge-nov badge-info"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Informativa</span>',
     };
 }
 
@@ -155,16 +155,16 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
           <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
         </div>
 
-        <div class="nav-links">
-          <a href="../INDEX/index.php">Inicio</a>
-          <a href="../VUELOS/vuelos.php">Vuelos</a>
-          <a href="../NOVEDADES/novedades.php" class="active">Novedades</a>
-          <a href="../PROMOCIONES/promociones.php">Promociones</a>
-        </div>
+        <ul class="nav-links">
+          <li><a href="../INDEX/index.php">Inicio</a></li>
+          <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
+          <li><a href="../NOVEDADES/novedades.php" class="active" aria-current="page">Novedades</a></li>
+          <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
+        </ul>
         
         <div class="nav-right">
-          <div class="foto-perfil" title="Perfil">
-            <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+          <div class="foto-perfil" aria-hidden="true">
+            <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg" focusable="false">
               <circle cx="21" cy="10" r="9" fill="#ffffff"/>
               <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
             </svg>
@@ -208,13 +208,13 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
 
     <div class="d-flex gap-2 flex-wrap align-items-center">
       <a href="<?= urlFiltro('') ?>" class="btn btn-sm <?= $tipoFiltro === '' ? 'btn-primary' : 'btn-outline-secondary' ?>">Todas</a>
-      <a href="<?= urlFiltro('importante') ?>" class="btn btn-sm <?= $tipoFiltro === 'importante' ? 'btn-primary' : 'btn-outline-secondary' ?>"><i class="bi bi-star-fill me-1"></i>Importantes</a>
-      <a href="<?= urlFiltro('alerta') ?>" class="btn btn-sm <?= $tipoFiltro === 'alerta' ? 'btn-warning' : 'btn-outline-warning' ?>"><i class="bi bi-cloud-lightning me-1"></i>Alertas</a>
-      <a href="<?= urlFiltro('informativa') ?>" class="btn btn-sm <?= $tipoFiltro === 'informativa' ? 'btn-success' : 'btn-outline-success' ?>"><i class="bi bi-info-circle me-1"></i>Informativas</a>
+      <a href="<?= urlFiltro('importante') ?>" class="btn btn-sm <?= $tipoFiltro === 'importante' ? 'btn-primary' : 'btn-outline-secondary' ?>"><i class="bi bi-star-fill me-1" aria-hidden="true"></i>Importantes</a>
+      <a href="<?= urlFiltro('alerta') ?>" class="btn btn-sm <?= $tipoFiltro === 'alerta' ? 'btn-warning' : 'btn-outline-warning' ?>"><i class="bi bi-cloud-lightning me-1" aria-hidden="true"></i>Alertas</a>
+      <a href="<?= urlFiltro('informativa') ?>" class="btn btn-sm <?= $tipoFiltro === 'informativa' ? 'btn-success' : 'btn-outline-success' ?>"><i class="bi bi-info-circle me-1" aria-hidden="true"></i>Informativas</a>
       
       <?php if ($esAdmin): ?>
         <button class="btn btn-sm btn-success ms-md-3" data-bs-toggle="modal" data-bs-target="#modalCrear">
-          <i class="bi bi-plus-circle me-1"></i>Crear Novedad
+          <i class="bi bi-plus-circle me-1" aria-hidden="true"></i>Crear Novedad
         </button>
       <?php endif; ?>
     </div>
@@ -222,7 +222,7 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
 
   <?php if ($novedades->num_rows === 0): ?>
     <div class="text-center py-5" style="color:var(--gris);">
-      <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+      <i class="bi bi-inbox fs-1 d-block mb-3" aria-hidden="true"></i>
       <p class="fs-5">No hay novedades registradas.</p>
     </div>
   <?php else: ?>
@@ -241,17 +241,17 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
           <div class="nov-titulo-card mt-2"><?= htmlspecialchars($nov['TituloNovedad']) ?></div>
           <p class="nov-texto"><?= nl2br(htmlspecialchars($nov['textoNovedad'])) ?></p>
           <div class="nov-fecha mt-3">
-            <span><i class="bi bi-calendar3"></i> <?= date('d/m/Y', strtotime($nov['fechaPublicacionNovedad'])) ?></span>
-            <span class="nov-vence"><i class="bi bi-clock"></i> Vence: <?= date('d/m/Y', strtotime($nov['fechaExpiracionNovedad'])) ?></span>
+            <span><i class="bi bi-calendar3" aria-hidden="true"></i> <?= date('d/m/Y', strtotime($nov['fechaPublicacionNovedad'])) ?></span>
+            <span class="nov-vence"><i class="bi bi-clock" aria-hidden="true"></i> Vence: <?= date('d/m/Y', strtotime($nov['fechaExpiracionNovedad'])) ?></span>
           </div>
           
           <?php if ($esAdmin): ?>
           <div class="d-flex justify-content-between align-items-center mt-1 pt-3 border-top">
               <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditar<?= $nov['codNovedad'] ?>">
-                  <i class="bi bi-pencil"></i> Editar
+                  <i class="bi bi-pencil" aria-hidden="true"></i> Editar
               </button>
               <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar<?= $nov['codNovedad'] ?>">
-                  <i class="bi bi-trash"></i> Eliminar
+                  <i class="bi bi-trash" aria-hidden="true"></i> Eliminar
               </button>
           </div>
 
@@ -264,29 +264,29 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
                 <div class="modal-content text-start" style="font-weight: normal;">
                   <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">Editar Novedad</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                   </div>
                   <div class="modal-body">
                     <input type="hidden" name="id" value="<?= $nov['codNovedad'] ?>">
                     <div class="mb-3">
-                      <label class="form-label fw-bold">Título (máx 50)</label>
-                      <input type="text" class="form-control" name="titulo" value="<?= htmlspecialchars($nov['TituloNovedad']) ?>" maxlength="50" required>
+                      <label class="form-label fw-bold" for="tituloEditar<?= $nov['codNovedad'] ?>">Título (máx 50)</label>
+                      <input type="text" id="tituloEditar<?= $nov['codNovedad'] ?>" class="form-control" name="titulo" value="<?= htmlspecialchars($nov['TituloNovedad']) ?>" maxlength="50" required>
                     </div>
                     <div class="mb-3">
-                      <label class="form-label fw-bold">Tipo</label>
-                      <select class="form-select" name="tipo_novedad" required>
+                      <label class="form-label fw-bold" for="tipoEditar<?= $nov['codNovedad'] ?>">Tipo</label>
+                      <select class="form-select" id="tipoEditar<?= $nov['codNovedad'] ?>" name="tipo_novedad" required>
                         <option value="Informativa" <?= $nov['tipoNovedad'] == 'Informativa' ? 'selected' : '' ?>>Informativa</option>
                         <option value="Importante" <?= $nov['tipoNovedad'] == 'Importante' ? 'selected' : '' ?>>Importante</option>
                         <option value="Alerta" <?= $nov['tipoNovedad'] == 'Alerta' ? 'selected' : '' ?>>Alerta</option>
                       </select>
                     </div>
                     <div class="mb-3">
-                      <label class="form-label fw-bold">Descripción</label>
-                      <textarea class="form-control" name="descripcion" rows="4" required><?= htmlspecialchars($nov['textoNovedad']) ?></textarea>
+                      <label class="form-label fw-bold" for="descEditar<?= $nov['codNovedad'] ?>">Descripción</label>
+                      <textarea class="form-control" id="descEditar<?= $nov['codNovedad'] ?>" name="descripcion" rows="4" required><?= htmlspecialchars($nov['textoNovedad']) ?></textarea>
                     </div>
                     <div class="mb-3">
-                      <label class="form-label fw-bold">Vencimiento</label>
-                      <input type="date" class="form-control" name="fecha_expiracion" value="<?= $nov['fechaExpiracionNovedad'] ?>" required>
+                      <label class="form-label fw-bold" for="fechaEditar<?= $nov['codNovedad'] ?>">Vencimiento</label>
+                      <input type="date" id="fechaEditar<?= $nov['codNovedad'] ?>" class="form-control" name="fecha_expiracion" value="<?= $nov['fechaExpiracionNovedad'] ?>" required>
                     </div>
                   </div>
                   <div class="modal-footer">
@@ -304,7 +304,7 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
                 <div class="modal-content text-start" style="font-weight: normal;">
                   <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title">Eliminar Novedad</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                   </div>
                   <div class="modal-body">
                     <input type="hidden" name="id" value="<?= $nov['codNovedad'] ?>">
@@ -337,7 +337,7 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
 
         <li class="page-item <?= $paginaActual <= 1 ? 'disabled' : '' ?>">
           <a class="page-link" href="<?= urlFiltro($tipoFiltro, $paginaActual - 1) ?>">
-            <i class="bi bi-chevron-left"></i> Anterior
+            <i class="bi bi-chevron-left" aria-hidden="true"></i> Anterior
           </a>
         </li>
 
@@ -370,7 +370,7 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
 
         <li class="page-item <?= $paginaActual >= $totalPaginas ? 'disabled' : '' ?>">
           <a class="page-link" href="<?= urlFiltro($tipoFiltro, $paginaActual + 1) ?>">
-            Siguiente <i class="bi bi-chevron-right"></i>
+            Siguiente <i class="bi bi-chevron-right" aria-hidden="true"></i>
           </a>
         </li>
 
@@ -394,12 +394,12 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Título (máx 50 carac.)</label>
-                        <input type="text" class="form-control" name="titulo" maxlength="50" required>
+                        <label class="form-label fw-bold" for="tituloCrear">Título (máx 50 carac.)</label>
+                        <input type="text" id="tituloCrear" class="form-control" name="titulo" maxlength="50" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Tipo de Novedad</label>
-                        <select class="form-select" name="tipo_novedad" required>
+                        <label class="form-label fw-bold" for="tipoCrear">Tipo de Novedad</label>
+                        <select class="form-select" id="tipoCrear" name="tipo_novedad" required>
                             <option value="" disabled selected>Seleccione un tipo...</option>
                             <option value="Informativa">Informativa</option>
                             <option value="Importante">Importante</option>
@@ -407,12 +407,12 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Descripción</label>
-                        <textarea class="form-control" name="descripcion" rows="4" required></textarea>
+                        <label class="form-label fw-bold" for="descripcionCrear">Descripción</label>
+                        <textarea class="form-control" id="descripcionCrear" name="descripcion" rows="4" required></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Fecha de Expiración</label>
-                        <input type="date" class="form-control" name="fecha_expiracion" min="<?= date('Y-m-d') ?>" required>
+                        <label class="form-label fw-bold" for="fechaExpCrear">Fecha de Expiración</label>
+                        <input type="date" id="fechaExpCrear" class="form-control" name="fecha_expiracion" min="<?= date('Y-m-d') ?>" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -425,29 +425,30 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
 </div>
 <?php endif; ?>
 
+<!-- FOOTER -->
 <section class="footer-section">
   <footer>
     <div class="row">
       <div class="col">
-        <h3><strong>Contactanos</strong><div class="subrayado"></div></h3>
+        <h3><strong>Contactanos</strong><span class="subrayado"></span></h3>
         <ul>
-          <li><i class="bi bi-envelope-at"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
-          <li><i class="bi bi-whatsapp"></i><a href="#">+54 9 341 234 5678</a></li>
-          <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.html">Formulario de Contacto</a></li>
+          <li><i class="bi bi-envelope-at" aria-hidden="true"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
+          <li><i class="bi bi-whatsapp" aria-hidden="true"></i><a href="#">+54 9 341 234 5678</a></li>
+          <li><i class="bi bi-pen" aria-hidden="true"></i><a href="../CONTACTO/contacto.php">Formulario de Contacto</a></li>
         </ul>
       </div>
       <div class="col">
-        <h3><strong>Mapa de sitio</strong><div class="subrayado"></div></h3>
+        <h3><strong>Mapa de sitio</strong><span class="subrayado"></span></h3>
         <ul>
-          <li><a href="../INDEX/index.php">Inicio</a></li>
+          <li><a href="index.php">Inicio</a></li>
           <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
           <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
-          <li><a href="novedades.php">Novedades</a></li>
+          <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
           <li><a href="">Mi Perfil</a></li>
         </ul>
       </div>
       <div class="col">
-        <h3><strong>Ubicación</strong><div class="subrayado"></div></h3>
+        <h3><strong>Ubicación</strong><span class="subrayado"></span></h3>
         <ul>
           <li><a href="https://maps.app.goo.gl/UvsGpUXHgk9GkpYP9" target="_blank">Zeballos 1341</a></li>
           <li><a href="https://maps.app.goo.gl/87YMeSLAp74gH9mc7" target="_blank">Rosario, Santa Fe</a></li>
@@ -455,21 +456,24 @@ function urlFiltro(string $tipo, int $pagina = 1): string {
         </ul>
       </div>
       <div class="col">
-        <h3><strong>Newsletter</strong><div class="subrayado"></div></h3>
+        <h3><strong>Newsletter</strong><span class="subrayado"></span></h3>
         <form>
-          <i class="bi bi-envelope"></i>
-          <input type="email" placeholder="Ingrese su mail">
-          <button type="submit"><i class="bi bi-arrow-return-left"></i></button>
+          <label for="newsletterEmail" class="visually-hidden">Correo electrónico para el newsletter</label>
+          <i class="bi bi-envelope" aria-hidden="true"></i>
+          <input type="email" id="newsletterEmail" placeholder="Ingrese su mail">
+          <button type="submit" aria-label="Suscribirse al newsletter">
+            <i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+          </button>
         </form>
         <div class="iconos-redes">
-          <i class="bi bi-facebook"></i>
-          <i class="bi bi-instagram"></i>
-          <i class="bi bi-twitter-x"></i>
+          <i class="bi bi-facebook" aria-hidden="true"></i>
+          <i class="bi bi-instagram" aria-hidden="true"></i>
+          <i class="bi bi-twitter-x" aria-hidden="true"></i>
         </div>
       </div>
     </div>
     <hr>
-    <p class="copyright">© 2026 VuelaSeguro. Todos los derechos reservados. Licenciado bajo
+    <p class="copyright">&copy; 2026 VuelaSeguro. Todos los derechos reservados. Licenciado bajo
       <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons BY 4.0</a>.
     </p>
   </footer>

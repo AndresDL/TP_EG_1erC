@@ -161,56 +161,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 
-  <!-- FOOTER -->
-  <section class="footer-section">
-    <footer>
-      <div class="row">
-        <div class="col">
-          <h3><strong>Contactanos</strong><div class="subrayado"></div></h3>
-          <ul>
-            <li><i class="bi bi-envelope-at"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
-            <li><i class="bi bi-whatsapp"></i><a href="#">+54 9 341 234 5678</a></li>
-            <li><i class="bi bi-pen"></i><a href="contacto.php">Formulario de Contacto</a></li>
-          </ul>
-        </div>
-        <div class="col">
-          <h3><strong>Mapa de sitio</strong><div class="subrayado"></div></h3>
-          <ul>
-            <li><a href="../INDEX/index.php">Inicio</a></li>
-            <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
-            <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
-            <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
-            <li><a href="">Mi Perfil</a></li>
-          </ul>
-        </div>
-        <div class="col">
-          <h3><strong>Ubicación</strong><div class="subrayado"></div></h3>
-          <ul>
-            <li><a href="https://maps.app.goo.gl/UvsGpUXHgk9GkpYP9" target="_blank">Zeballos 1341</a></li>
-            <li><a href="https://maps.app.goo.gl/87YMeSLAp74gH9mc7" target="_blank">Rosario, Santa Fe</a></li>
-            <li><a href="https://maps.app.goo.gl/u94xc8o8xowqeTuz8" target="_blank">Argentina</a></li>
-          </ul>
-        </div>
-        <div class="col">
-          <h3><strong>Newsletter</strong><div class="subrayado"></div></h3>
-          <form>
-            <i class="bi bi-envelope"></i>
-            <input type="email" placeholder="Ingrese su mail">
-            <button type="submit"><i class="bi bi-arrow-return-left"></i></button>
-          </form>
-          <div class="iconos-redes">
-            <i class="bi bi-facebook"></i>
-            <i class="bi bi-instagram"></i>
-            <i class="bi bi-twitter-x"></i>
-          </div>
+<!-- FOOTER -->
+<section class="footer-section">
+  <footer>
+    <div class="row">
+      <div class="col">
+        <h3><strong>Contactanos</strong><span class="subrayado"></span></h3>
+        <ul>
+          <li><i class="bi bi-envelope-at"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
+          <li><i class="bi bi-whatsapp"></i><a href="#">+54 9 341 234 5678</a></li>
+          <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.php">Formulario de Contacto</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><strong>Mapa de sitio</strong><span class="subrayado"></span></h3>
+        <ul>
+          <li><a href="index.php">Inicio</a></li>
+          <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
+          <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
+          <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
+          <li><a href="">Mi Perfil</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><strong>Ubicación</strong><span class="subrayado"></span></h3>
+        <ul>
+          <li><a href="https://maps.app.goo.gl/UvsGpUXHgk9GkpYP9" target="_blank">Zeballos 1341</a></li>
+          <li><a href="https://maps.app.goo.gl/87YMeSLAp74gH9mc7" target="_blank">Rosario, Santa Fe</a></li>
+          <li><a href="https://maps.app.goo.gl/u94xc8o8xowqeTuz8" target="_blank">Argentina</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><strong>Newsletter</strong><span class="subrayado"></span></h3>
+        <form>
+          <i class="bi bi-envelope"></i>
+          <input type="email" placeholder="Ingrese su mail">
+          <button type="submit"><i class="bi bi-arrow-return-left"></i></button>
+        </form>
+        <div class="iconos-redes">
+          <i class="bi bi-facebook"></i>
+          <i class="bi bi-instagram"></i>
+          <i class="bi bi-twitter-x"></i>
         </div>
       </div>
-      <hr>
-      <p class="copyright">&copy; 2026 VuelaSeguro. Todos los derechos reservados. Licenciado bajo
-        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons BY 4.0</a>.
-      </p>
-    </footer>
-  </section>
+    </div>
+    <hr>
+    <p class="copyright">&copy; 2026 VuelaSeguro. Todos los derechos reservados. Licenciado bajo
+      <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons BY 4.0</a>.
+    </p>
+  </footer>
+</section>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

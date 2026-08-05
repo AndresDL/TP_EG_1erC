@@ -6,7 +6,7 @@ if (!$link) {
 }
 // include_once($_SERVER['DOCUMENT_ROOT'] . '/conexion.inc');
 
-// Variables de control de rol
+// Variables de control de rol estamos probando
 $esCEO = (isset($_SESSION['tipoUsuario']) && $_SESSION['tipoUsuario'] === 'CEO');
 $codAerolineaCEO = $esCEO ? $_SESSION['codUsuario'] : null;
 
@@ -24,12 +24,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
   $codUsuarioCompra  = (int)$_SESSION['codUsuario'];
   $cantidadPasajeros = max(1, min(9, (int)($_POST['cantidadPasajeros'] ?? 1)));
 
-  $resVuelo  = mysqli_query($link, "SELECT asientosDisponibles FROM vuelos WHERE codVuelo = $codVueloCompra");
+  $resVuelo  = mysqli_query($link, "SELECT asientosDisponibles, fechaSalidaVuelo, horaSalidaVuelo FROM vuelos WHERE codVuelo = $codVueloCompra");
   $vueloData = mysqli_fetch_assoc($resVuelo);
 
-  if (!$vueloData || $vueloData['asientosDisponibles'] < $cantidadPasajeros) {
-    $asientosRestantes = $vueloData['asientosDisponibles'] ?? 0;
-    $mensaje = "Lo sentimos, no hay suficientes asientos disponibles para este vuelo. Asientos disponibles: $asientosRestantes.";
+  $fechaHoraVuelo = $vueloData ? strtotime($vueloData['fechaSalidaVuelo'] . ' ' . $vueloData['horaSalidaVuelo']) : false;
+
+  if (!$vueloData || $fechaHoraVuelo < time()) {
+    $mensaje = "No es posible reservar este vuelo porque su fecha de salida ya pasó.";
+    $tipo_mensaje = "danger";
+  } elseif ($vueloData['asientosDisponibles'] < $cantidadPasajeros) {
+    $mensaje = "Lo sentimos, no hay suficientes asientos disponibles para este vuelo. Asientos disponibles: {$vueloData['asientosDisponibles']}.";
     $tipo_mensaje = "danger";
   } else {
     $resExiste = mysqli_query($link, "SELECT codReserva FROM reservas WHERE codUsuario = $codUsuarioCompra AND codVuelo = $codVueloCompra AND estadoReserva = 'Pendiente de pago'");
@@ -80,6 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
       } else {
           $mensaje = "Error al procesar la reserva. Por favor, intentalo nuevamente.";
           $tipo_mensaje = "danger";
+        $mensaje = "Error al procesar la reserva: " . mysqli_error($link);
+        $tipo_mensaje = "danger";
       }
     }
   }
@@ -313,16 +319,16 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
           <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
         </div>
 
-        <div class="nav-links">
-          <a href="../INDEX/index.php">Inicio</a>
-          <a href="../VUELOS/vuelos.php" class="active">Vuelos</a>
-          <a href="../NOVEDADES/novedades.php">Novedades</a>
-          <a href="../PROMOCIONES/promociones.php">Promociones</a>
-        </div>
+        <ul class="nav-links">
+          <li><a href="../INDEX/index.php">Inicio</a></li>
+          <li><a href="../VUELOS/vuelos.php" class="active" aria-current="page">Vuelos</a></li>
+          <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
+          <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
+        </ul>
         
         <div class="nav-right">
-          <div class="foto-perfil" title="Perfil">
-            <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg">
+          <div class="foto-perfil" aria-hidden="true">
+            <svg width="26" height="40" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg" focusable="false">
               <circle cx="21" cy="10" r="9" fill="#ffffff"/>
               <path d="M -4 42 Q 21 7 46 42 Z" fill="#ffffff"/>
             </svg>
@@ -358,31 +364,29 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
   <div class="resultados-wrapper">
 
     <aside class="sidebar">
-      <h3>MODIFICAR BÚSQUEDA</h3>
-      <div class="sidebar-grupo">
-        <label>Origen</label>
-        <input class="sidebar-input" type="text" id="sb_origen" value="<?php echo htmlspecialchars($filtroOrigen); ?>">
-      </div>
-      <div class="sidebar-grupo">
-        <label>Destino</label>
-        <input class="sidebar-input" type="text" id="sb_destino" value="<?php echo htmlspecialchars($filtroDestino); ?>">
-      </div>
-      <div class="sidebar-grupo">
-        <label>Ida fecha</label>
-        <input class="sidebar-input-date" type="date" id="sb_fechaIda" value="<?php echo htmlspecialchars($filtroFechaIda); ?>">
-      </div>
-      <div class="sidebar-grupo">
-        <label>Vuelta fecha<span style="color: var(--gris);"> (opcional)</span></label>
-        <input class="sidebar-input-date" type="date" id="sb_fechaVuelta" 
-               value="<?php echo htmlspecialchars($filtroFechaVuelta); ?>"
-               title="Fecha de vuelta (opcional)">
-        <small style="color: var(--gris); font-size: .78rem;">(opcional)</small>
-      </div>
-      <div class="sidebar-grupo">
-        <label>Cantidad pasajeros</label>
-        <input class="sidebar-input" type="number" id ="sb_pasajeros" placeholder="Ej: 2" min="1" value="<?php echo htmlspecialchars(isset($_GET['pasajeros']) ? $_GET['pasajeros'] : ''); ?>">
-      </div>
-      <button class="btn-aplicar" onclick="aplicarFiltros()"> Buscar </button>
+      <form role="search" aria-label="Modificar búsqueda de vuelos" onsubmit="event.preventDefault(); aplicarFiltros();">
+        <h3>MODIFICAR BÚSQUEDA</h3>
+        <div class="sidebar-grupo">
+          <label for="sb_origen">Origen</label>
+          <input class="sidebar-input" type="text" id="sb_origen" value="<?php echo htmlspecialchars($filtroOrigen); ?>">
+        </div>
+        <div class="sidebar-grupo">
+          <label for="sb_destino">Destino</label>
+          <input class="sidebar-input" type="text" id="sb_destino" value="<?php echo htmlspecialchars($filtroDestino); ?>">
+        </div>
+        <div class="sidebar-grupo">
+          <label for="sb_fechaIda">Ida fecha</label>
+          <input class="sidebar-input-date" type="date" id="sb_fechaIda" value="<?php echo htmlspecialchars($filtroFechaIda); ?>">
+        </div>
+        <div class="sidebar-grupo">
+          <label for="sb_fechaVuelta">Vuelta fecha<span style="color: var(--gris);"></span></label>
+          <input class="sidebar-input-date" type="date" id="sb_fechaVuelta" 
+                 value="<?php echo htmlspecialchars($filtroFechaVuelta); ?>"
+                 title="Fecha de vuelta ">
+          <small style="color: var(--gris); font-size: .78rem;"></small>
+        </div>
+        <button type="submit" class="btn-aplicar"> Buscar </button>
+      </form>
     </aside>
 
     <!-- LISTA DE VUELOS DISPONIBLES -->
@@ -395,7 +399,7 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
         
         <?php if ($esCEO): ?>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCrearVuelo" style="border-radius: 8px; font-weight: 500; padding: 10px 20px;">
-                <i class="bi bi-plus-circle me-2"></i>Cargar Nuevo Vuelo
+                <i class="bi bi-plus-circle me-2" aria-hidden="true"></i>Cargar Nuevo Vuelo
             </button>
         <?php endif; ?>
       </div>
@@ -415,21 +419,21 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
                   <?php endif; ?>
                 </div>
                 <div class="vuelo-ruta">
-                  <div >
-                    <span class="ciudad-nombre"><?php echo htmlspecialchars($vuelo['origenVuelo']); ?></span>
+                  <div>
+                    <span class="ciudad-nombre"><span class="visually-hidden">Origen: </span><?php echo htmlspecialchars($vuelo['origenVuelo']); ?></span>
                     <span class="ciudad-horario">Horario salida ida: <?php echo date('H:i', strtotime($vuelo['horaSalidaVuelo'])); ?> hs</span>
                   </div>
                   <div>
-                    <span class="ciudad-nombre"><?php echo htmlspecialchars($vuelo['destinoVuelo']); ?></span>
+                    <span class="ciudad-nombre"><span class="visually-hidden">Destino: </span><?php echo htmlspecialchars($vuelo['destinoVuelo']); ?></span>
                     <span class="ciudad-horario">Fecha ida: <?php echo date('d/m/Y', strtotime($vuelo['fechaSalidaVuelo'])); ?></span>
                   </div>
                   <?php if (!empty($vuelo['fechaVuelta']) && $vuelo['fechaVuelta'] !== '0000-00-00'): ?>
                     <div>
-                      <span class="ciudad-nombre"> &nbsp; </span>
+                      <span class="ciudad-nombre" aria-hidden="true">&nbsp;</span>
                       <span class="ciudad-horario">Horario salida vuelta: <?php echo date('H:i', strtotime($vuelo['horaVuelta'])); ?> hs</span>
                     </div>
                     <div>
-                      <span class="ciudad-nombre"> &nbsp; </span>
+                      <span class="ciudad-nombre" aria-hidden="true">&nbsp;</span>
                       <span class="ciudad-horario">Fecha vuelta: <?php echo date('d/m/Y', strtotime($vuelo['fechaVuelta'])); ?></span>
                     </div>
                   <?php endif; ?>
@@ -455,8 +459,8 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
                   <span class="precio-valor" style="color:var(--verde);">
                     $<?php echo number_format($precioConDescuento, 0, ',', '.'); ?>
                   </span>
-                  <span style="background:#e8f8ee;color:var(--verde);border:1px solid #9dd8b5;border-radius:8px;padding:3px 10px;font-size:.78rem;font-weight:700;margin-top:2px;">
-                    <i class="bi bi-tag-fill me-1"></i><?php echo number_format($promoVuelo['descuentoPromocion'],0); ?>% OFF — <?php echo htmlspecialchars($promoVuelo['descripcionPromocion']); ?>
+                  <span style="background:#e8f8ee;color:#0f5132;border:1px solid #9dd8b5;border-radius:8px;padding:3px 10px;font-size:.78rem;font-weight:700;margin-top:2px;">
+                    <i class="bi bi-tag-fill me-1" aria-hidden="true"></i><?php echo number_format($promoVuelo['descuentoPromocion'],0); ?>% OFF — <?php echo htmlspecialchars($promoVuelo['descripcionPromocion']); ?>
                   </span>
                 <?php else: ?>
                   <span class="precio-valor">$<?php echo number_format($precioOriginal, 0, ',', '.'); ?></span>
@@ -522,7 +526,7 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 12px; border: none;">
               <div class="modal-header bg-primary text-white" id="modalHeader">
-                <h5 class="modal-title" id="modalTitle"><i class="bi bi-airplane-fill me-2"></i>Registrar Nuevo Vuelo</h5>
+                <h5 class="modal-title" id="modalTitle"><i class="bi bi-airplane-fill me-2" aria-hidden="true"></i>Registrar Nuevo Vuelo</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <form action="" method="POST" id="formCrearEditar">
@@ -530,44 +534,44 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
             <div class="modal-body p-4">
               <div class="row g-3">
                 <div class="col-md-6">
-                  <label class="form-label">Origen</label>
-                  <input type="text" name="origen" class="form-control" placeholder="Ej: Rosario" required>
+                  <label class="form-label" for="v_origen">Origen</label>
+                  <input type="text" id="v_origen" name="origen" class="form-control" placeholder="Ej: Rosario" required>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">Destino</label>
-                  <input type="text" name="destino" class="form-control" placeholder="Ej: Mendoza" required>
+                  <label class="form-label" for="v_destino">Destino</label>
+                  <input type="text" id="v_destino" name="destino" class="form-control" placeholder="Ej: Mendoza" required>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">Fecha de Salida</label>
-                  <input type="date" name="fecha" class="form-control" required>
+                  <label class="form-label" for="v_fecha">Fecha de Salida</label>
+                  <input type="date" id="v_fecha" name="fecha" class="form-control" required>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">Hora de Salida</label>
+                  <label class="form-label" for="v_hora">Hora de Salida</label>
                   <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-clock"></i></span>
-                    <input type="text" name="hora" class="form-control" placeholder="HH:MM" maxlength="5" pattern="^([01]\\d|2[0-3]):([0-5]\\d)$" required>
+                    <span class="input-group-text"><i class="bi bi-clock" aria-hidden="true"></i></span>
+                    <input type="text" id="v_hora" name="hora" class="form-control" placeholder="HH:MM" maxlength="5" pattern="^([01]\\d|2[0-3]):([0-5]\\d)$" required>
                   </div>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">Precio ($)</label>
-                  <input type="number" step="0.01" name="precio" class="form-control" placeholder="Ej: 90000" min="0" max="10000000" inputmode="decimal" required>
+                  <label class="form-label" for="v_precio">Precio ($)</label>
+                  <input type="number" step="0.01" id="v_precio" name="precio" class="form-control" placeholder="Ej: 90000" min="0" max="10000000" inputmode="decimal" required>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">Asientos Disponibles</label>
-                  <input type="number" name="asientos" class="form-control" placeholder="Cantidad" min="1" max="300" inputmode="numeric" required>
+                  <label class="form-label" for="v_asientos">Asientos Disponibles</label>
+                  <input type="number" id="v_asientos" name="asientos" class="form-control" placeholder="Cantidad" min="1" max="300" inputmode="numeric" required>
                 </div>
                 <input type="hidden" name="codAerolinea" value="<?php echo $codAerolineaCEO; ?>">
                 <div class="col-md-12">
-                  <label class="form-label">Aerolínea</label>
-                  <input type="text" class="form-control" value="<?php echo htmlspecialchars($_SESSION['nombreUsuario'] ?? ''); ?>" disabled>
+                  <label class="form-label" for="v_aerolinea">Aerolínea</label>
+                  <input type="text" id="v_aerolinea" class="form-control" value="<?php echo htmlspecialchars($_SESSION['nombreUsuario'] ?? ''); ?>" disabled>
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">Fecha de Vuelta<span style="color: var(--gris);"> (opcional)</span></label>
-                  <input type="date" name="fechaVuelta" class="form-control">
+                  <label class="form-label" for="v_fechaVuelta">Fecha de Vuelta<span style="color: var(--gris);"></span></label>
+                  <input type="date" id="v_fechaVuelta" name="fechaVuelta" class="form-control">
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label">Hora de Vuelta<span style="color: var(--gris);"> (opcional)</span></label>
-                  <input type="text" name="horaVuelta" class="form-control" placeholder="HH:MM" maxlength="5" pattern="^([01]\\d|2[0-3]):([0-5]\\d)$">
+                  <label class="form-label" for="v_horaVuelta">Hora de Vuelta<span style="color: var(--gris);"></span></label>
+                  <input type="text" id="v_horaVuelta" name="horaVuelta" class="form-control" placeholder="HH:MM" maxlength="5" pattern="^([01]\\d|2[0-3]):([0-5]\\d)$">
                 </div>
               </div>
             </div>
@@ -588,7 +592,7 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
           <div class="modal-content text-start" style="font-weight: normal;">
             <div class="modal-header bg-danger text-white">
               <h5 class="modal-title">Eliminar Vuelo</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body">
               <p>¿Estás seguro que deseas eliminar el vuelo de <strong id="eliminar-origen"></strong> a <strong id="eliminar-destino"></strong>?</p>
@@ -603,55 +607,59 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
     </div>
   <?php endif; ?>
 
-  <!-- FOOTER -->
-
-  <section class="footer-section">
-    <footer>
-      <div class="row">
-        <div class="col">
-          <h3><strong>Contactanos</strong><div class="subrayado"></div></h3>
-          <ul>
-            <li><i class="bi bi-envelope-at"></i><a>vuela@seguro.com.ar</a></li>
-            <li><i class="bi bi-whatsapp"></i><a>+54 9 341 234 5678</a></li>
-            <li><i class="bi bi-pen"></i><a href="../CONTACTO/contacto.html">Formulario de Contacto</a></li>
-          </ul>
-        </div>
-        <div class="col">
-          <h3><strong>Mapa de sitio</strong><div class="subrayado"></div></h3>
-          <ul>
-            <li><a href="../INDEX/index.php">Inicio</a></li>
-            <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
-            <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
-            <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
-            <li><a href="">Mi Perfil</a></li>
-          </ul>
-        </div>
-        <div class="col">
-          <h3><strong>Ubicación</strong><div class="subrayado"></div></h3>
-          <ul>
-            <li><a href="https://maps.app.goo.gl/UvsGpUXHgk9GkpYP9" target="_blank">Zeballos 1341</a></li>
-            <li><a href="https://maps.app.goo.gl/87YMeSLAp74gH9mc7" target="_blank">Rosario, Santa Fe</a></li>
-            <li><a href="https://maps.app.goo.gl/u94xc8o8xowqeTuz8" target="_blank">Argentina</a></li>
-          </ul>
-        </div>
-        <div class="col">
-          <h3><strong>Newsletter</strong><div class="subrayado"></div></h3>
-          <form>
-            <i class="bi bi-envelope"></i>
-            <input type="email" placeholder="Ingrese su mail">
-            <button type="submit"><i class="bi bi-arrow-return-left"></i></button>
-          </form>
-          <div class="iconos-redes">
-            <i class="bi bi-facebook"></i>
-            <i class="bi bi-instagram"></i>
-            <i class="bi bi-twitter-x"></i>
-          </div>
+ <!-- FOOTER -->
+<section class="footer-section">
+  <footer>
+    <div class="row">
+      <div class="col">
+        <h3><strong>Contactanos</strong><span class="subrayado"></span></h3>
+        <ul>
+          <li><i class="bi bi-envelope-at" aria-hidden="true"></i><a href="mailto:vuela@seguro.com.ar">vuela@seguro.com.ar</a></li>
+          <li><i class="bi bi-whatsapp" aria-hidden="true"></i><a href="#">+54 9 341 234 5678</a></li>
+          <li><i class="bi bi-pen" aria-hidden="true"></i><a href="../CONTACTO/contacto.php">Formulario de Contacto</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><strong>Mapa de sitio</strong><span class="subrayado"></span></h3>
+        <ul>
+          <li><a href="index.php">Inicio</a></li>
+          <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
+          <li><a href="../PROMOCIONES/promociones.php">Promociones</a></li>
+          <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
+          <li><a href="">Mi Perfil</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><strong>Ubicación</strong><span class="subrayado"></span></h3>
+        <ul>
+          <li><a href="https://maps.app.goo.gl/UvsGpUXHgk9GkpYP9" target="_blank">Zeballos 1341</a></li>
+          <li><a href="https://maps.app.goo.gl/87YMeSLAp74gH9mc7" target="_blank">Rosario, Santa Fe</a></li>
+          <li><a href="https://maps.app.goo.gl/u94xc8o8xowqeTuz8" target="_blank">Argentina</a></li>
+        </ul>
+      </div>
+      <div class="col">
+        <h3><strong>Newsletter</strong><span class="subrayado"></span></h3>
+        <form>
+          <label for="newsletterEmail" class="visually-hidden">Correo electrónico para el newsletter</label>
+          <i class="bi bi-envelope" aria-hidden="true"></i>
+          <input type="email" id="newsletterEmail" placeholder="Ingrese su mail">
+          <button type="submit" aria-label="Suscribirse al newsletter">
+            <i class="bi bi-arrow-return-left" aria-hidden="true"></i>
+          </button>
+        </form>
+        <div class="iconos-redes">
+          <i class="bi bi-facebook" aria-hidden="true"></i>
+          <i class="bi bi-instagram" aria-hidden="true"></i>
+          <i class="bi bi-twitter-x" aria-hidden="true"></i>
         </div>
       </div>
-      <hr>
-      <p class="copyright">© 2026 VuelaSeguro. Todos los derechos reservados.</p>
-    </footer>
-  </section>
+    </div>
+    <hr>
+    <p class="copyright">&copy; 2026 VuelaSeguro. Todos los derechos reservados. Licenciado bajo
+      <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons BY 4.0</a>.
+    </p>
+  </footer>
+</section>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -707,7 +715,7 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
           // panel de editar vuelo con header amarilo
           modalHeader.classList.remove('bg-primary','text-white');
           modalHeader.classList.add('bg-warning','text-dark');
-          modalTitle.innerHTML = '<i class="bi bi-pencil-square me-2"></i>Modificar Vuelo';
+          modalTitle.innerHTML = '<i class="bi bi-pencil-square me-2" aria-hidden="true"></i>Modificar Vuelo';
           
           // carga los datos del vuelo en el form antes de abrir el modal
           form.querySelector('input[name="origen"]').value = dataset.origen || '';
@@ -741,7 +749,7 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
       modalEl.addEventListener('hidden.bs.modal', function(){
         modalHeader.classList.remove('bg-warning','text-dark');
         modalHeader.classList.add('bg-primary','text-white');
-        modalTitle.innerHTML = '<i class="bi bi-airplane-fill me-2"></i>Registrar Nuevo Vuelo';
+        modalTitle.innerHTML = '<i class="bi bi-airplane-fill me-2" aria-hidden="true"></i>Registrar Nuevo Vuelo';
         modalSubmitBtn.textContent = 'Guardar Vuelo';
         modalSubmitBtn.classList.remove('btn-warning','text-white');
         modalSubmitBtn.classList.add('btn-success');
@@ -814,8 +822,8 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="border-radius:12px;border:none;">
       <div class="modal-header bg-success text-white">
-        <h5 class="modal-title"><i class="bi bi-check-circle me-2"></i>Confirmar reserva</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <h5 class="modal-title"><i class="bi bi-check-circle me-2" aria-hidden="true"></i>Confirmar reserva</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body" style="padding:24px;">
         <p style="font-size:1rem;margin-bottom:12px;">
@@ -829,8 +837,8 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
         </div>
         <!-- Selector de promo si hay -->
         <div id="bloquePromo" style="display:none; margin-top:12px; background:#e8f8ee; border:1px solid #9dd8b5; border-radius:10px; padding:14px;">
-          <p style="font-weight:700; color:var(--verde); margin-bottom:8px;">
-            <i class="bi bi-tag-fill me-1"></i> Hay una promoción disponible para este vuelo
+          <p style="font-weight:700; color:#0f5132; margin-bottom:8px;">
+            <i class="bi bi-tag-fill me-1" aria-hidden="true"></i> Hay una promoción disponible para este vuelo
           </p>
           <p id="modalPromoDesc" style="font-size:.9rem; color:#333; margin-bottom:10px;"></p>
           <div class="d-flex gap-3 align-items-center">
@@ -857,14 +865,14 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
         </div>
         <div class="mt-3">
           <label for="cantidadPasajeros" style="font-weight:600; font-size:.9rem;">Cantidad de pasajeros</label>
-          <input type="number" class="form-control mt-1" id="cantidadPasajeros" name="cantidadPasajeros" min="1" max="9" value="1" style="width:120px;">
-          <div id="errorPasajeros" class="text-danger mt-1" style="font-size:.85rem; display:none;">Ingresá una cantidad válida (entre 1 y 9).</div>
+          <input type="number" class="form-control mt-1" id="cantidadPasajeros" name="cantidadPasajeros" min="1" max="9" value="1" style="width:120px;" aria-describedby="errorPasajeros" aria-invalid="false">
+          <div id="errorPasajeros" class="text-danger mt-1" role="alert" style="font-size:.85rem; display:none;">Ingresá una cantidad válida (entre 1 y 9).</div>
         </div>
         <p class="mt-3 mb-0" style="font-size:.88rem; color:var(--gris);">Podrás pagar desde tu perfil en <strong>Reservas activas</strong>.</p>
       </div>
       <div class="modal-footer bg-light">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <form method="POST" action="vuelos.php" id="formComprar" onsubmit="var c=document.getElementById('cantidadPasajeros'),e=document.getElementById('errorPasajeros'),v=parseInt(c.value);if(!v||v<1||v>9){e.style.display='block';return false;}e.style.display='none';document.getElementById('cantidadPasajerosHidden').value=v;">
+        <form method="POST" action="vuelos.php" id="formComprar" onsubmit="var c=document.getElementById('cantidadPasajeros'),e=document.getElementById('errorPasajeros'),v=parseInt(c.value);if(!v||v<1||v>9){e.style.display='block';c.setAttribute('aria-invalid','true');c.focus();return false;}e.style.display='none';c.setAttribute('aria-invalid','false');document.getElementById('cantidadPasajerosHidden').value=v;">
           <input type="hidden" name="comprar_vuelo" value="1">
           <input type="hidden" name="codVuelo" id="codVueloComprar" value="">
           <input type="hidden" name="cantidadPasajeros" id="cantidadPasajerosHidden" value="1">
@@ -872,7 +880,7 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
           <input type="hidden" name="codPromoUsar" id="codPromoUsarHidden" value="0">
           <input type="hidden" name="precioFinal" id="precioFinalHidden" value="0">
           <button type="submit" class="btn btn-success" style="font-weight:600;">
-            <i class="bi bi-check-lg me-1"></i>Sí, reservar
+            <i class="bi bi-check-lg me-1" aria-hidden="true"></i>Sí, reservar
           </button>
         </form>
       </div>
