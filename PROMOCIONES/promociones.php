@@ -533,17 +533,6 @@ function estadoBadge($estado) {
               <input type="text" class="form-control" value="<?= htmlspecialchars($miAerolineaNombre ?: 'Aerolínea no encontrada') ?>" disabled readonly>
               <input type="hidden" name="codAerolinea" value="<?= $codUsuario ?>">
               <label class="form-label fw-bold" for="aerolineaCrear">Aerolínea</label>
-              <?php if ($aerolineasRes && mysqli_num_rows($aerolineasRes) > 0): ?>
-                <select class="form-select" id="aerolineaCrear" name="codAerolinea">
-                  <option value="0">Sin aerolínea específica</option>
-                  <?php mysqli_data_seek($aerolineasRes, 0); while ($al = mysqli_fetch_assoc($aerolineasRes)): ?>
-                    <option value="<?= $al['codAerolinea'] ?>"><?= htmlspecialchars($al['nombreAerolinea']) ?></option>
-                  <?php endwhile; ?>
-                </select>
-              <?php else: ?>
-                <input type="hidden" name="codAerolinea" value="0">
-                <input type="text" id="aerolineaCrear" class="form-control" value="Sin aerolíneas en BD" disabled>
-              <?php endif; ?>
             </div>
             <div class="col-md-6">
               <label class="form-label fw-bold" for="descuentoCrear">Descuento (%) <span class="text-danger">*</span></label>
