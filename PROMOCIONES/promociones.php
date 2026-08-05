@@ -532,7 +532,6 @@ function estadoBadge($estado) {
               <label class="form-label fw-bold">Aerolínea</label>
               <input type="text" class="form-control" value="<?= htmlspecialchars($miAerolineaNombre ?: 'Aerolínea no encontrada') ?>" disabled readonly>
               <input type="hidden" name="codAerolinea" value="<?= $codUsuario ?>">
-              <label class="form-label fw-bold" for="aerolineaCrear">Aerolínea</label>
             </div>
             <div class="col-md-6">
               <label class="form-label fw-bold" for="descuentoCrear">Descuento (%) <span class="text-danger">*</span></label>
