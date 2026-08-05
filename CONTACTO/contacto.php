@@ -4,8 +4,23 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include_once('../mailer.inc');
+if (!is_readable(__DIR__ . '/../mailer.inc')) {
+    die('Error: no se puede cargar mailer.inc');
+}
+require_once __DIR__ . '/../mailer.inc';
 
+if (!defined('MAIL_REMITENTE_EMAIL')) {
+    define('MAIL_REMITENTE_EMAIL', 'vuelaseguro.soporte@gmail.com');
+}
+
+if (!function_exists('enviarMail')) {
+    function enviarMail(string $destinatario, string $asunto, string $contenidoHtml): bool {
+        $cabeceras  = "MIME-Version: 1.0\r\n";
+        $cabeceras .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $cabeceras .= "From: " . MAIL_REMITENTE_EMAIL . "\r\n";
+        return mail($destinatario, $asunto, $contenidoHtml, $cabeceras);
+    }
+}
 
 $mensaje      = "";
 $tipo_mensaje = "";
@@ -23,14 +38,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensaje      = "El email ingresado no es válido.";
         $tipo_mensaje = "warning";
     } else {
-        $html = plantillaMail(
-            'Nueva consulta de contacto',
-            '<strong>Nombre:</strong> ' . htmlspecialchars($nombre) . '<br>' .
-            '<strong>Email:</strong> ' . htmlspecialchars($email) . '<br><br>' .
-            '<strong>Mensaje:</strong><br>' . nl2br(htmlspecialchars($mensaje_usuario)),
-            'Responder a ' . htmlspecialchars($nombre),
-            'mailto:' . rawurlencode($email)
-        );
+        $html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Nueva consulta de contacto</title></head><body>' .
+                '<h1>Nueva consulta de contacto</h1>' .
+                '<p><strong>Nombre:</strong> ' . htmlspecialchars($nombre) . '</p>' .
+                '<p><strong>Email:</strong> ' . htmlspecialchars($email) . '</p>' .
+                '<p><strong>Mensaje:</strong><br>' . nl2br(htmlspecialchars($mensaje_usuario)) . '</p>' .
+                '<p><a href="mailto:' . htmlspecialchars($email) . '">Responder a ' . htmlspecialchars($nombre) . '</a></p>' .
+                '</body></html>';
 
         if (enviarMail(MAIL_REMITENTE_EMAIL, 'Nueva consulta de contacto – VuelaSeguro', $html)) {
             $enviado      = true;
