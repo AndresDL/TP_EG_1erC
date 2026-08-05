@@ -41,14 +41,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
       $mensaje = "Ya tenés una reserva pendiente de pago para este vuelo. Revisá tu perfil.";
       $tipo_mensaje = "warning";
     } else {
-      $hoy = date('Y-m-d');
-      $sqlInsertReserva = "INSERT INTO reservas (codUsuario, codVuelo, fechaReserva, estadoReserva, cantidadPasajeros) VALUES ($codUsuarioCompra, $codVueloCompra, '$hoy', 'Pendiente de pago', $cantidadPasajeros)";
+      $hoy           = date('Y-m-d');
+      $aplicarPromo  = ($_POST['aplicarPromo'] ?? 'no') === 'si';
+      $codPromoUsar  = (int)($_POST['codPromoUsar'] ?? 0);
+      $precioFinal   = (int)($_POST['precioFinal'] ?? 0);
+
+      // Verificar que la promo es válida para este usuario si la quiere aplicar
+      $promoValida = false;
+      if ($aplicarPromo && $codPromoUsar > 0) {
+          $chkPromo = mysqli_query($link,
+              "SELECT s.codSolicitud FROM solicitudes_promo s
+               INNER JOIN promociones p ON s.codPromocion = p.codPromocion
+               INNER JOIN vuelos v ON v.codAerolinea = p.codAerolinea
+               WHERE s.codUsuario = $codUsuarioCompra
+               AND s.codPromocion = $codPromoUsar
+               AND s.usada = 0
+               AND p.estadoPromocion = 'aprobada'
+               AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
+               AND v.codVuelo = $codVueloCompra");
+          $promoValida = ($chkPromo && mysqli_num_rows($chkPromo) > 0);
+      }
+
+      $codPromoGuardar = $promoValida ? $codPromoUsar : 'NULL';
+      $precioGuardar   = $precioFinal > 0 ? $precioFinal : 'NULL';
+
+      $sqlInsertReserva = "INSERT INTO reservas (codUsuario, codVuelo, fechaReserva, estadoReserva, cantidadPasajeros, codPromocion, precioFinal)
+                           VALUES ($codUsuarioCompra, $codVueloCompra, '$hoy', 'Pendiente de pago', $cantidadPasajeros, $codPromoGuardar, $precioGuardar)";
+
       if (mysqli_query($link, $sqlInsertReserva)) {
-        // Decremento asientos según cantidad elegida
-        mysqli_query($link, "UPDATE vuelos SET asientosDisponibles = asientosDisponibles - $cantidadPasajeros WHERE codVuelo = $codVueloCompra");
-        header('Location: vuelos.php?msg=reservado');
-        exit;
+          $codReservaNew = mysqli_insert_id($link);
+
+          // Descontar asientos
+          mysqli_query($link, "UPDATE vuelos SET asientosDisponibles = asientosDisponibles - $cantidadPasajeros WHERE codVuelo = $codVueloCompra");
+
+          // Marcar la promo como usada para que no se pueda volver a aplicar
+          if ($promoValida) {
+              mysqli_query($link, "UPDATE solicitudes_promo SET usada = 1, codReserva = $codReservaNew WHERE codUsuario = $codUsuarioCompra AND codPromocion = $codPromoUsar");
+          }
+
+          header('Location: vuelos.php?msg=reservado');
+          exit;
       } else {
+          $mensaje = "Error al procesar la reserva. Por favor, intentalo nuevamente.";
+          $tipo_mensaje = "danger";
         $mensaje = "Error al procesar la reserva: " . mysqli_error($link);
         $tipo_mensaje = "danger";
       }
@@ -247,6 +282,7 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
          WHERE p.estadoPromocion = 'aprobada'
          AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
          AND s.codUsuario = $codUsuarioVuelos
+         AND s.usada = 0
          ORDER BY p.descuentoPromocion DESC");
     if ($resPromosVuelos) {
         while ($pv = mysqli_fetch_assoc($resPromosVuelos)) {
@@ -464,7 +500,8 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
                         '<?php echo addslashes($vuelo['destinoVuelo']); ?>',
                         <?php echo $precioOriginal; ?>,
                         <?php echo $precioConDescuento ?? 'null'; ?>,
-                        '<?php echo $promoVuelo ? addslashes($promoVuelo['descripcionPromocion']) : ''; ?>'
+                        '<?php echo $promoVuelo ? addslashes($promoVuelo['descripcionPromocion']) : ''; ?>',
+                        <?php echo $promoVuelo ? (int)$promoVuelo['codPromocion'] : 0; ?>
                       )">
                       COMPRAR
                     </button>
@@ -735,27 +772,29 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
       if (pasajeros) params.append('pasajeros', pasajeros);
       window.location.href = 'vuelos.php?' + params.toString();
     }
-    function confirmarCompra(codVuelo, origen, destino, precioOriginal, precioConPromo, promoDesc) {
-      document.getElementById('codVueloComprar').value = codVuelo;
+    function confirmarCompra(codVuelo, origen, destino, precioOriginal, precioConPromo, promoDesc, codPromo) {
+      document.getElementById('codVueloComprar').value    = codVuelo;
       document.getElementById('modalRutaTexto').textContent = origen + ' → ' + destino;
+      document.getElementById('codPromoUsarHidden').value  = codPromo || 0;
 
-      var bloquePromo = document.getElementById('bloquePromo');
+      var bloquePromo  = document.getElementById('bloquePromo');
       var bloqueNormal = document.getElementById('bloquePrecionormal');
 
-      if (precioConPromo !== null && precioConPromo !== undefined) {
-        // Hay promo disponible
-        bloquePromo.style.display = 'block';
+      if (precioConPromo !== null && precioConPromo !== undefined && codPromo > 0) {
+        bloquePromo.style.display  = 'block';
         bloqueNormal.style.display = 'none';
-        document.getElementById('modalPromoDesc').textContent = promoDesc;
-        document.getElementById('modalPrecioSin').textContent = '$' + precioOriginal.toLocaleString('es-AR');
-        document.getElementById('modalPrecioConPromo').textContent = '$' + precioConPromo.toLocaleString('es-AR');
-        // Reset radio
+        document.getElementById('modalPromoDesc').textContent        = promoDesc;
+        document.getElementById('modalPrecioSin').textContent        = '$' + precioOriginal.toLocaleString('es-AR');
+        document.getElementById('modalPrecioConPromo').textContent   = '$' + precioConPromo.toLocaleString('es-AR');
         document.getElementById('promoSi').checked = true;
+        document.getElementById('aplicarPromoHidden').value = 'si';
+        document.getElementById('precioFinalHidden').value  = precioConPromo;
       } else {
-        // Sin promo
-        bloquePromo.style.display = 'none';
+        bloquePromo.style.display  = 'none';
         bloqueNormal.style.display = 'block';
         document.getElementById('modalPrecioTexto').textContent = '$' + precioOriginal.toLocaleString('es-AR');
+        document.getElementById('aplicarPromoHidden').value = 'no';
+        document.getElementById('precioFinalHidden').value  = precioOriginal;
       }
 
       var modal = new bootstrap.Modal(document.getElementById('modalConfirmarCompra'));
@@ -763,7 +802,18 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
     }
 
     function actualizarPrecioModal() {
-      // Solo visual — la lógica de descuento se puede aplicar en el servidor si se agrega un campo hidden
+      var si = document.getElementById('promoSi');
+      var aplicar = document.getElementById('aplicarPromoHidden');
+      var precioEl = document.getElementById('precioFinalHidden');
+      var con  = document.getElementById('modalPrecioConPromo');
+      var sin  = document.getElementById('modalPrecioSin');
+      if (si && si.checked) {
+        aplicar.value  = 'si';
+        precioEl.value = con ? con.textContent.replace(/[^0-9]/g,'') : 0;
+      } else {
+        aplicar.value  = 'no';
+        precioEl.value = sin ? sin.textContent.replace(/[^0-9]/g,'') : 0;
+      }
     }
   </script>
 
@@ -826,6 +876,9 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
           <input type="hidden" name="comprar_vuelo" value="1">
           <input type="hidden" name="codVuelo" id="codVueloComprar" value="">
           <input type="hidden" name="cantidadPasajeros" id="cantidadPasajerosHidden" value="1">
+          <input type="hidden" name="aplicarPromo" id="aplicarPromoHidden" value="no">
+          <input type="hidden" name="codPromoUsar" id="codPromoUsarHidden" value="0">
+          <input type="hidden" name="precioFinal" id="precioFinalHidden" value="0">
           <button type="submit" class="btn btn-success" style="font-weight:600;">
             <i class="bi bi-check-lg me-1" aria-hidden="true"></i>Sí, reservar
           </button>

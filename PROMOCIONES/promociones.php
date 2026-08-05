@@ -34,7 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_promo']) && $es
     $descripcion  = mysqli_real_escape_string($link, trim($_POST['descripcionPromocion'] ?? ''));
     $descuento    = (float)($_POST['descuentoPromocion'] ?? 0);
     $vigencia     = mysqli_real_escape_string($link, trim($_POST['vigenciaPromocion'] ?? ''));
-    $codAerolinea = (int)($_POST['codAerolinea'] ?? 0);
+    // La aerolínea NO se toma del formulario: siempre es la del CEO logueado.
+    // Así evitamos que se pueda elegir (o forzar por POST) otra aerolínea.
+    $codAerolinea = $codUsuario;
 
     $imagen = '';
     if (!empty($_FILES['imagenFile']['name'])) {
@@ -181,17 +183,27 @@ if ($esAdmin) {
     $cantPendientes = $pendientesRes ? mysqli_num_rows($pendientesRes) : 0;
 }
 
-// Mis promos para CEO
+// Mis promos para CEO — solo las de la aerolínea logueada
 $misPromosRes = null;
 if ($esCEO) {
     $misPromosRes = mysqli_query($link,
         "SELECT p.*, a.nombreAerolinea FROM promociones p
          LEFT JOIN aerolineas a ON p.codAerolinea = a.codAerolinea
+         WHERE p.codAerolinea = $codUsuario
          ORDER BY p.codPromocion DESC");
 }
 
 // Aerolíneas
 $aerolineasRes = mysqli_query($link, "SELECT codAerolinea, nombreAerolinea FROM aerolineas ORDER BY nombreAerolinea");
+
+// Aerolínea del CEO logueado (para autocompletar el modal de Nueva Promoción)
+$miAerolineaNombre = '';
+if ($esCEO) {
+    $miAeroRes = mysqli_query($link, "SELECT nombreAerolinea FROM aerolineas WHERE codAerolinea = $codUsuario LIMIT 1");
+    if ($miAeroRes && mysqli_num_rows($miAeroRes) > 0) {
+        $miAerolineaNombre = mysqli_fetch_assoc($miAeroRes)['nombreAerolinea'];
+    }
+}
 
 function urlPromos($pagina, $busqueda = '') {
     $p = ['pagina' => $pagina];
@@ -515,6 +527,9 @@ function estadoBadge($estado) {
           </p>
           <div class="row g-3">
             <div class="col-md-6">
+              <label class="form-label fw-bold">Aerolínea</label>
+              <input type="text" class="form-control" value="<?= htmlspecialchars($miAerolineaNombre ?: 'Aerolínea no encontrada') ?>" disabled readonly>
+              <input type="hidden" name="codAerolinea" value="<?= $codUsuario ?>">
               <label class="form-label fw-bold" for="aerolineaCrear">Aerolínea</label>
               <?php if ($aerolineasRes && mysqli_num_rows($aerolineasRes) > 0): ?>
                 <select class="form-select" id="aerolineaCrear" name="codAerolinea">
