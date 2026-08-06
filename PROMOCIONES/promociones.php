@@ -239,7 +239,9 @@ function estadoBadge($estado) {
   <nav class="navbar-custom">
 
         <div class="logo-wrap">
-          <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+          <a href="../INDEX/index.php">
+            <img src="../INDEX/logo-vuelaseguro.png" class="logo-vuela" alt="Logo VuelaSeguro">
+          </a>
         </div>
 
         <ul class="nav-links">
@@ -530,18 +532,6 @@ function estadoBadge($estado) {
               <label class="form-label fw-bold">Aerolínea</label>
               <input type="text" class="form-control" value="<?= htmlspecialchars($miAerolineaNombre ?: 'Aerolínea no encontrada') ?>" disabled readonly>
               <input type="hidden" name="codAerolinea" value="<?= $codUsuario ?>">
-              <label class="form-label fw-bold" for="aerolineaCrear">Aerolínea</label>
-              <?php if ($aerolineasRes && mysqli_num_rows($aerolineasRes) > 0): ?>
-                <select class="form-select" id="aerolineaCrear" name="codAerolinea">
-                  <option value="0">Sin aerolínea específica</option>
-                  <?php mysqli_data_seek($aerolineasRes, 0); while ($al = mysqli_fetch_assoc($aerolineasRes)): ?>
-                    <option value="<?= $al['codAerolinea'] ?>"><?= htmlspecialchars($al['nombreAerolinea']) ?></option>
-                  <?php endwhile; ?>
-                </select>
-              <?php else: ?>
-                <input type="hidden" name="codAerolinea" value="0">
-                <input type="text" id="aerolineaCrear" class="form-control" value="Sin aerolíneas en BD" disabled>
-              <?php endif; ?>
             </div>
             <div class="col-md-6">
               <label class="form-label fw-bold" for="descuentoCrear">Descuento (%) <span class="text-danger">*</span></label>
@@ -702,7 +692,11 @@ function estadoBadge($estado) {
           <li><a href="../VUELOS/vuelos.php">Vuelos</a></li>
           <li><a href="promociones.php">Promociones</a></li>
           <li><a href="../NOVEDADES/novedades.php">Novedades</a></li>
-	  <li><a href="">Mi Perfil</a></li>
+	        <?php if (isset($_SESSION['nombreUsuario'])): ?>
+            <li><a href="../PERFIL/perfiles.php">Mi Perfil</a></li>
+          <?php else: ?>
+            <li><a href="../LOGIN/login.php">Mi Perfil</a></li>
+          <?php endif; ?>
         </ul>
       </div>
       <div class="col">
