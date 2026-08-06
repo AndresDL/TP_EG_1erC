@@ -43,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
       $tipo_mensaje = "warning";
     } else {
       $hoy = date('Y-m-d');
-      $sqlInsertReserva = "INSERT INTO reservas (codUsuario, codVuelo, fechaReserva, estadoReserva, cantidadPasajeros, codPromocion, precioFinal) VALUES ($codUsuarioCompra, $codVueloCompra, '$hoy', 'Pendiente de pago', $cantidadPasajeros, NULL, $precioFinal)";
       $hoy           = date('Y-m-d');
       $aplicarPromo  = ($_POST['aplicarPromo'] ?? 'no') === 'si';
       $codPromoUsar  = (int)($_POST['codPromoUsar'] ?? 0);

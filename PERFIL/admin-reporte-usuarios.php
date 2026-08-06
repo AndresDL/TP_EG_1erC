@@ -200,7 +200,6 @@ $nombreAdmin = $_SESSION['nombreUsuario'];
         <select name="tipo" class="filtro-input" style="cursor:pointer;">
             <option value="">Todos los tipos</option>
             <option value="usuario" <?php echo $filtroTipo === 'usuario' ? 'selected' : ''; ?>>Cliente</option>
-            <option value="CEO"     <?php echo $filtroTipo === 'CEO'     ? 'selected' : ''; ?>>CEO</option>
             <option value="admin"   <?php echo $filtroTipo === 'admin'   ? 'selected' : ''; ?>>Admin</option>
         </select>
 
@@ -245,7 +244,6 @@ $nombreAdmin = $_SESSION['nombreUsuario'];
                         };
                         $badgeLabel = match($u['tipoUsuario']) {
                             'admin'   => 'Admin',
-                            'CEO'     => 'CEO',
                             default   => 'Cliente',
                         };
                     ?>
