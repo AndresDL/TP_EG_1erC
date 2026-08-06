@@ -8,7 +8,7 @@ if (!$link) {
 }
 
 // Verificar si el usuario es admin
-if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['tipoUsuario'] != 'admin') {
+if (!isset($_SESSION['tipoUsuario'] ) || $_SESSION['tipoUsuario'] != 'admin') {
     header("Location: ../INDEX/index.php");
     exit();
 }

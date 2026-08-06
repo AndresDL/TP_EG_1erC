@@ -45,7 +45,11 @@ if (isset($_SESSION['message']) && $_SESSION['message'] !== '') {
 
       if(password_verify($clave, $claveHash)){
 
-        if (isset($row['emailVerificado']) && $row['emailVerificado'] == 0) {
+        if ($row['tipoUsuario'] === 'CEO') {
+
+          $message = 'Las cuentas de aerolínea inician sesión desde el acceso para aerolíneas.';
+
+        } elseif (isset($row['emailVerificado']) && $row['emailVerificado'] == 0) {
 
           $message = 'Tenés que verificar tu email antes de iniciar sesión. Revisá tu casilla de correo.';
 
