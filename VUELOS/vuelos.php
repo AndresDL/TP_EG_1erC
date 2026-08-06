@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
           exit;
       } else {
           $mensaje = "Error al procesar la reserva. Por favor, intentalo nuevamente.";
-          $tipo_mensaje = "danger";
+          
         $mensaje = "Error al procesar la reserva: " . mysqli_error($link);
         $tipo_mensaje = "danger";
       }
