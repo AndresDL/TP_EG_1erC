@@ -4,7 +4,7 @@ include_once('../conexion.inc');
 if (!$link) {
     die("Error de conexión a la base de datos.");
 }
-// include_once($_SERVER['DOCUMENT_ROOT'] . '/conexion.inc');
+include_once($_SERVER['DOCUMENT_ROOT'] . '/conexioni.inc');
 
 // Variables de control de rol estamos probando
 $esCEO = (isset($_SESSION['tipoUsuario']) && $_SESSION['tipoUsuario'] === 'CEO');
@@ -141,22 +141,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_vuelo']) && $es
         $precio = (float)$_POST['precio'];
         $asientos = (int)$_POST['asientos'];
         $codAerolinea = $codAerolineaCEO;
-        if($_POST['fechaVuelta'] === ''){
-          $fechaVuelta = NULL;
-        } else {
-          $fechaVuelta = $_POST['fechaVuelta'];
-        }
-        $horaVuelta = $_POST['horaVuelta'];
+        $fechaVueltaPost = trim($_POST['fechaVuelta'] ?? '');
+        $horaVueltaPost  = trim($_POST['horaVuelta'] ?? '');
+        $fechaVuelta = $fechaVueltaPost !== '' ? $fechaVueltaPost : null;
+        $horaVuelta  = $horaVueltaPost !== '' ? $horaVueltaPost : null;
         if ($precio < 0 || $precio > 10000000) {
             $mensaje = "El precio debe estar entre 0 y 10.000.000.";
             $tipo_mensaje = "danger";
         } elseif ($asientos < 1 || $asientos > 300) {
             $mensaje = "La cantidad de asientos debe ser entre 1 y 300.";
             $tipo_mensaje = "danger";
+        } elseif ($fechaVuelta !== null && strtotime($fechaVuelta) < strtotime($fecha)) {
+            $mensaje = "La fecha de vuelta no puede ser anterior a la fecha de ida.";
+            $tipo_mensaje = "danger";
         } else {
-            $sqlInsert = "INSERT INTO vuelos (origenVuelo, destinoVuelo, fechaSalidaVuelo, horaSalidaVuelo, precioVuelo, asientosDisponibles, codAerolinea, fechaVuelta, horaVuelta) 
-                          VALUES ('$origen', '$destino', '$fecha', '$hora', $precio, $asientos, $codAerolinea, '$fechaVuelta', '$horaVuelta')";
+            $fechaVueltaSql = $fechaVuelta !== null ? "'" . mysqli_real_escape_string($link, $fechaVuelta) . "'" : "NULL";
+            $horaVueltaSql  = $horaVuelta  !== null ? "'" . mysqli_real_escape_string($link, $horaVuelta)  . "'" : "NULL";
 
+            $sqlInsert = "INSERT INTO vuelos (origenVuelo, destinoVuelo, fechaSalidaVuelo, horaSalidaVuelo, precioVuelo, asientosDisponibles, codAerolinea, fechaVuelta, horaVuelta) 
+                          VALUES ('$origen', '$destino', '$fecha', '$hora', $precio, $asientos, $codAerolinea, $fechaVueltaSql, $horaVueltaSql)";
             if (mysqli_query($link, $sqlInsert)) {
                 header('Location: vuelos.php?msg=creado');
                 exit;
@@ -187,8 +190,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_vuelo']) && $e
   $precio = (float)$_POST['precio'];
   $asientos = (int)$_POST['asientos'];
   $codAerolinea = $codAerolineaCEO;
-  $fechaVuelta = $_POST['fechaVuelta'];
-  $horaVuelta = $_POST['horaVuelta'];
+  $fechaVueltaPost = trim($_POST['fechaVuelta'] ?? '');
+  $horaVueltaPost  = trim($_POST['horaVuelta'] ?? '');
+  $fechaVuelta = $fechaVueltaPost !== '' ? $fechaVueltaPost : null;
+  $horaVuelta  = $horaVueltaPost !== '' ? $horaVueltaPost : null;
 
     if (empty($_POST['origen']) || empty($_POST['destino']) || empty($_POST['fecha']) || empty($_POST['hora']) || empty($_POST['precio']) || empty($_POST['asientos'])) {
         $mensaje = "Por favor, complete todos los campos para actualizar el vuelo.";
@@ -196,10 +201,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_vuelo']) && $e
     } elseif ($precio < 0 || $precio > 10000000) {
         $mensaje = "El precio debe estar entre 0 y 10.000.000.";
         $tipo_mensaje = "danger";
-    } elseif ($asientos < 1 || $asientos > 300) {
+      } elseif ($asientos < 1 || $asientos > 300) {
         $mensaje = "La cantidad de asientos debe ser entre 1 y 300.";
         $tipo_mensaje = "danger";
+    } elseif ($fechaVuelta !== null && strtotime($fechaVuelta) < strtotime($fecha)) {
+        $mensaje = "La fecha de vuelta no puede ser anterior a la fecha de ida.";
+        $tipo_mensaje = "danger";
     } else {
+        $fechaVueltaSql = $fechaVuelta !== null ? "'" . mysqli_real_escape_string($link, $fechaVuelta) . "'" : "NULL";
+        $horaVueltaSql  = $horaVuelta  !== null ? "'" . mysqli_real_escape_string($link, $horaVuelta)  . "'" : "NULL";
+
         $sqlUpdate = "UPDATE vuelos SET 
                         origenVuelo='$origen', 
                         destinoVuelo='$destino', 
@@ -208,10 +219,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_vuelo']) && $e
                         precioVuelo=$precio, 
                         asientosDisponibles=$asientos, 
                         codAerolinea=$codAerolinea, 
-                        fechaVuelta='$fechaVuelta', 
-                        horaVuelta='$horaVuelta' 
+                        fechaVuelta=$fechaVueltaSql, 
+                        horaVuelta=$horaVueltaSql 
                       WHERE codVuelo=$idEditar AND codAerolinea = $codAerolineaCEO";
-
         if (mysqli_query($link, $sqlUpdate)) {
             header('Location: vuelos.php?msg=actualizado');
             exit;
@@ -663,6 +673,27 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+
+function limitarFechas(idaId, vueltaId) {
+  var hoy = new Date().toISOString().split('T')[0];
+  var ida = document.getElementById(idaId);
+  var vuelta = document.getElementById(vueltaId);
+  if (!ida || !vuelta) return;
+
+  ida.min = hoy;
+  vuelta.min = ida.value || hoy;
+
+  ida.addEventListener('change', function () {
+    vuelta.min = ida.value || hoy;
+    if (vuelta.value && vuelta.value < vuelta.min) {
+      vuelta.value = '';
+    }
+  });
+}
+
+limitarFechas('sb_fechaIda', 'sb_fechaVuelta');
+limitarFechas('v_fecha', 'v_fechaVuelta');
+
     (function(){
       var modalEl = document.getElementById('modalCrearVuelo');
       if (!modalEl) return;
@@ -764,12 +795,10 @@ if ($codUsuarioVuelos > 0 && ($_SESSION['tipoUsuario'] ?? '') === 'usuario') {
       var destino = document.getElementById('sb_destino').value.trim();
       var fechaIda = document.getElementById('sb_fechaIda').value;
       var fechaVuelta = document.getElementById('sb_fechaVuelta').value;
-      var pasajeros = document.getElementById('sb_pasajeros').value.trim();
       if (origen) params.append('origen', origen);
       if (destino) params.append('destino', destino);
       if (fechaIda) params.append('fechaIda', fechaIda);
       if (fechaVuelta) params.append('fechaVuelta', fechaVuelta);
-      if (pasajeros) params.append('pasajeros', pasajeros);
       window.location.href = 'vuelos.php?' + params.toString();
     }
     function confirmarCompra(codVuelo, origen, destino, precioOriginal, precioConPromo, promoDesc, codPromo) {

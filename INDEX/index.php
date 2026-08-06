@@ -116,9 +116,6 @@ function claseNovedad($tipo) {
       <input type="date" id="inputFechaVuelta" onchange="setFecha(this,'textoVuelta','Vuelta')"/>
     </div>
 
-    <label for="pasajeros" class="visually-hidden">Cantidad de pasajeros</label>
-    <input class="filtro-input" type="number" placeholder="👤 Pasajeros" min="1" id="pasajeros" style="max-width:130px;"/>
-
     <button class="btn-buscar-hero" onclick="buscarVuelos()">
       <i class="bi bi-search me-1" aria-hidden="true"></i> Buscar
     </button>
@@ -327,6 +324,10 @@ function claseNovedad($tipo) {
 var fechaIdaVal = '';
 var fechaVueltaVal = '';
 
+var hoyISO = new Date().toISOString().split('T')[0];
+document.getElementById('inputFechaIda').min = hoyISO;
+document.getElementById('inputFechaVuelta').min = hoyISO;
+
 function setFecha(input, labelId, fallback) {
 
    const el = document.getElementById(labelId);
@@ -337,13 +338,20 @@ function setFecha(input, labelId, fallback) {
     } else {
         el.textContent = fallback;
         el.style.color = 'var(--gris)';
+        if (input.id === 'inputFechaIda') {
+    var vuelta = document.getElementById('inputFechaVuelta');
+    vuelta.min = input.value || hoyISO;
+    if (vuelta.value && vuelta.value < vuelta.min) {
+        vuelta.value = '';
+        setFecha(vuelta, 'textoVuelta', 'Vuelta');
+    }
+}
     }
 }
 
 function buscarVuelos() {
     var origen = document.getElementById('origen').value.trim();
     var destino = document.getElementById('destino').value.trim();
-    var pasajeros = document.getElementById('pasajeros').value.trim();
     var fechaIda = document.getElementById ('inputFechaIda').value;
     var fechaVuelta = document.getElementById ('inputFechaVuelta').value;
     var params = new URLSearchParams();
@@ -351,7 +359,6 @@ function buscarVuelos() {
     if (destino) params.append('destino', destino);
     if (fechaIda) params.append('fechaIda', fechaIda);
     if (fechaVuelta) params.append('fechaVuelta', fechaVuelta);
-    if (pasajeros) params.append('pasajeros', pasajeros);
     window.location.href = '../VUELOS/vuelos.php?' + params.toString();
 }
 </script>
