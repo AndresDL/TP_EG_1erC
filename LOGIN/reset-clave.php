@@ -28,7 +28,7 @@
     if ($row) {
       $tokenValido = true;
     } else {
-      $message = 'El link de recuperación no es válido o ya expiró. Solicitá uno nuevo.';
+      $message = 'El enlace de recuperación no es válido o ya expiró. Solicitá uno nuevo.';
     }
   }
 

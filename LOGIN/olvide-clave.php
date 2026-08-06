@@ -32,7 +32,7 @@
 
     // Por seguridad mostramos el mismo mensaje exista o no el email,
     // así no revelamos qué direcciones están registradas.
-    $message = 'Si el email ingresado existe en nuestro sistema, te enviamos un link para restablecer tu contraseña.';
+    $message = 'Si el email ingresado existe en nuestro sistema, te enviamos un enlace para restablecer tu contraseña.';
     $enviado = true;
 
     if ($row) {
