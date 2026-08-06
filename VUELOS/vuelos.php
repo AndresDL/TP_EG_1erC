@@ -29,13 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
 
   $fechaHoraVuelo = $vueloData ? strtotime($vueloData['fechaSalidaVuelo'] . ' ' . $vueloData['horaSalidaVuelo']) : false;
 
-  if (!$vueloData || $fechaHoraVuelo < time()) {
+  if (!$vueloData || $fechaHoraVuelo < time()) { //validaciones de fecha, asientos, hora
     $mensaje = "No es posible reservar este vuelo porque su fecha de salida ya pasó.";
     $tipo_mensaje = "danger";
   } elseif ($vueloData['asientosDisponibles'] < $cantidadPasajeros) {
     $mensaje = "Lo sentimos, no hay suficientes asientos disponibles para este vuelo. Asientos disponibles: {$vueloData['asientosDisponibles']}.";
     $tipo_mensaje = "danger";
-  } else {
+  } else { //valida si falta pagarla para que no haya otra reserva pendiente
     $resExiste = mysqli_query($link, "SELECT codReserva FROM reservas WHERE codUsuario = $codUsuarioCompra AND codVuelo = $codVueloCompra AND estadoReserva = 'Pendiente de pago'");
     if (mysqli_num_rows($resExiste) > 0) {
       $mensaje = "Ya tenés una reserva pendiente de pago para este vuelo. Revisá tu perfil.";
@@ -109,6 +109,7 @@ if (isset($_GET['msg'])) {
     }
 }
 
+//ABM VUELOS TRAER VUELO A EDITAR
 //  Traigo lista de aerolíneas
 $queryAerolineas = mysqli_query($link, "SELECT codAerolinea, nombreAerolinea FROM aerolineas ORDER BY nombreAerolinea ASC");
 $aerolineas = [];
@@ -135,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_vuelo']) && $es
     } elseif (strtotime($_POST['fecha']) < strtotime(date('Y-m-d'))) {
         $mensaje = "La fecha del vuelo no puede ser anterior a la fecha actual.";
     } else {
-        $origen = mysqli_real_escape_string($link, $_POST['origen']);
+        $origen = mysqli_real_escape_string($link, $_POST['origen']); //para inyeccion sql
         $destino = mysqli_real_escape_string($link, $_POST['destino']);
         $fecha = $_POST['fecha'];
         $hora = $_POST['hora'];
@@ -191,7 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_vuelo']) && $e
   $precio = (float)$_POST['precio'];
   $asientos = (int)$_POST['asientos'];
   $codAerolinea = $codAerolineaCEO;
-  $fechaVueltaPost = trim($_POST['fechaVuelta'] ?? '');
+  $fechaVueltaPost = trim($_POST['fechaVuelta'] ?? ''); //limpia espacios en blanco
   $horaVueltaPost  = trim($_POST['horaVuelta'] ?? '');
   $fechaVuelta = $fechaVueltaPost !== '' ? $fechaVueltaPost : null;
   $horaVuelta  = $horaVueltaPost !== '' ? $horaVueltaPost : null;
@@ -745,6 +746,24 @@ limitarFechas('v_fecha', 'v_fechaVuelta');
 
         setupHoraInput(horaInput);
         setupHoraInput(horaVueltaInput);
+
+        // Bloquea el input de hora vuelta si no hay fecha vuelta cargada
+        var fechaVueltaInput = form.querySelector('input[name="fechaVuelta"]');
+        var actualizarEstadoHoraVuelta = function(){
+          if (!fechaVueltaInput || !horaVueltaInput) return;
+          if (fechaVueltaInput.value) {
+            horaVueltaInput.disabled = false;
+          } else {
+            horaVueltaInput.value = '';
+            horaVueltaInput.disabled = true;
+          }
+        };
+        if (fechaVueltaInput) {
+          fechaVueltaInput.addEventListener('change', actualizarEstadoHoraVuelta);
+          fechaVueltaInput.addEventListener('input', actualizarEstadoHoraVuelta);
+        }
+        actualizarEstadoHoraVuelta();
+
       document.querySelectorAll('.btn-edit').forEach(function(btn){
         btn.addEventListener('click', function(){
           var dataset = btn.dataset;
@@ -762,6 +781,7 @@ limitarFechas('v_fecha', 'v_fechaVuelta');
           form.querySelector('input[name="asientos"]').value = dataset.asientos || '';
           form.querySelector('input[name="fechaVuelta"]').value = dataset.fechaVuelta || '';
           form.querySelector('input[name="horaVuelta"]').value = dataset.horaVuelta || '';
+          actualizarEstadoHoraVuelta();
           
           idInput.value = dataset.id || '';
           modalSubmitBtn.textContent = 'Actualizar Vuelo';
@@ -792,6 +812,7 @@ limitarFechas('v_fecha', 'v_fechaVuelta');
         modalSubmitBtn.name = 'crear_vuelo';
         idInput.value = '';
         form.reset();
+        actualizarEstadoHoraVuelta();
       });
     })();
     function aplicarFiltros(){
