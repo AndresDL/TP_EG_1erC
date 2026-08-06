@@ -1,10 +1,10 @@
 <?php
 $link = null;
-include_once('../conexion.inc');
+include_once('../conexioni.inc');
 if (!$link) {
     die("Error de conexión a la base de datos.");
 }
-include_once($_SERVER['DOCUMENT_ROOT'] . '/conexioni.inc');
+//include_once($_SERVER['DOCUMENT_ROOT'] . '/conexioni.inc');
 
 // Variables de control de rol estamos probando
 $esCEO = (isset($_SESSION['tipoUsuario']) && $_SESSION['tipoUsuario'] === 'CEO');
@@ -272,8 +272,6 @@ if ($filtroFechaIda) {
 if ($filtroFechaVuelta) {
     $filtroFechaVueltaEsc = mysqli_real_escape_string($link, $filtroFechaVuelta);
     $condiciones[] = "v.fechaVuelta = '$filtroFechaVueltaEsc'";
-} else if ($filtroFechaIda && !$filtroFechaVuelta) {
-    $condiciones[] = "(v.fechaVuelta IS NULL OR v.fechaVuelta = '0000-00-00')";
 }
 
 $sql = "SELECT v.*, a.nombreAerolinea FROM vuelos v LEFT JOIN aerolineas a ON v.codAerolinea = a.codAerolinea";
