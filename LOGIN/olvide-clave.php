@@ -115,7 +115,7 @@
     <div class="contacto-form-card">
 
       <h2>Recuperar contraseña</h2>
-      <h4>Ingresá el email de tu cuenta y te mandamos un link para restablecerla</h4>
+      <h4>Ingresá el email de tu cuenta y te mandamos un enlace para restablecerla</h4>
 
       <?php if($enviado): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -133,7 +133,7 @@
         </div>
 
         <div class="d-flex justify-content-end">
-          <button type="submit" class="btn-enviar">Enviar link</button>
+          <button type="submit" class="btn-enviar">Enviar enlace</button>
         </div>
 
       </form>
