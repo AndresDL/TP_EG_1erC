@@ -27,7 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
   $resVuelo  = mysqli_query($link, "SELECT asientosDisponibles, fechaSalidaVuelo, horaSalidaVuelo, precioVuelo FROM vuelos WHERE codVuelo = $codVueloCompra");
   $vueloData = mysqli_fetch_assoc($resVuelo);
 
-  $precioFinal = $vueloData ? $vueloData['precioVuelo'] * $cantidadPasajeros : 0;
   $fechaHoraVuelo = $vueloData ? strtotime($vueloData['fechaSalidaVuelo'] . ' ' . $vueloData['horaSalidaVuelo']) : false;
 
   if (!$vueloData || $fechaHoraVuelo < time()) {
@@ -47,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
       $hoy           = date('Y-m-d');
       $aplicarPromo  = ($_POST['aplicarPromo'] ?? 'no') === 'si';
       $codPromoUsar  = (int)($_POST['codPromoUsar'] ?? 0);
-      $precioFinal   = (int)($_POST['precioFinal'] ?? 0);
+      $precioFinal   = (int)($_POST['precioFinal'] ?? 0) * $cantidadPasajeros;
 
       // Verificar que la promo es válida para este usuario si la quiere aplicar
       $promoValida = false;

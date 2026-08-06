@@ -33,7 +33,7 @@ if (isset($_GET['cancelar']) && !empty($_SESSION) && $_SESSION['tipoUsuario'] ==
     exit;
 }
 
-// Los mensajeeeees
+// Los mensajes
 $msgPerfil = '';
 $tipoPerfil = 'success';
 if (isset($_GET['msg'])) {
@@ -50,7 +50,7 @@ $reservasActivas = [];
 if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
     $codUsuarioRes = (int)$_SESSION['codUsuario'];
     $resActivas = mysqli_query($link, 
-    "SELECT r.codReserva, r.estadoReserva, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo, v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo, v.codAerolinea, a.nombreAerolinea,
+    "SELECT r.codReserva, r.estadoReserva,r.precioFinal, r.cantidadPasajeros,r.codPromocion, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo, v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo, v.codAerolinea, a.nombreAerolinea,
             p.descuentoPromocion, p.descripcionPromocion
      FROM reservas r
      JOIN vuelos v ON r.codVuelo = v.codVuelo
@@ -59,7 +59,7 @@ if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
          AND p.estadoPromocion = 'aprobada'
          AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
      WHERE r.codUsuario = $codUsuarioRes AND r.estadoReserva = 'Pendiente de pago'
-     GROUP BY r.codReserva, r.estadoReserva, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo,
+     GROUP BY r.codReserva, r.estadoReserva, r.precioFinal, r.cantidadPasajeros,r.codPromocion, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo,
               v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo, v.codAerolinea,
               a.nombreAerolinea, p.descuentoPromocion, p.descripcionPromocion
      ORDER BY r.fechaReserva DESC");
@@ -93,16 +93,16 @@ if (!empty($_SESSION) && $_SESSION['tipoUsuario'] === 'usuario') {
     $offset = ($paginaActual - 1) * $porPagina;
 
     $resHistorial = mysqli_query($link,
-    "SELECT r.codReserva, r.estadoReserva, r.fechaReserva, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo, v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo, v.codAerolinea, a.nombreAerolinea,
+    "SELECT r.codReserva, r.estadoReserva, r.fechaReserva, r.precioFinal, r.cantidadPasajeros,r.codPromocion, v.origenVuelo, v.destinoVuelo, v.fechaSalidaVuelo, v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo, v.codAerolinea, a.nombreAerolinea,
             p.descuentoPromocion, p.descripcionPromocion
      FROM reservas r
      JOIN vuelos v ON r.codVuelo = v.codVuelo
      LEFT JOIN aerolineas a ON v.codAerolinea = a.codAerolinea
      LEFT JOIN promociones p ON p.codAerolinea = v.codAerolinea
-         AND p.estadoPromocion = 'aprobada'
-         AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
+            AND p.estadoPromocion = 'aprobada'
+            AND (p.vigenciaPromocion IS NULL OR p.vigenciaPromocion >= CURDATE())
      WHERE r.codUsuario = $codUsuarioHist AND r.estadoReserva = 'Confirmada'
-     GROUP BY r.codReserva, r.estadoReserva, r.fechaReserva, v.origenVuelo, v.destinoVuelo,
+     GROUP BY r.codReserva, r.estadoReserva, r.fechaReserva, r.precioFinal, r.cantidadPasajeros,r.codPromocion, v.origenVuelo, v.destinoVuelo,
               v.fechaSalidaVuelo, v.horaSalidaVuelo, v.fechaVuelta, v.horaVuelta, v.precioVuelo,
               v.codAerolinea, a.nombreAerolinea, p.descuentoPromocion, p.descripcionPromocion
      ORDER BY r.fechaReserva DESC
@@ -281,18 +281,22 @@ body {
             <span style="background:#fff3cd;color:#856404;border-radius:6px;padding:2px 10px;font-size:.78rem;font-weight:600;">Pendiente de pago</span>
             </div>
             <div class="vuelo-ruta">
-            <div>
-                <span class="ciudad-nombre"><?php echo htmlspecialchars($res['origenVuelo']); ?></span>
-                <span class="ciudad-horario">Salida: <?php echo date('d/m/Y', strtotime($res['fechaSalidaVuelo'])); ?> — <?php echo date('H:i', strtotime($res['horaSalidaVuelo'])); ?> hs</span>
-            </div>
-            <div>
-                <span class="ciudad-nombre"><?php echo htmlspecialchars($res['destinoVuelo']); ?></span>
-                <?php if (!empty($res['fechaVuelta']) && $res['fechaVuelta'] !== '0000-00-00'): ?>
-                <span class="ciudad-horario">Vuelta: <?php echo date('d/m/Y', strtotime($res['fechaVuelta'])); ?> — <?php echo date('H:i', strtotime($res['horaVuelta'])); ?> hs</span>
-                <?php else: ?>
-                <span class="ciudad-horario" style="color:var(--gris);">Solo ida</span>
-                <?php endif; ?>
-            </div>
+                <div>
+                    <span class="ciudad-nombre"><?php echo htmlspecialchars($res['origenVuelo']); ?></span>
+                    <span class="ciudad-horario">Salida: <?php echo date('d/m/Y', strtotime($res['fechaSalidaVuelo'])); ?> — <?php echo date('H:i', strtotime($res['horaSalidaVuelo'])); ?> hs</span>
+                </div>
+                <div>
+                    <span class="ciudad-nombre"><?php echo htmlspecialchars($res['destinoVuelo']); ?></span>
+                    <?php if (!empty($res['fechaVuelta']) && $res['fechaVuelta'] !== '0000-00-00'): ?>
+                    <span class="ciudad-horario">Vuelta: <?php echo date('d/m/Y', strtotime($res['fechaVuelta'])); ?> — <?php echo date('H:i', strtotime($res['horaVuelta'])); ?> hs</span>
+                    <?php else: ?>
+                    <span class="ciudad-horario" style="color:var(--gris);">Solo ida</span>
+                    <?php endif; ?>
+                </div>
+                <div>
+                    <span class="ciudad-nombre">Cantidad de pasajeros</span> <!--Reutilizo clase ciudad-nombre-->
+                    <span class="ciudad-horario">Esta reserva esta hecha para: <?php echo htmlspecialchars($res['cantidadPasajeros']); ?> persona(s)</span>
+                </div>
             </div>
         </div>
   <div class="vuelo-precio-col" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:140px;gap:8px;">
@@ -300,12 +304,12 @@ body {
     <?php
       $descRes = !empty($res['descuentoPromocion']) ? (float)$res['descuentoPromocion'] : 0;
       $precioFinalRes = $descRes > 0
-        ? round((float)$res['precioVuelo'] * (1 - $descRes / 100))
-        : (float)$res['precioVuelo'];
+        ? round((float)$res['precioFinal'] * (1 - $descRes / 100))
+        : (float)$res['precioFinal'];
     ?>
-    <?php if ($descRes > 0): ?>
+    <?php if (($descRes > 0) && ($res['codPromocion'] != NULL)): ?>
       <span style="text-decoration:line-through;color:var(--gris);font-size:.9rem;">
-        $<?php echo number_format((float)$res['precioVuelo'], 0, ',', '.'); ?>
+        $<?php echo number_format((float)$res['precioFinal'], 0, ',', '.'); ?>
       </span>
       <span class="precio-valor" style="color:var(--verde);">
         $<?php echo number_format($precioFinalRes, 0, ',', '.'); ?>
@@ -314,7 +318,7 @@ body {
         <?php echo number_format($descRes, 0); ?>% OFF
       </span>
     <?php else: ?>
-      <span class="precio-valor">$<?php echo number_format((float)$res['precioVuelo'], 0, ',', '.'); ?></span>
+      <span class="precio-valor">$<?php echo number_format((float)$res['precioFinal'], 0, ',', '.'); ?></span>
     <?php endif; ?>
     <button type="button"
         class="btn btn-success btn-sm w-100"
@@ -369,9 +373,13 @@ body {
                 <span class="ciudad-horario" style="color:var(--gris);">Solo ida</span>
                 <?php endif; ?>
             </div>
+            <div>
+                <span class="ciudad-nombre">Cantidad de pasajeros</span> <!--Reutilizo clase ciudad-nombre-->
+                <span class="ciudad-horario">Esta reserva esta hecha para: <?php echo htmlspecialchars($com['cantidadPasajeros']); ?> persona(s)</span>
+            </div>
             </div>
             <div style="margin-top:8px;">
-                <span class="ciudad-horario" style="color:var(--gris);">Comprado el <?php echo date('d/m/Y', strtotime($com['fechaReserva'])); ?> — Reserva #<?php echo $com['codReserva']; ?></span>
+                <span class="ciudad-horario" style="color:var(--gris);"><strong>Comprado</strong> el <?php echo date('d/m/Y', strtotime($com['fechaReserva'])); ?> — Reserva #<?php echo $com['codReserva']; ?></span>
             </div>
         </div>
   <div class="vuelo-precio-col" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:140px;gap:8px;">
@@ -379,12 +387,12 @@ body {
     <?php
       $descCom = !empty($com['descuentoPromocion']) ? (float)$com['descuentoPromocion'] : 0;
       $precioFinalCom = $descCom > 0
-        ? round((float)$com['precioVuelo'] * (1 - $descCom / 100))
-        : (float)$com['precioVuelo'];
+        ? round((float)$com['precioFinal'] * (1 - $descCom / 100))
+        : (float)$com['precioFinal'];
     ?>
-    <?php if ($descCom > 0): ?>
+    <?php if (($descCom > 0) && ($com['codPromocion'] != NULL)): ?>
       <span style="text-decoration:line-through;color:var(--gris);font-size:.9rem;">
-        $<?php echo number_format((float)$com['precioVuelo'], 0, ',', '.'); ?>
+        $<?php echo number_format((float)$com['precioFinal'], 0, ',', '.'); ?>
       </span>
       <span class="precio-valor" style="color:var(--verde);">
         $<?php echo number_format($precioFinalCom, 0, ',', '.'); ?>
@@ -393,7 +401,7 @@ body {
         <?php echo number_format($descCom, 0); ?>% OFF — <?php echo htmlspecialchars($com['descripcionPromocion']); ?>
       </span>
     <?php else: ?>
-      <span class="precio-valor">$<?php echo number_format((float)$com['precioVuelo'], 0, ',', '.'); ?></span>
+      <span class="precio-valor">$<?php echo number_format((float)$com['precioFinal'], 0, ',', '.'); ?></span>
     <?php endif; ?>
   </div>
     </div>

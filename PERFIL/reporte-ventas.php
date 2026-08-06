@@ -22,7 +22,7 @@
         $fechaHasta = $tmp;
     }
 
-    $sql = "SELECT r.codReserva, u.nombreUsuario, v.codVuelo, v.origenVuelo, v.destinoVuelo,
+    $sql = "SELECT r.codReserva, r.precioFinal, r.cantidadPasajeros, u.nombreUsuario, v.codVuelo, v.origenVuelo, v.destinoVuelo,
                    v.fechaSalidaVuelo, v.precioVuelo, r.fechaReserva, r.estadoReserva
             FROM reservas r
             INNER JOIN vuelos v ON r.codVuelo = v.codVuelo
@@ -55,7 +55,7 @@
     $totalRecaudado = 0;
     while ($fila = mysqli_fetch_assoc($resultado)) {
         $ventas[] = $fila;
-        $totalRecaudado += $fila['precioVuelo'];
+        $totalRecaudado += $fila['precioFinal'];
     }
     $cantidadVentas = count($ventas);
 
@@ -219,6 +219,7 @@
                 <tr>
                     <th>Reserva</th>
                     <th>Pasajero</th>
+                    <th>Acompañantes</th>
                     <th>Vuelo</th>
                     <th>Origen</th>
                     <th>Destino</th>
@@ -239,12 +240,13 @@
                         <tr>
                             <td>#<?php echo htmlspecialchars($venta['codReserva']); ?></td>
                             <td><?php echo htmlspecialchars($venta['nombreUsuario']); ?></td>
+                            <td><?php echo number_format($venta['cantidadPasajeros'] - 1); ?></td>
                             <td>#<?php echo htmlspecialchars($venta['codVuelo']); ?></td>
                             <td><?php echo htmlspecialchars($venta['origenVuelo']); ?></td>
                             <td><?php echo htmlspecialchars($venta['destinoVuelo']); ?></td>
                             <td><?php echo htmlspecialchars($venta['fechaSalidaVuelo']); ?></td>
                             <td><?php echo htmlspecialchars($venta['fechaReserva']); ?></td>
-                            <td>$<?php echo number_format($venta['precioVuelo'], 0, ',', '.'); ?></td>
+                            <td>$<?php echo number_format($venta['precioFinal'], 0, ',', '.'); ?></td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
