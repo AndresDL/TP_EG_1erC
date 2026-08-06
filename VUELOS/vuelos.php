@@ -4,9 +4,9 @@ include_once('../conexion.inc');
 if (!$link) {
     die("Error de conexión a la base de datos.");
 }
-//include_once($_SERVER['DOCUMENT_ROOT'] . '/conexioni.inc');
 
-// Variables de control de rol estamos probando
+
+// Variables de control de rol
 $esCEO = (isset($_SESSION['tipoUsuario']) && $_SESSION['tipoUsuario'] === 'CEO');
 $codAerolineaCEO = $esCEO ? $_SESSION['codUsuario'] : null;
 
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['comprar_vuelo'])) {
   }
   $codVueloCompra    = (int)$_POST['codVuelo'];
   $codUsuarioCompra  = (int)$_SESSION['codUsuario'];
-  $cantidadPasajeros = max(1, min(9, (int)($_POST['cantidadPasajeros'] ?? 1)));
+  $cantidadPasajeros = max(1, min(9, (int)($_POST['cantidadPasajeros'] ?? 1))); //usa 1 como default
 
   $resVuelo  = mysqli_query($link, "SELECT asientosDisponibles, fechaSalidaVuelo, horaSalidaVuelo, precioVuelo FROM vuelos WHERE codVuelo = $codVueloCompra");
   $vueloData = mysqli_fetch_assoc($resVuelo);
