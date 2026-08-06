@@ -1,6 +1,6 @@
 <?php
 $link = null;
-include_once('../conexioni.inc');
+include_once('../conexion.inc');
 if (!$link) {
     die("Error de conexión a la base de datos.");
 }
