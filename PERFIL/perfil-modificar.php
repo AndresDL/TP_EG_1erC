@@ -162,7 +162,7 @@
  
         <div class="mb-3">
           <label class="form-label">Nombre</label>
-          <input type="text" class="form-control" name="nombre1"
+          <input type="text" class="form-control" name="nombre"
                  placeholder="Tu nombre"
                  pattern="[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]{2,50}"
                  minlength="2" maxlength="50"
