@@ -7,6 +7,12 @@ if (!$link) {
 }
 
 
+// Verificar si el usuario es admin
+if (!isset($_SESSION['usuario']) || $_SESSION['usuario']!= 'admin') {
+    header("Location: ../INDEX/index.php");
+    exit();
+}
+
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])){
 
     $validarQuery = 'DELETE FROM aerolineas WHERE codAerolinea = ? ';

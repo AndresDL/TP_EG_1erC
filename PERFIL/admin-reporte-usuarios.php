@@ -50,12 +50,18 @@ if ($paginaActual > $totalPaginas) $paginaActual = $totalPaginas;
 $offset = ($paginaActual - 1) * $porPagina;
 
 // ─── ESTADÍSTICAS FIJAS ──────────────────────
+// Nota: la tabla usuarios ya no debería tener tipoUsuario = 'CEO'; ese rol
+// vive en la tabla aerolineas (ver aerolinea-login.php). Por eso las
+// aerolíneas se cuentan aparte, con su propia query.
 $conteosPorTipo = [];
 $resTipos = mysqli_query($link, "SELECT tipoUsuario, COUNT(*) AS total FROM usuarios GROUP BY tipoUsuario");
 while ($fila = mysqli_fetch_assoc($resTipos)) {
     $conteosPorTipo[$fila['tipoUsuario']] = (int)$fila['total'];
 }
 $totalGeneral = array_sum($conteosPorTipo);
+
+$resAerolineas = mysqli_query($link, "SELECT COUNT(*) AS total FROM aerolineas");
+$totalAerolineas = (int)mysqli_fetch_assoc($resAerolineas)['total'];
 
 // ─── LISTADO PAGINADO ──────────────────────────────────────────────────────────
 $sqlLista = "SELECT u.codUsuario, u.nombreUsuario, u.emailUsuario, u.telefonoUsuario,
@@ -175,8 +181,9 @@ $nombreAdmin = $_SESSION['nombreUsuario'];
         </div>
         <div class="col-md-3" style="margin-bottom:1rem;">
             <div class="contacto-form-card" style="margin:0;padding:20px;">
-                <h4 style="border:none;padding:0;margin-bottom:4px;">CEOs</h4>
-                <h2 style="color:var(--azul);margin:0;"><?php echo $conteosPorTipo['CEO'] ?? 0; ?></h2>
+                <h4 style="border:none;padding:0;margin-bottom:4px;">Aerolíneas registradas</h4>
+                <h2 style="color:var(--azul);margin:0;"><?php echo $totalAerolineas; ?></h2>
+                <small style="color:var(--gris);">Ver detalle en <a href="../AEROLINEA/aerolinea-lista.php">Aerolíneas</a></small>
             </div>
         </div>
         <div class="col-md-3" style="margin-bottom:1rem;">
@@ -200,7 +207,6 @@ $nombreAdmin = $_SESSION['nombreUsuario'];
         <select name="tipo" class="filtro-input" style="cursor:pointer;">
             <option value="">Todos los tipos</option>
             <option value="usuario" <?php echo $filtroTipo === 'usuario' ? 'selected' : ''; ?>>Cliente</option>
-            <option value="CEO"     <?php echo $filtroTipo === 'CEO'     ? 'selected' : ''; ?>>CEO</option>
             <option value="admin"   <?php echo $filtroTipo === 'admin'   ? 'selected' : ''; ?>>Admin</option>
         </select>
 
@@ -240,12 +246,10 @@ $nombreAdmin = $_SESSION['nombreUsuario'];
                         // Badge de tipo reutilizando colores de las variables globales
                         $badgeColor = match($u['tipoUsuario']) {
                             'admin'   => 'var(--rojo)',
-                            'CEO'     => 'var(--azul)',
                             default   => 'var(--verde)',
                         };
                         $badgeLabel = match($u['tipoUsuario']) {
                             'admin'   => 'Admin',
-                            'CEO'     => 'CEO',
                             default   => 'Cliente',
                         };
                     ?>
