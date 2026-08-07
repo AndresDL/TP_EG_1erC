@@ -133,6 +133,7 @@
               <i class="bi bi-eye"></i>
             </button>
           </div>
+          <div class="form-text text-muted">Mínimo 8 caracteres con al menos una letra y un número.</div>
         </div>
 
         <div class="mb-3">
@@ -143,6 +144,7 @@
               <i class="bi bi-eye"></i>
             </button>
           </div>
+          <div class="form-text text-muted">Mínimo 8 caracteres con al menos una letra y un número.</div>
         </div>
 
         <div class="d-flex justify-content-end">
