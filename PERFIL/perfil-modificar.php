@@ -167,6 +167,7 @@
                  pattern="[A-Za-záéíóúÁÉÍÓÚñÑüÜ\s]{2,50}"
                  minlength="2" maxlength="50"
                  title="Solo letras y espacios, entre 2 y 50 caracteres"
+                 value="<?php echo htmlspecialchars($row['nombreUsuario']); ?>"
                  required>
           <div class="form-text text-muted">Solo letras, mínimo 2 caracteres.</div>
         </div>
@@ -177,6 +178,7 @@
                  placeholder="ejemplo@correo.com"
                  maxlength="100"
                  title="Ingresá un email válido, por ejemplo: nombre@correo.com"
+                 value="<?php echo htmlspecialchars($row['emailUsuario']); ?>"
                  required>
         </div>
 
@@ -187,6 +189,7 @@
                  pattern="[0-9\+\-\s]{7,20}"
                  minlength="7" maxlength="20"
                  title="Solo números, espacios, + o -, entre 7 y 20 caracteres. Ej: 3411234567"
+                  value="<?php echo htmlspecialchars($row['telefonoUsuario']); ?>"
                  required>
           <div class="form-text text-muted">Solo números, entre 7 y 20 dígitos.</div>
         </div>
