@@ -23,10 +23,10 @@ if (isset($_GET['cancelar']) && !empty($_SESSION) && $_SESSION['tipoUsuario'] ==
     $codReservaCancelar = (int)$_GET['cancelar'];
     $codUsuarioCancelar = (int)$_SESSION['codUsuario'];
     // Recuperar asineto
-    $resReservaCancelar = mysqli_query($link, "SELECT codVuelo FROM reservas WHERE codReserva = $codReservaCancelar AND codUsuario = $codUsuarioCancelar");
+    $resReservaCancelar = mysqli_query($link, "SELECT codVuelo, cantidadPasajeros FROM reservas WHERE codReserva = $codReservaCancelar AND codUsuario = $codUsuarioCancelar");
     $dataCancelar = mysqli_fetch_assoc($resReservaCancelar);
     if ($dataCancelar) {
-        mysqli_query($link, "UPDATE vuelos SET asientosDisponibles = asientosDisponibles + 1 WHERE codVuelo = ". (int)$dataCancelar['codVuelo']);
+        mysqli_query($link, "UPDATE vuelos SET asientosDisponibles = asientosDisponibles + " . (int)$dataCancelar['cantidadPasajeros'] . " WHERE codVuelo = ". (int)$dataCancelar['codVuelo']);
         mysqli_query($link, "DELETE FROM reservas WHERE codReserva =$codReservaCancelar AND codUsuario = $codUsuarioCancelar");
     }
     header('Location: perfiles.php?msg=cancelado');
